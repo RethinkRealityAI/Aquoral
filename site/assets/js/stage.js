@@ -699,7 +699,7 @@ async function boot() {
       /* Desktop: when the cap lifts off, pull back a little so the cap clears the menu bar (phones already leave room). */
       if (s && b && !isPhone && s.dyn.explode > 0) s.dyn.fit = Math.max(s.base.fit, 1.34);
       /* Desktop twin shot: step back a little so the pair and the gluten-free badge clear the screen edge and the cards. */
-      if (s && b && !isPhone && s.dyn.twin > 0) s.dyn.fit = Math.max(s.base.fit, 1.62);
+      if (s && b && !isPhone && s.dyn.twin > 0) { s.dyn.fit = Math.max(s.base.fit, 1.62); s.dyn.lift = .9; }
     }
     anatomy.style.setProperty('--progress', p.toFixed(4));
   }
@@ -717,7 +717,7 @@ async function boot() {
       const sH = r.height / vh * WORLD_H, sW = r.width / vh * WORLD_H;
       const sc = Math.min(sH / P.fit, sW / P.fitW);
       const [x, y] = px2w(r.left + r.width / 2, r.bottom);
-      const pose = { ...P, x, y: y + (sH - sc * P.fit) * .5, s: sc };
+      const pose = { ...P, x, y: y + (sH - sc * P.fit) * .5 + (P.lift || 0) * (sH - sc) * .5, s: sc };   // lift: centre a stepped-back bottle in its slot instead of resting it on the bottom
       for (const k of KEYS) acc[k] += pose[k] * w;
       const yw = P.spin > .5 ? spin : (P.yaw ?? 0);
       sx += Math.sin(yw) * w; cx += Math.cos(yw) * w; wsum += w; maxW = Math.max(maxW, w);
