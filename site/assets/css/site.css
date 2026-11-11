@@ -653,3 +653,36 @@ html { overflow-x: clip; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-hero > .wrap { padding-inline: calc(var(--gutter) + 10px); } }
   :root[data-theme="dark"] .page-hero > .wrap { padding-inline: calc(var(--gutter) + 10px); }
 }
+
+/* ================= Section rhythm polish (Dapo 2026-11-11: "most premium, polished") =================
+   One rule in both themes: contrasting sections float as rounded panels on the page.
+   Light theme: Institut Pasteur is a navy panel on white. Dark theme: it is a lit blue panel between white islands. */
+:root { --panel-inset-y: clamp(8px, 1.2vw, 18px); --panel-inset-x: clamp(8px, 1.6vw, 24px); --panel-radius: clamp(28px, 3vw, 44px); }
+.tech-section { background: var(--surface-sunken); isolation: isolate; }
+.tech-section::before { content: ""; position: absolute; inset: var(--panel-inset-y) var(--panel-inset-x); z-index: -2; border-radius: var(--panel-radius); pointer-events: none;
+  background: radial-gradient(60% 70% at 78% 45%, rgba(212,42,142,.24), transparent 70%), radial-gradient(55% 60% at 12% 85%, rgba(111,194,236,.2), transparent 70%), linear-gradient(160deg, #0B1833 0%, #10285A 55%, #0B1833 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(163,218,244,.14), 0 50px 100px -50px rgba(11,24,51,.7); }
+.tech-bg { inset: var(--panel-inset-y) var(--panel-inset-x); z-index: -1; border-radius: var(--panel-radius); background-size: 1400px auto; background-position: 0 0; animation: tech-drift-bg 40s linear infinite; }
+@keyframes tech-drift-bg { to { background-position: -120px 60px; } }
+@media (max-width: 860px) { .tech-section > .wrap { padding-inline: calc(var(--gutter) + 10px); } }
+/* Dark theme: the blue panel is lit at its rim so it reads as its own surface on the navy page */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tech-section { background: var(--tide-950); }
+  :root:not([data-theme="light"]) .tech-section::before { box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1px rgba(163,218,244,.28), 0 0 70px -20px rgba(111,194,236,.35), 0 0 120px -40px rgba(212,42,142,.3); } }
+:root[data-theme="dark"] .tech-section { background: var(--tide-950); }
+:root[data-theme="dark"] .tech-section::before { box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1px rgba(163,218,244,.28), 0 0 70px -20px rgba(111,194,236,.35), 0 0 120px -40px rgba(212,42,142,.3); }
+
+/* Dark-theme white islands: a lit sky rim, a soft halo into the navy, and the packaging swirl rising from the lower corner */
+[data-island]::before { inset: var(--panel-inset-y) var(--panel-inset-x); border-radius: var(--panel-radius);
+  background: url(../img/swirl-light.svg) center bottom -1px / 100% min(46%, 300px) no-repeat, radial-gradient(120% 70% at 50% 0%, #fff 60%, var(--sky-50)), #fff;
+  box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(163,218,244,.35), 0 0 60px -18px rgba(111,194,236,.45), 0 40px 90px -50px rgba(111,194,236,.5); }
+
+/* Panels rise into place as they scroll in: a short lift and the corners settling (scroll-linked, so it never runs on its own) */
+@supports (animation-timeline: view()) {
+  [data-island]::before, .tech-section::before, .tech-bg { animation: panel-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+  .tech-bg { animation: panel-rise linear both, tech-drift-bg 40s linear infinite; animation-timeline: view(), auto; animation-range: entry 0% entry 45%, normal; }
+  @keyframes panel-rise { from { transform: translateY(48px) scale(.965); border-radius: calc(var(--panel-radius) * 1.8); opacity: .4; } }
+  @media (prefers-reduced-motion: reduce) { @keyframes panel-rise { from { opacity: .4; } } }
+}
+/* Dark theme: one even navy canvas under the panels (the sunken tint only muddied the seams between them) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .section-sunken:not([data-island]) { background: var(--tide-950); } }
+:root[data-theme="dark"] .section-sunken:not([data-island]) { background: var(--tide-950); }

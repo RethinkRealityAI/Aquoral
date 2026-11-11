@@ -86,7 +86,9 @@ How the website applies it:
   `<script>try{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>`
 - **Controls.** The header has a switch (`button.theme-toggle[role=switch][data-theme-toggle]`: sun on a day-sky track, moon on a night track). The phone menu has an Appearance control (`.theme-choice`, Auto / Light / Dark radio group) so a visitor can hand the choice back to their device. Switching spreads the new theme out from the control with a View Transition; under reduced motion it is a short cross-fade. Open tabs stay in sync.
 - **White islands in the dark theme.** To keep dark pages from becoming one block of navy, a section marked `data-island` (and every inner-page `.page-hero`) becomes a rounded white panel on the navy page in the dark theme, with the light tokens inside it. In the light theme it is an ordinary section. The home page alternates: How it works (white), Why Aquoral (navy), Institut Pasteur (blue), Everyday relief (white), How to use (navy), Learn (white).
-- **3D stage sections** (hero, anatomy, who it helps, order) and the Institut Pasteur section are dark in both themes by design.
+- **3D stage sections** (hero, anatomy, who it helps, order) stay full-bleed and dark in both themes. The Institut Pasteur section is a floating navy panel in both themes (on white in light mode, rim-lit on navy in dark mode).
+- **Panel polish.** Panels share `--panel-inset-y`, `--panel-inset-x` and `--panel-radius`. White islands carry a sky rim, a soft halo and the packaging swirl along the bottom edge. Panels rise into place on a scroll-linked animation (`animation-timeline: view()`, ignored where unsupported; fade only under reduced motion).
+- **Header placement.** On desktop the switch sits in the bar's top-right corner. At 1080 px and below it moves into the menu's Appearance control, and the bar keeps only the logo, Order and the menu.
 - **Header glass** is dark liquid glass over dark grounds and clear light glass over white islands, so it never turns grey.
 
 ## Iconography
