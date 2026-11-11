@@ -74,6 +74,23 @@ Aquoral Canada is calm, clinical and quietly premium. It keeps the packaging's o
 - On dark grounds, use a white or `tide-100` wordmark with the `orchid-300` dot, once the client supplies a reversed version.
 - Leave clear space equal to the height of the dot on all sides.
 
+## Light and dark themes
+
+Both themes are built in. The tokens in `aquoral-tokens.css` define every semantic colour twice: light values on `:root`, dark values under `prefers-color-scheme: dark` and `html[data-theme="dark"]`. `html[data-theme="light"]` forces light on a dark device. Always use the semantic tokens (`surface`, `ink`, `brand`, `line` and so on), never raw hexes, so a component works in both themes for free.
+
+How the website applies it:
+
+- **Default follows the device.** With no stored choice, `html` has no `data-theme` and the media query decides.
+- **A visitor's choice is remembered** in `localStorage` under `aq-theme` (`light` or `dark`). Choosing Auto removes the key.
+- **No flash on load.** This must be the first script in `<head>`, before any stylesheet:
+  `<script>try{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>`
+- **Controls.** The header has a switch (`button.theme-toggle[role=switch][data-theme-toggle]`: sun on a day-sky track, moon on a night track). The phone menu has an Appearance control (`.theme-choice`, Auto / Light / Dark radio group) so a visitor can hand the choice back to their device. Switching spreads the new theme out from the control with a View Transition; under reduced motion it is a short cross-fade. Open tabs stay in sync.
+- **A true swap.** The switch turns the whole site: whatever is dark in one theme is light in the other. Sections marked `data-island` (How it works, Everyday relief, Learn) and every inner-page `.page-hero` are inverted panels: rounded white panels with light tokens in the dark theme, rounded navy panels with dark tokens in the light theme.
+- **3D stage sections** (hero, anatomy, who it helps, order) follow the theme: a deep-ocean studio in dark, a daylight studio in light. `stage.js` re-reads the `--stage-*` variables on the `aq:theme` event (dispatched by `site.js`) and on device changes, and also swaps rim lights, fresnel, shadow, motes blending, exposure and a backdrop gain. The Institut Pasteur section is a floating panel: navy and rim-lit in dark, white-to-sky in light. The footer follows the theme too.
+- **Panel polish.** Panels share `--panel-inset-y`, `--panel-inset-x` and `--panel-radius`. White islands carry a sky rim, a soft halo and the packaging swirl along the bottom edge. Panels rise into place on a scroll-linked animation (`animation-timeline: view()`, ignored where unsupported; fade only under reduced motion).
+- **Header placement.** On desktop the switch sits in the bar's top-right corner. At 1080 px and below it moves into the menu's Appearance control, and the bar keeps only the logo, Order and the menu.
+- **Header glass** follows the ground under it (theme XOR inverted panel), so it is dark glass over navy and clear light glass over white, never grey.
+
 ## Iconography
 
 - Use Lucide outline icons at 1.75px stroke, 24px default size, coloured with `ink` or `accent`. Pair every icon with a visible text label.
