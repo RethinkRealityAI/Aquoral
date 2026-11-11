@@ -1,0 +1,26 @@
+# Aquoral Canada website: static site built by site/build.py (Python standard library only).
+[build]
+  command = "python3 site/build.py"
+  publish = "site/dist"
+
+[build.environment]
+  # build.py uses f-string syntax that needs Python 3.12 or newer
+  PYTHON_VERSION = "3.13"
+
+# Preview deploys: keep search engines out until launch (product claims and checkout are placeholders).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/assets/models/*.glb"
+  [headers.values]
+    Content-Type = "model/gltf-binary"
