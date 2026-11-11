@@ -96,15 +96,26 @@
           <div class="qa-gauge" aria-hidden="true">
             <span class="qa-fall"></span><span class="qa-ring r1"></span><span class="qa-ring r2"></span>
             <span class="qa-mist"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <svg viewBox="0 0 120 150">
+            <svg viewBox="0 0 120 160" class="qa-drop3d">
               <defs>
                 <clipPath id="qa-clip"><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z"/></clipPath>
-                <linearGradient id="qa-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--qa-c1)"/><stop offset="1" stop-color="var(--qa-c2)"/></linearGradient>
+                <clipPath id="qa-clip-in"><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" transform="translate(60 96) scale(.9) translate(-60 -96)"/></clipPath>
+                <radialGradient id="qa-glass" cx=".38" cy=".42" r=".75"><stop offset="0" style="stop-color:#fff;stop-opacity:.55"/><stop offset=".45" style="stop-color:var(--qa-c1);stop-opacity:.16"/><stop offset="1" style="stop-color:var(--qa-c2);stop-opacity:.42"/></radialGradient>
+                <radialGradient id="qa-fill" cx=".32" cy=".35" r=".85"><stop offset="0" style="stop-color:color-mix(in srgb, var(--qa-c1) 55%, #fff)"/><stop offset=".45" style="stop-color:var(--qa-c1)"/><stop offset="1" style="stop-color:var(--qa-c2)"/></radialGradient>
+                <radialGradient id="qa-vol" cx=".3" cy=".32" r=".8"><stop offset=".45" style="stop-color:#000;stop-opacity:0"/><stop offset="1" style="stop-color:#06102a;stop-opacity:.42"/></radialGradient>
+                <linearGradient id="qa-rimg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#fff;stop-opacity:.95"/><stop offset=".5" style="stop-color:#fff;stop-opacity:.15"/><stop offset="1" style="stop-color:var(--qa-c1);stop-opacity:.9"/></linearGradient>
+                <radialGradient id="qa-floor"><stop offset="0" style="stop-color:var(--qa-c2);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--qa-c2);stop-opacity:0"/></radialGradient>
+                <filter id="qa-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
               </defs>
-              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" class="qa-gauge-bg"/>
-              <g clip-path="url(#qa-clip)"><g class="qa-level"><path class="qa-wave w1" d="M-120 0q15-7 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/><path class="qa-wave w2" d="M-120 4q15-6 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/></g></g>
-              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" class="qa-gauge-rim"/>
-              <ellipse cx="40" cy="80" rx="7" ry="14" fill="#fff" opacity=".45" transform="rotate(20 40 80)"/>
+              <ellipse class="qa-floor" cx="60" cy="150" rx="40" ry="7" fill="url(#qa-floor)"/>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" fill="url(#qa-glass)"/>
+              <g clip-path="url(#qa-clip-in)"><g class="qa-level"><path class="qa-wave w2" d="M-120 4q15-6 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/><path class="qa-wave w1" d="M-120 0q15-7 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/></g>
+                <ellipse cx="60" cy="132" rx="26" ry="9" fill="#fff" opacity=".28" filter="url(#qa-soft)"/></g>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" fill="url(#qa-vol)"/>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" class="qa-gauge-rim" fill="none" stroke="url(#qa-rimg)" stroke-width="1.6"/>
+              <ellipse cx="39" cy="74" rx="8" ry="17" fill="#fff" opacity=".7" transform="rotate(24 39 74)" filter="url(#qa-soft)"/>
+              <circle cx="44" cy="58" r="2.6" fill="#fff" opacity=".95"/>
+              <path d="M92 104a34 34 0 0 1-22 30" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".4" filter="url(#qa-soft)"/>
             </svg>
             <span class="qa-score"><b data-score>0</b><small>of 6</small></span>
             <span class="qa-reading">Reading your answers…</span>
@@ -118,8 +129,8 @@
         <ol class="qa-scale" aria-label="Severity scale"><li data-l="0">None</li><li data-l="1">Mild</li><li data-l="2">Moderate</li><li data-l="3">Severe</li></ol>
 
         <div class="qa-res-grid">
-          <div class="qa-res-card"><span class="qa-res-ic">{{icon:activity}}</span><h3>What it’s like</h3><p data-symptoms></p></div>
-          <div class="qa-res-card"><span class="qa-res-ic">{{icon:droplets}}</span><h3>What helps</h3><p data-relief></p></div>
+          <div class="qa-res-card is-like"><span class="qa-res-ic">{{icon:activity}}</span><h3>What it’s like</h3><p data-symptoms></p></div>
+          <div class="qa-res-card is-helps"><span class="qa-res-ic">{{icon:droplets}}</span><h3>What helps</h3><p data-relief></p></div>
         </div>
 
         <div class="qa-tips" data-tips hidden><h3 class="qa-h3">Based on your answers</h3><ul></ul></div>
