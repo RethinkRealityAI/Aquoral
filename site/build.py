@@ -83,6 +83,10 @@ def layout(meta, body, base):
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
                   '<canvas id="stage" aria-hidden="true"></canvas><svg id="leaders" aria-hidden="true"></svg>') if stage else ''
     stage_js = f'<script type="module" src="{base}assets/js/stage.js"></script>' if stage else ''
+    # Stage pages: fetch three.js and the models in parallel with the page, so the water stage paints sooner
+    stage_preload = ('<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin>'
+                     f'<link rel="modulepreload" href="{base}assets/js/stage.js">'
+                     + ('' if ARTIFACT else f'<link rel="preload" href="{base}assets/models/bottle.glb" as="fetch" crossorigin><link rel="preload" href="{base}assets/models/box.glb" as="fetch" crossorigin>')) if stage else ''
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -97,6 +101,7 @@ def layout(meta, body, base):
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
+{stage_preload}
 {models}
 </head>
 <body class="{"has-stage" if stage else ""} {meta.get("bodyClass", "")}">
