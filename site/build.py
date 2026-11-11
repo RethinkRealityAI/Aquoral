@@ -62,7 +62,7 @@ NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dr
 
 def layout(meta, body, base):
     nav_links = ''.join(f'<li><a href="{base}{href}"{" aria-current=\"page\"" if meta.get("nav") == key else ""}>{label}</a></li>' for key, label, href in NAV)
-    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
+    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}assessment.html">Free assessment</a></li><li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
     stage = meta.get('stage')
     models = f'<script src="{base}assets/js/models.js"></script>' if (stage and ARTIFACT) else ''
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
@@ -112,7 +112,7 @@ def layout(meta, body, base):
         <p style="max-width:26rem;margin:0;color:#A9B8D2;font-size:16px">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>
-      <div><h3>Dry mouth</h3><ul><li><a href="{base}dry-mouth.html">Causes and who it helps</a></li><li><a href="{base}medications.html">Medications</a></li><li><a href="{base}conditions/cancer.html">Cancer treatment</a></li><li><a href="{base}conditions/sjogrens.html">Sjögren’s</a></li><li><a href="{base}conditions/cpap.html">CPAP and sleep apnea</a></li><li><a href="{base}conditions/diabetes.html">Diabetes</a></li><li><a href="{base}learn.html">Articles</a></li></ul></div>
+      <div><h3>Dry mouth</h3><ul><li><a href="{base}dry-mouth.html">Causes and who it helps</a></li><li><a href="{base}medications.html">Medications</a></li><li><a href="{base}conditions/cancer.html">Cancer treatment</a></li><li><a href="{base}conditions/sjogrens.html">Sjögren’s</a></li><li><a href="{base}conditions/cpap.html">CPAP and sleep apnea</a></li><li><a href="{base}conditions/diabetes.html">Diabetes</a></li><li><a href="{base}learn.html">Articles</a></li><li><a href="{base}assessment.html">Free dry mouth assessment</a></li></ul></div>
       <div><h3>Company</h3><ul><li><a href="{base}contact.html">Contact</a></li><li><a href="{base}safety.html">Safety information</a></li><li><a href="{base}privacy.html">Privacy</a></li><li><a href="{base}terms.html">Terms</a></li></ul></div>
     </div>
     <div class="footer-base"><span>© 2026 Aquoral Canada. Aquoral is a registered trademark.</span><span>Prototype for review. Product claims pending Canadian label approval.</span></div>
