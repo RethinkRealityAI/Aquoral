@@ -252,7 +252,7 @@
   new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
 })();
 
-/* The film: big play button over the poster; hands over to native controls once playing */
+/* The why (video): big play button over the poster; hands over to native controls once playing */
 (() => {
   const v = document.querySelector('.film-vid'), b = document.querySelector('.film-play'); if (!v || !b) return;
   const fig = v.closest('.film');

@@ -745,7 +745,7 @@ html { overflow-x: clip; }
 @media not all and (prefers-color-scheme: dark) { :root:not([data-theme="dark"]) .page-hero .crumbs a { color: var(--sky-200); } }
 :root[data-theme="light"] .page-hero .crumbs a { color: var(--sky-200); }
 
-/* ================= The film (commercial) ================= */
+/* ================= The why (commercial video) ================= */
 .film { margin: clamp(28px, 4vw, 48px) auto 0; max-width: 980px; }
 .film-frame { position: relative; aspect-ratio: 16 / 9; border-radius: clamp(18px, 2.4vw, 32px); overflow: hidden; background: #061430;
   box-shadow: 0 40px 90px -40px rgba(10,30,80,.55), 0 0 0 1px rgba(255,255,255,.08), 0 0 80px -20px color-mix(in oklab, var(--orchid-500) 35%, transparent); isolation: isolate; }
