@@ -303,6 +303,309 @@ async function boot() {
     for (let i = 1; i < bins; i++) if (!r[i]) r[i] = r[i - 1];
     return y => r[clamp(Math.floor(y / H * bins), 0, bins - 1)]; })();
 
+  /* ---------- Anatomy step animations (Dapo 2026-11-11) ----------
+     One real-3D effect per step of "Small canister. Serious relief.", rendered in this WebGL scene (so it can never sit on top
+     of the page text or cards) and placed in the free space beside the bottle:
+       01 holographic scan rings + measuring bracket   02 pump press + two fine-mist bursts from the nozzle
+       03 floating liquid-glass case: tissue loses moisture, then the OGT lipid film spreads over it and locks it in
+       04 a 6-hour gauge ring behind the canister       05 a "gluten free" pearl badge beside the two canisters
+     They play at normal speed even with reduced motion on (Dapo wants them to autoplay); each is a calm loop. */
+  const fxRoot = new THREE.Group(); rig.add(fxRoot);
+  const fxK = [0, 0, 0, 0, 0], fxT = [0, 0, 0, 0, 0];
+  const cSky = new THREE.Color(css('--sky-300', '#A3DAF4')), cSky4 = new THREE.Color(css('--sky-400', '#6FC2EC'));
+  const cOrchid = new THREE.Color(css('--orchid-500', '#D42A8E')), cOrchid3 = new THREE.Color(css('--orchid-300', '#E59AC2'));
+  const glowMat = (color, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity, toneMapped: false, depthWrite: false, blending: THREE.AdditiveBlending });
+  const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const glowSprite = (color, size, opacity = 1) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); s.scale.setScalar(size); s.userData.o = opacity; return s; };
+  const textTex = (lines, { w = 512, h = 96, color = '#EAF6FD', dot = null } = {}) => {
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+    g.font = `500 ${Math.round(h * .42)}px "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace`; g.textBaseline = 'middle';
+    let x = 8; if (dot) { g.fillStyle = dot; g.beginPath(); g.arc(h * .22, h / 2, h * .12, 0, Math.PI * 2); g.fill(); x = h * .5; }
+    g.fillStyle = color; g.fillText(lines, x, h / 2 + 2);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
+  const tri = x => 1 - Math.abs(((x % 2) + 2) % 2 - 1);            // 0→1→0 ping-pong
+  const bump = (t, at, w) => Math.exp(-(((t - at) / w) ** 2));
+  const Y = new THREE.Vector3(0, 1, 0), fxV = new THREE.Vector3(), fxV2 = new THREE.Vector3();
+  const axisOf = (g, out) => { g.getWorldPosition(out); return fxRoot.worldToLocal(out); };   // rig-local foot of a canister
+
+  /* 01 · scan rings + measuring bracket (left of the canister) */
+  const scanG = new THREE.Group(); fxRoot.add(scanG);
+  const ringGeo = new THREE.TorusGeometry(.14, .003, 8, 120);
+  const scanRings = [0, 1].map(() => { const m = new THREE.Mesh(ringGeo, glowMat(cSky, .9)); m.rotation.x = Math.PI / 2; scanG.add(m); return m; });
+  const bandMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false,
+    uniforms: { uC: { value: cSky4 }, uK: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
+    fragmentShader: `uniform vec3 uC; uniform float uK; varying vec2 vUv; void main(){ float a = pow(vUv.y, 2.2) * .32 * uK; gl_FragColor = vec4(uC, a);
+      #include <colorspace_fragment>
+    }` });
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .07, 72, 1, true), bandMat); scanG.add(band);
+  const bracket = new THREE.Group(); scanG.add(bracket);
+  const barMat = glowMat(cSky, .75);
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(.0035, 1, .0035), barMat); bar.position.y = .5; bracket.add(bar);
+  const ends = [0, 1].map(y => { const m = new THREE.Mesh(new THREE.BoxGeometry(.05, .0035, .0035), barMat); m.position.set(.012, y, 0); bracket.add(m); return m; });
+  const ticks = Array.from({ length: 9 }, (_, i) => { const m = new THREE.Mesh(new THREE.BoxGeometry(i % 2 ? .014 : .026, .0026, .0026), glowMat(cSky, .6)); m.position.set(i % 2 ? -.007 : -.013, (i + 1) / 10, 0); bracket.add(m); return m; });
+  const bracketDot = glowSprite(cSky, .07); bracket.add(bracketDot);
+  const bracketCore = new THREE.Mesh(new THREE.SphereGeometry(.007, 16, 12), glowMat(0xffffff)); bracket.add(bracketCore);
+
+  /* 02 · pump press + two fine-mist bursts (GPU particles; the beat turns the nozzle to face left, away from the text) */
+  const pumpNode = bottle.getObjectByName('Pump'), nozzleNode = bottle.getObjectByName('Nozzle');
+  const pump0 = pumpNode?.position.y ?? 0, nozzle0 = nozzleNode?.position.y ?? 0;
+  const MIST = HIGH ? 900 : 520;
+  const mistGeo = new THREE.BufferGeometry(), mRnd = new Float32Array(MIST * 4), mPuff = new Float32Array(MIST);
+  for (let i = 0; i < MIST; i++) { mRnd.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4); mPuff[i] = i % 2; }
+  mistGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MIST * 3), 3));
+  mistGeo.setAttribute('aRnd', new THREE.BufferAttribute(mRnd, 4)); mistGeo.setAttribute('aPuff', new THREE.BufferAttribute(mPuff, 1));
+  const mistMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    uniforms: { uOrigin: { value: new THREE.Vector3() }, uDir: { value: new THREE.Vector3(-1, 0, 0) }, uAge: { value: new THREE.Vector2(-9, -9) }, uK: { value: 0 }, uPx: { value: 1 }, uColor: { value: new THREE.Color(0xeaf7ff) } },
+    vertexShader: `attribute vec4 aRnd; attribute float aPuff; uniform vec3 uOrigin, uDir; uniform vec2 uAge; uniform float uK, uPx; varying float vA, vB;
+      void main(){
+        float age = (aPuff < .5 ? uAge.x : uAge.y) - aRnd.w * .1;
+        float life = 1.3 + aRnd.z * 1.2;
+        vec3 up = abs(uDir.y) > .9 ? vec3(1.,0.,0.) : vec3(0.,1.,0.);
+        vec3 t1 = normalize(cross(uDir, up)), t2 = cross(uDir, t1);
+        float a = aRnd.x * 6.2832, rr = sqrt(aRnd.y) * .42;
+        vec3 d = normalize(uDir + (t1 * cos(a) + t2 * sin(a)) * rr);
+        float v = .75 + aRnd.z * .8, drag = 2.6;
+        float ag = max(age, 0.);
+        vec3 p = uOrigin + d * v * (1. - exp(-drag * ag)) / drag;
+        p.y += .02 * ag - .022 * ag * ag;
+        p += vec3(sin(ag * 2.1 + aRnd.x * 40.), cos(ag * 1.7 + aRnd.y * 50.), sin(ag * 1.3 + aRnd.z * 30.)) * .014 * ag;
+        vec4 mv = modelViewMatrix * vec4(p, 1.);
+        gl_Position = projectionMatrix * mv;
+        float big = step(.97, aRnd.w);
+        float sz = mix(.012 + .05 * smoothstep(0., 1.6, ag), .006, big);
+        gl_PointSize = max(1., sz * uPx / -mv.z);
+        vA = uK * step(0., age) * smoothstep(0., .05, age) * (1. - smoothstep(life * .35, life, age)) * mix(.55 * (1. - .5 * smoothstep(0., 1.2, ag)), 1.1, big);
+        vB = big;
+      }`,
+    fragmentShader: `uniform vec3 uColor; varying float vA, vB;
+      void main(){ vec2 c = gl_PointCoord - .5; float r = length(c);
+        float soft = smoothstep(.5, 0., r); soft *= soft;
+        float drop = smoothstep(.5, .1, r);
+        float a = mix(soft * .32, drop, vB) * vA; if (a < .004) discard;
+        gl_FragColor = vec4(uColor, a);
+        #include <colorspace_fragment>
+      }` });
+  const mist = new THREE.Points(mistGeo, mistMat); mist.frustumCulled = false; mist.renderOrder = 6; fxRoot.add(mist);
+  const nozzleFlash = glowSprite(cSky, .09, 0); fxRoot.add(nozzleFlash);
+
+  /* 03 · floating liquid-glass case with a tissue cross-section, moisture droplets, vapour and the OGT film */
+  const caseG = new THREE.Group(), case3 = new THREE.Group(); caseG.add(case3); fxRoot.add(caseG);
+  const PW = .36, PH = .3, PD = .15;
+  const glassF = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: .1, roughness: .06, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.8, depthWrite: false });
+  addFresnel(glassF, COL.rim, 1.1);
+  const glassB = glassF.clone(); glassB.side = THREE.BackSide; glassB.opacity = .07; addFresnel(glassB, COL.rim, .5);
+  let RoundedBox = null;
+  try { ({ RoundedBoxGeometry: RoundedBox } = await import('three/addons/geometries/RoundedBoxGeometry.js')); } catch {}
+  const caseGeo = RoundedBox ? new RoundedBox(PW, PH, PD, 5, .022) : new THREE.BoxGeometry(PW, PH, PD);
+  const caseBack = new THREE.Mesh(caseGeo, glassB), caseFront = new THREE.Mesh(caseGeo, glassF);
+  caseBack.renderOrder = 7; caseFront.renderOrder = 9; case3.add(caseBack, caseFront);
+  const edgeMat = new THREE.LineBasicMaterial({ color: cSky, transparent: true, opacity: .4, toneMapped: false, depthWrite: false });
+  const caseEdges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(PW - .012, PH - .012, PD - .012)), edgeMat); caseEdges.renderOrder = 9; case3.add(caseEdges);
+  // tissue block with a soft wavy top (lit, with a wet sheen once the film covers it)
+  const TW = .31, TD = .11, TH = .075, tissueY = -PH / 2 + .022 + TH / 2;
+  const wave = (x, z) => .011 * Math.sin(x * 30 + 1) + .005 * Math.sin(x * 64 + z * 42) + .004 * Math.cos(z * 57 + x * 9);
+  const tGeo = new THREE.BoxGeometry(TW, TH, TD, 72, 4, 24); { const p = tGeo.attributes.position, col = new Float32Array(p.count * 3), deep = new THREE.Color(css('--orchid-600', '#A51F72')), top = cOrchid3.clone().lerp(new THREE.Color(0xffffff), .12);
+    for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = clamp((y + TH / 2) / TH, 0, 1); p.setY(i, y + wave(x, z) * f); const c = deep.clone().lerp(top, Math.pow(f, .7)); col.set([c.r, c.g, c.b], i * 3); }
+    tGeo.setAttribute('color', new THREE.BufferAttribute(col, 3)); tGeo.computeVertexNormals(); }
+  const tissueMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffd9ec), sheenRoughness: .45, clearcoat: 0, clearcoatRoughness: .2, transparent: true, envMapIntensity: .8 });
+  const tissue = new THREE.Mesh(tGeo, tissueMat); tissue.position.y = tissueY; tissue.renderOrder = 8; case3.add(tissue);
+  const surfY = (x, z) => tissueY + TH / 2 + wave(x, z);
+  // OGT film: thin iridescent sheet that flows across the surface (revealed by a world-space clipping plane)
+  const filmClip = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+  const fGeo = new THREE.PlaneGeometry(TW - .004, TD - .004, 72, 24); fGeo.rotateX(-Math.PI / 2);
+  { const p = fGeo.attributes.position; for (let i = 0; i < p.count; i++) p.setY(i, surfY(p.getX(i), p.getZ(i)) + .0055); fGeo.computeVertexNormals(); }
+  const filmMat = new THREE.MeshPhysicalMaterial({ color: 0xe6f6ff, transparent: true, opacity: .7, roughness: .1, iridescence: 1, iridescenceIOR: 1.7, iridescenceThicknessRange: [200, 560],
+    clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: 2.2, side: THREE.DoubleSide, depthWrite: false, clippingPlanes: [filmClip] });
+  addFresnel(filmMat, cSky, .6);
+  const film = new THREE.Mesh(fGeo, filmMat); film.renderOrder = 8.5; case3.add(film);
+  const filmEdge = new THREE.Mesh(new THREE.CylinderGeometry(.0035, .0035, TD - .01, 10), glowMat(cSky, .9)); filmEdge.rotation.x = Math.PI / 2; filmEdge.renderOrder = 8.6; case3.add(filmEdge);
+  const filmEdgeGlow = glowSprite(cSky, .06, .7); case3.add(filmEdgeGlow);
+  // moisture droplets sitting on the tissue
+  const dropletMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: .6, roughness: .02, clearcoat: 1, clearcoatRoughness: .02, envMapIntensity: 2.4, ior: 1.33 });
+  addFresnel(dropletMat, new THREE.Color(0xffffff), .9);
+  const beads = [-.12, -.075, -.03, .015, .055, .095, .128].map((x, i) => {
+    const z = ((i * 37) % 7 / 7 - .5) * TD * .55, r = .009 + (i * 13 % 5) * .0013;
+    const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), dropletMat); m.renderOrder = 8.7;
+    m.userData = { x, z, r, s: 1 }; m.position.set(x, surfY(x, z), z); case3.add(m); return m; });
+  // vapour leaving uncovered droplets (CPU-updated points, few dozen)
+  const VAP = 56, vGeo = new THREE.BufferGeometry(), vPos = new Float32Array(VAP * 3), vA = new Float32Array(VAP), vSeed = Array.from({ length: VAP }, (_, i) => ({ b: i % beads.length, ph: Math.random(), sx: (Math.random() - .5) * .02, sz: (Math.random() - .5) * .02 }));
+  vGeo.setAttribute('position', new THREE.BufferAttribute(vPos, 3)); vGeo.setAttribute('aA', new THREE.BufferAttribute(vA, 1));
+  const vapMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    uniforms: { uPx: { value: 1 }, uColor: { value: new THREE.Color(0xe6f6ff) } },
+    vertexShader: `attribute float aA; uniform float uPx; varying float vA; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.); gl_Position = projectionMatrix * mv; gl_PointSize = max(1., .016 * uPx / -mv.z); vA = aA; }`,
+    fragmentShader: `uniform vec3 uColor; varying float vA; void main(){ float r = length(gl_PointCoord - .5); float a = smoothstep(.5, 0., r); a *= a * vA * .6; if (a < .004) discard; gl_FragColor = vec4(uColor, a);
+      #include <colorspace_fragment>
+    }` });
+  const vapour = new THREE.Points(vGeo, vapMat); vapour.frustumCulled = false; vapour.renderOrder = 8.8; case3.add(vapour);
+  // status chip on the case: "Moisture escaping" → "OGT film · protected"
+  const chipGeo = new THREE.PlaneGeometry(.23, .23 * 96 / 720);
+  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('MOISTURE ESCAPING', { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('OGT FILM · PROTECTED', { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
+  [chipA, chipB].forEach(m => { m.position.set(-PW / 2 + .02 + .115, PH / 2 - .035, PD / 2 + .001); m.renderOrder = 10; case3.add(m); });
+  const caseMats = [glassF, glassB, edgeMat, tissueMat, filmMat, dropletMat, chipA.material, chipB.material, filmEdge.material, filmEdgeGlow.material];
+  caseMats.forEach(m => { m.userData.o = m.opacity; m.transparent = true; });
+
+  /* 04 · six-hour gauge: a ring standing behind the canister, filling from 0 to 6 h over the top */
+  const dialG = new THREE.Group(); fxRoot.add(dialG);
+  const DR = .37;
+  const dialTrack = new THREE.Mesh(new THREE.TorusGeometry(DR, .0022, 8, 200), glowMat(cSky, .22)); dialG.add(dialTrack);
+  const arcMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    uniforms: { uP: { value: 0 }, uK: { value: 0 }, uA: { value: cSky4 }, uB: { value: cOrchid3 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
+    fragmentShader: `uniform float uP, uK; uniform vec3 uA, uB; varying vec2 vUv;
+      void main(){ float s = vUv.x; if (s > uP) discard;
+        float head = smoothstep(uP - .05, uP, s);
+        vec3 c = mix(uA, uB, smoothstep(0., .5, s)) + head * .6;
+        gl_FragColor = vec4(c, (.75 + head * .25) * uK);
+        #include <colorspace_fragment>
+      }` });
+  const arc = new THREE.Mesh(new THREE.TorusGeometry(DR, .009, 12, 240), arcMat); dialG.add(arc);
+  // torus uv.x runs counter-clockwise from +x; flip so it starts at 9 o'clock and sweeps clockwise over the top
+  arc.rotation.set(0, Math.PI, 0);
+  const hourTicks = Array.from({ length: 13 }, (_, i) => { const a = Math.PI - i / 12 * Math.PI, m = new THREE.Mesh(new THREE.BoxGeometry(i % 2 ? .016 : .03, .0045, .0045), glowMat(cSky, .3));
+    m.position.set(Math.cos(a) * (DR + .03), Math.sin(a) * (DR + .03), 0); m.rotation.z = a; m.userData.i = i; dialG.add(m); return m; });
+  const dialHead = glowSprite(0xffffff, .09, 1), dialCore = new THREE.Mesh(new THREE.SphereGeometry(.011, 16, 12), glowMat(0xffffff)); dialG.add(dialHead, dialCore);
+  const hLabelGeo = new THREE.PlaneGeometry(.15, .15 * 96 / 256);
+  const h0 = new THREE.Mesh(hLabelGeo, new THREE.MeshBasicMaterial({ map: textTex('0 h', { w: 256, color: '#B9D9EE' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const h6 = new THREE.Mesh(hLabelGeo, new THREE.MeshBasicMaterial({ map: textTex('6 h', { w: 256, color: '#FFFFFF' }), transparent: true, depthWrite: false, toneMapped: false }));
+  h0.position.set(-DR - .02, -.045, 0); h6.position.set(DR + .045, -.045, 0); dialG.add(h0, h6);
+
+  /* 05 · "gluten free" pearl badge floating beside the pair of canisters */
+  const badgeG = new THREE.Group(), badge3 = new THREE.Group(); badgeG.add(badge3); fxRoot.add(badgeG);
+  const badgeTex = (() => { const S = 512, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), m = S / 2;
+    const gr = g.createRadialGradient(m * .8, m * .7, 10, m, m, m); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.7, '#EAF6FD'); gr.addColorStop(1, '#C9E9F9');
+    g.fillStyle = gr; g.beginPath(); g.arc(m, m, m, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#D42A8E'; g.lineWidth = 14; g.beginPath(); g.arc(m, m, m - 26, 0, Math.PI * 2); g.stroke();
+    // wheat ear
+    g.save(); g.translate(m, m - 18); g.strokeStyle = '#13306B'; g.fillStyle = '#13306B'; g.lineWidth = 12; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(0, 120); g.lineTo(0, -120); g.stroke();
+    for (let k = 0; k < 4; k++) for (const sd of [-1, 1]) { g.save(); g.translate(sd * 4, -90 + k * 48); g.rotate(sd * .6); g.beginPath(); g.ellipse(sd * 26, 0, 30, 14, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
+    g.beginPath(); g.ellipse(0, -128, 13, 26, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    // strike-through
+    g.strokeStyle = '#D42A8E'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
+    g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.center.set(.5, .5); t.rotation = -Math.PI / 2; return t; })();
+  const BR = .068, BS = isPhone ? 1.2 : 1.15;
+  const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });
+  const coinSide = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--sky-200', '#C9E9F9')), roughness: .22, metalness: .2, clearcoat: 1, sheen: 1, sheenColor: new THREE.Color(0xffffff), transparent: true });
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(BR, BR, .016, 72, 1), [coinSide, coinFace, coinFace]); coin.rotation.x = Math.PI / 2; badge3.add(coin);
+  const coinGlow = glowSprite(cSky, .3, .35); coinGlow.position.z = -.02; badgeG.add(coinGlow);
+  const sparkles = Array.from({ length: 7 }, (_, i) => { const s = glowSprite(i % 2 ? cSky : cOrchid3, .03, .9); s.userData.a = i / 7 * Math.PI * 2; s.userData.r = BR + .03 + (i % 3) * .012; badgeG.add(s); return s; });
+  const badgeMats = [coinFace, coinSide]; badgeMats.forEach(m => m.userData.o = 1);
+
+  const setK = (mats, k) => { for (const m of mats) m.opacity = (m.userData.o ?? 1) * k; };
+  let pressPrev = 0;
+  function anatomyFX(dt) {
+    const anat = clamp(cur.grid * presence, 0, 1);
+    for (let i = 0; i < 5; i++) {
+      const on = activeBeat === i && anat > .5 ? 1 : 0;
+      if (on && fxK[i] < .02) fxT[i] = 0;
+      fxK[i] = damp(fxK[i], on, on ? 3.2 : 6, dt); fxT[i] += dt;
+    }
+    const s = cur.s, pxPerUnit = s * vh / WORLD_H * CAM_D * renderer.getPixelRatio();
+    const bAxis = axisOf(bottleG, fxV);
+
+    // 01
+    let k = fxK[0]; scanG.visible = k > .005;
+    if (scanG.visible) {
+      const t = fxT[0];
+      scanG.position.copy(bAxis);
+      scanRings.forEach((m, j) => { const u = ease.inOut(tri(t / 2.6 + j)); const y = .03 + u * .74; m.position.y = y; m.scale.setScalar((profile(y) + .014) / .14); m.material.opacity = .9 * k; });
+      const y0 = scanRings[0].position.y; band.position.y = y0 - .035; band.scale.set(profile(y0) + .012, 1, profile(y0) + .012); bandMat.uniforms.uK.value = k;
+      const draw = ease.out(clamp((t - .15) / 1.1, 0, 1));
+      bracket.position.set(-(profile(.5) + .085), 0, .04);
+      bar.scale.y = Math.max(.001, draw); bar.position.y = draw / 2;
+      ends[1].position.y = draw; ends.forEach((m, j) => m.visible = j === 0 || draw > .98);
+      barMat.opacity = .75 * k;
+      ticks.forEach((m, j) => { m.material.opacity = .6 * k * clamp((draw - (j + 1) / 10) * 8, 0, 1); });
+      bracketDot.position.y = bracketCore.position.y = y0; bracketDot.material.opacity = k * .9; bracketCore.material.opacity = k;
+    }
+
+    // 02
+    k = fxK[1]; mist.visible = k > .005;
+    let press = 0;
+    if (mist.visible) {
+      const CYC = 3.8, t = fxT[1] % CYC, p1 = .45, p2 = 1.05;
+      press = Math.max(bump(t, p1 - .02, .08), bump(t, p2 - .02, .08)) * k;
+      tmp.set(0, .695 - press * .024, .095); bottleG.localToWorld(tmp); fxRoot.worldToLocal(tmp);
+      mistMat.uniforms.uOrigin.value.copy(tmp);
+      mistMat.uniforms.uDir.value.set(0, .12, 1).applyAxisAngle(Y, turn.rotation.y).normalize();
+      mistMat.uniforms.uAge.value.set(fxT[1] < p1 ? -9 : t - p1, fxT[1] < p2 ? -9 : t - p2);
+      mistMat.uniforms.uK.value = k; mistMat.uniforms.uPx.value = pxPerUnit;
+      nozzleFlash.position.copy(tmp); nozzleFlash.material.opacity = .9 * k * Math.max(bump(t, p1 + .04, .1), bump(t, p2 + .04, .1));
+    }
+    if (pumpNode && (press > 0 || pressPrev > 0)) { pumpNode.position.y = pump0 - press * .0021; if (nozzleNode) nozzleNode.position.y = nozzle0 - press * .0021; }
+    pressPrev = press;
+
+    // 03
+    k = fxK[2]; caseG.visible = k > .005;
+    if (caseG.visible) {
+      const t = fxT[2], CYC = 8.4, u = t % CYC, e = ease.out(k);
+      const leftEdge = (px2w(isPhone ? 10 : 24, 0)[0] - cur.x) / cur.s, room = (bAxis.x - .13 - .04) - (leftEdge + .015), fit = clamp(room / .4, .55, 1.25);
+      caseG.position.set(leftEdge + .015 + room / 2, .52 + Math.sin(t * 1.1) * .008 - (1 - e) * .05, .06);
+      caseG.rotation.set(.2 + Math.sin(t * .7) * .015, .42 + Math.sin(t * .5) * .05, 0);
+      caseG.scale.setScalar(fit * (.9 + .1 * e));
+      // film edge position along the tissue (local x)
+      const spread = ease.inOut(clamp((u - 2.4) / 1.8, 0, 1)), fade = 1 - clamp((u - 7.4) / .8, 0, 1);
+      const ex = -TW / 2 + spread * TW;
+      caseG.updateMatrixWorld(true);
+      fxV2.set(ex, 0, 0); case3.localToWorld(fxV2);
+      const nx = new THREE.Vector3(1, 0, 0).transformDirection(case3.matrixWorld).negate();
+      filmClip.setFromNormalAndCoplanarPoint(nx, fxV2);
+      setK(caseMats, k);
+      filmMat.opacity = filmMat.userData.o * k * fade * (spread > 0 ? 1 : 0);
+      const edgeOn = spread > 0 && spread < 1 ? 1 : 0;
+      filmEdge.position.set(ex, surfY(ex, 0) + .006, 0); filmEdge.material.opacity = .9 * k * edgeOn;
+      filmEdgeGlow.position.copy(filmEdge.position); filmEdgeGlow.material.opacity = .7 * k * edgeOn;
+      filmMat.iridescenceThicknessRange[0] = 200 + Math.sin(t * 1.3) * 60; filmMat.iridescenceThicknessRange[1] = 560 + Math.sin(t * .9) * 90;
+      tissueMat.clearcoat = .7 * spread * fade;
+      const exposedPhase = u < 2.4 || u > 7.4;
+      beads.forEach(b => { const d = b.userData, covered = !exposedPhase && d.x < ex;
+        const target = covered ? 1 : (u < 2.4 ? 1 - .55 * ease.inOut(u / 2.4) : d.s);
+        d.s = covered ? damp(d.s, 1, 3, dt) : (u < 2.4 ? target : d.s); d.covered = covered;
+        const r = d.r * d.s; b.scale.set(r, r * .72, r); b.position.y = surfY(d.x, d.z) + r * .55; });
+      vSeed.forEach((v, i) => { const b = beads[v.b], d = b.userData; const ph = (u * .55 + v.ph) % 1;
+        const live = (u < 2.4 || (!d.covered && u < 4.6)) ? 1 : 0;
+        vPos[i * 3] = d.x + v.sx * (1 + ph * 2); vPos[i * 3 + 1] = b.position.y + .01 + ph * .1; vPos[i * 3 + 2] = d.z + v.sz;
+        vA[i] = live * k * Math.sin(ph * Math.PI) * .9; });
+      vGeo.attributes.position.needsUpdate = true; vGeo.attributes.aA.needsUpdate = true;
+      vapMat.uniforms.uPx.value = pxPerUnit * .9;
+      const prot = clamp((spread - .8) * 5, 0, 1) * fade;
+      chipA.material.opacity = k * (1 - prot); chipB.material.opacity = k * prot;
+    }
+
+    // 04
+    k = fxK[3]; dialG.visible = k > .005;
+    if (dialG.visible) {
+      const t = fxT[3], CYC = 6.2, u = t % CYC;
+      dialG.position.set(bAxis.x, .5, bAxis.z - .2);
+      dialG.rotation.set(-.22, .18, 0);
+      const fill = ease.inOut(clamp((u - .5) / 2.8, 0, 1)) * (1 - clamp((u - 5.6) / .5, 0, 1));
+      arcMat.uniforms.uP.value = fill * .5; arcMat.uniforms.uK.value = k;
+      dialTrack.material.opacity = .22 * k;
+      hourTicks.forEach(m => { const lit = fill * 12 >= m.userData.i - .01 && fill > 0; m.material.opacity = k * (lit ? .95 : .28); });
+      const a = Math.PI - fill * Math.PI;
+      dialHead.position.set(Math.cos(a) * DR, Math.sin(a) * DR, .01); dialCore.position.copy(dialHead.position);
+      const headOn = fill > .001 ? 1 : 0;
+      dialHead.material.opacity = k * headOn * (.8 + .2 * Math.sin(t * 6)); dialCore.material.opacity = k * headOn;
+      h0.material.opacity = .85 * k; h6.material.opacity = k * clamp((fill - .9) * 10, 0, 1);
+    }
+
+    // 05
+    k = fxK[4]; badgeG.visible = k > .005;
+    if (badgeG.visible) {
+      const t = fxT[4], e = ease.out(k), tw = axisOf(twinG, fxV2);
+      badgeG.position.set(tw.x + profile(.5) * twinG.scale.x + BR * BS + .035, .62 + Math.sin(t * 1.2) * .01, tw.z + .05);
+      badge3.rotation.y = Math.sin(t * .9) * .42 - (1 - e) * Math.PI;
+      badge3.scale.setScalar(BS * (.6 + .4 * e)); coinGlow.scale.setScalar(.3 * BS);
+      setK(badgeMats, k); coinGlow.material.opacity = .35 * k;
+      sparkles.forEach((sp, i) => { const a = sp.userData.a + t * .6; sp.position.set(Math.cos(a) * sp.userData.r, Math.sin(a) * sp.userData.r * .9, Math.sin(a) * .03); sp.material.opacity = k * (.4 + .5 * Math.max(0, Math.sin(t * 2.3 + i * 1.7))); });
+    }
+  }
+
   /* Intro FX */
   const droplet = new THREE.Mesh(new THREE.SphereGeometry(.06, 48, 32), dropMat); bottleG.add(droplet); droplet.visible = false;
   const meniscus = new THREE.Mesh(new THREE.TorusGeometry(1, .005, 12, 160), new THREE.MeshBasicMaterial({ color: C('rim'), transparent: true, opacity: 0, toneMapped: false }));
@@ -382,7 +685,9 @@ async function boot() {
       anatomy.style.setProperty('--beat', i); anatomy.dataset.step = i;
       anatomy.dispatchEvent(new CustomEvent('aq:beat', { detail: i }));
       const b = beats[i], s = slots.find(s => s.name === 'anatomy');
-      if (s && b) s.dyn = { yaw: parseFloat(b.dataset.yaw || 0), explode: parseFloat(b.dataset.explode || 0), box: parseFloat(b.dataset.box || 0), twin: parseFloat(b.dataset.twin || 0) };
+      if (s && b) s.dyn = { yaw: parseFloat(b.dataset.yaw || 0), explode: parseFloat(b.dataset.explode || 0), box: parseFloat(b.dataset.box || 0), twin: parseFloat(b.dataset.twin || 0), bx: parseFloat(b.dataset.bx || 0) };
+      /* Desktop: when the cap lifts off, pull back a little so the cap clears the menu bar (phones already leave room). */
+      if (s && b && !isPhone && s.dyn.explode > 0) s.dyn.fit = Math.max(s.base.fit, 1.34);
     }
     anatomy.style.setProperty('--progress', p.toFixed(4));
   }
@@ -529,6 +834,7 @@ async function boot() {
     floorMat.uniforms.uTime.value = elapsed; if (reflector) reflector.material.uniforms.uTime.value = elapsed; motesMat.uniforms.uTime.value = elapsed; gridMat.uniforms.uTime.value = elapsed;
 
     rig.updateMatrixWorld(true);
+    anatomyFX(dt);
     updateOverlays(); updateHot(elapsed);
   }
 
@@ -659,7 +965,7 @@ async function boot() {
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   startIntro();
 
-  window.__stage = { renderer, scene, camera, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
+  window.__stage = { renderer, scene, camera, fxT, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
   if (params.has('debug')) {
     const gl = renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info'), box = document.createElement('pre');
     box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;font:12px/1.4 monospace;background:#000c;color:#fff;padding:8px;border-radius:6px;max-width:90vw;white-space:pre-wrap';
