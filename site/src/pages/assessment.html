@@ -81,6 +81,7 @@
           <div class="qa-field qa-span"><label class="qa-label" for="qa-em">Email</label><input class="qa-input" id="qa-em" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required><p class="qa-err" hidden>Please enter a valid email, like name@example.com.</p></div>
           <div class="qa-field qa-span"><label class="qa-label" for="qa-ph">Phone number <span class="qa-opt">Optional</span></label><input class="qa-input" id="qa-ph" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(416) 555-0123"><p class="qa-err" hidden>Please check your phone number, or leave it blank.</p></div>
         </div>
+        <p class="qa-hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <label class="qa-check"><input type="checkbox" name="marketing_opt_in" value="yes"><span class="qa-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span><span>Yes, send me Aquoral news and offers by email. You can unsubscribe at any time.</span></label>
         <p class="qa-fine">We use your details to send your result and code. See our <a href="{{base}}privacy.html">privacy policy</a>.</p>
         <div class="qa-actions">
@@ -93,6 +94,8 @@
       <section class="qa-step qa-result" data-step="result" aria-labelledby="qa-res-h">
         <div class="qa-res-head">
           <div class="qa-gauge" aria-hidden="true">
+            <span class="qa-fall"></span><span class="qa-ring r1"></span><span class="qa-ring r2"></span>
+            <span class="qa-mist"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
             <svg viewBox="0 0 120 150">
               <defs>
                 <clipPath id="qa-clip"><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z"/></clipPath>
@@ -104,6 +107,7 @@
               <ellipse cx="40" cy="80" rx="7" ry="14" fill="#fff" opacity=".45" transform="rotate(20 40 80)"/>
             </svg>
             <span class="qa-score"><b data-score>0</b><small>of 6</small></span>
+            <span class="qa-reading">Reading your answers…</span>
           </div>
           <div>
             <p class="qa-kicker">Your result</p>
@@ -134,11 +138,19 @@
           <button type="button" class="btn btn-glass" data-restart>{{icon:refresh}} Retake</button>
         </div>
         <p class="qa-fine">This assessment is for information only and is not a diagnosis. If your symptoms are severe or getting worse, talk to your pharmacist, dentist or doctor. No prescription is needed for Aquoral in Canada.</p>
-        <p class="qa-fine qa-proto" data-proto hidden>Prototype: your answers aren’t sent anywhere yet.</p>
       </section>
     </form>
   </div>
 </section>
+
+<!-- Netlify Forms registration: the form above is driven by JS, so this hidden copy lists every field it posts. -->
+<form name="dry-mouth-assessment" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="firstname"><input name="lastname"><input type="email" name="email"><input name="phone">
+  <input name="xerostomia_cause"><input name="xerostomia_cause_other">
+  <input name="q1_parched"><input name="q2_sleep"><input name="q3_washroom"><input name="q4_eating"><input name="q5_speaking"><input name="q6_diagnosed">
+  <input name="score"><input name="severity"><input name="marketing_opt_in"><input name="page">
+  <input type="hidden" name="subject"><input name="bot-field">
+</form>
 
 <!-- Yes / No control, cloned into every question step -->
 <template id="qa-yn">

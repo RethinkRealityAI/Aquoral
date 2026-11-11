@@ -1,7 +1,8 @@
 /* Aquoral Canada: free dry mouth assessment.
    Questions and scoring follow the US assessment (aquoralspray.com/assessment): six Yes/No questions, Yes = 1 point.
    0 = no dry mouth, 1 = mild, 2-3 = moderate, 4-6 = severe.
-   Lead capture: set window.AQ_ASSESSMENT_ENDPOINT to a URL that accepts a JSON POST. Until then nothing is sent. */
+   Submissions: details go to Netlify Forms (form "dry-mouth-assessment", for notifications), and every completed
+   assessment (with or without details) is stored in Netlify Database via POST /api/assessment. */
 (() => {
   const form = document.getElementById('qa-form');
   if (!form) return;
@@ -55,26 +56,41 @@
   const answered = q => !!$(`input[name="${q}"]:checked`);
   const firstUnanswered = () => (!$('input[name="cause"]:checked') ? 'cause' : QUESTIONS.find(q => !answered(q)));
 
+  let busy = false;
+  const qa = form.closest('.qa');
   function go(step, { push = true, dir } = {}) {
     if (step === 'result' && firstUnanswered()) step = firstUnanswered();
+    if (step === cur) return;
     const from = STEPS.indexOf(cur), to = STEPS.indexOf(step);
-    card.dataset.dir = dir || (to < from ? 'back' : 'fwd');
-    $$('.qa-step').forEach(s => s.classList.toggle('is-current', s.dataset.step === step));
-    cur = step;
-    const n = to;   // cause = 1 ... details = 8
-    const showTop = step !== 'intro' && step !== 'result';
-    top.hidden = !showTop;
-    bar.style.setProperty('--p', Math.max(0, n - 1) / TOTAL + (showTop ? 0.5 / TOTAL : 0));
-    bar.setAttribute('aria-valuenow', String(n));
-    count.textContent = showTop ? `${n} / ${TOTAL}` : '';
-    if (step === 'result') renderResult();
+    const back = dir ? dir === 'back' : to < from;
+    const old = $(`[data-step="${cur}"]`), neu = $(`[data-step="${step}"]`);
+    busy = true;
+    card.dataset.dir = back ? 'back' : 'fwd';
+    old.classList.add('is-leaving');
+    const swap = () => {
+      old.classList.remove('is-current', 'is-leaving');
+      // stagger the new screen's parts in
+      [...neu.children].forEach((el, i) => el.style.setProperty('--i', i));
+      neu.classList.add('is-current');
+      cur = step;
+      const n = to, showTop = step !== 'intro' && step !== 'result';
+      top.hidden = !showTop;
+      qa?.style.setProperty('--step', String(n));
+      bar.style.setProperty('--p', Math.max(0, n - 1) / TOTAL + (showTop ? 0.5 / TOTAL : 0));
+      bar.setAttribute('aria-valuenow', String(n));
+      count.textContent = showTop ? `${n} / ${TOTAL}` : '';
+      if (step === 'result') renderResult();
+      const h = $(`[data-step="${step}"] [tabindex="-1"]`);
+      requestAnimationFrame(() => { h?.focus({ preventScroll: true }); });
+      const rect = form.getBoundingClientRect();
+      if (rect.top < 0 || rect.top > innerHeight * .4) scrollTo({ top: 0, behavior: 'smooth' });   // the form sits at the top of the page
+      setTimeout(() => { busy = false; }, 120);
+    };
     if (push) history.pushState({ qa: step }, '', '#' + step);
-    const h = $(`[data-step="${step}"] [tabindex="-1"]`);
-    requestAnimationFrame(() => { h?.focus({ preventScroll: true }); });
-    const rect = form.getBoundingClientRect();
-    if (rect.top < 0 || rect.top > innerHeight * .4) scrollTo({ top: 0, behavior: 'smooth' });   // the form sits at the top of the page
+    setTimeout(swap, 230);
   }
   const next = () => {
+    if (busy) return;
     if (cur === 'cause' && !checkCause()) return;
     go(STEPS[STEPS.indexOf(cur) + 1]);
   };
@@ -165,7 +181,7 @@
     if (!validate(true)) return;
     skipped = false; send(); go('result');
   });
-  $('[data-skip]').addEventListener('click', () => { skipped = true; go('result'); });
+  $('[data-skip]').addEventListener('click', () => { skipped = true; send(); go('result'); });
 
   /* Navigation */
   $$('[data-next]').forEach(b => b.addEventListener('click', next));
@@ -196,10 +212,9 @@
     $('[data-symptoms]', res).textContent = L.symptoms;
     $('[data-relief]', res).textContent = L.relief;
     $$('.qa-scale li', res).forEach(li => li.classList.toggle('is-on', Number(li.dataset.l) === l));
-    // Fill the droplet: empty at 0, nearly full at 6
-    const lvl = $('.qa-level', res);
-    lvl.style.transition = 'none'; lvl.style.transform = 'translateY(150px)';
-    requestAnimationFrame(() => requestAnimationFrame(() => { lvl.style.transition = ''; lvl.style.transform = `translateY(${150 - (s === 0 ? 10 : 20 + s * 19)}px)`; }));
+    // Reveal: the result droplet starts big in the middle of the card, a drop falls in, it fills to the score
+    // while the number counts up, then it glides into the header and the rest of the result rises in.
+    playReveal(res, s);
     // Personal tips: matching answers first, then the cause page
     const ul = $('[data-tips] ul', res); ul.innerHTML = '';
     const tip = (ic, t, d, href, a) => {
@@ -216,7 +231,36 @@
     // Discount code only for people who left their email
     $('[data-code]', res).hidden = skipped; $('[data-code-locked]', res).hidden = !skipped;
     $('[data-order-link]', res).href = base + 'order.html' + (skipped ? '' : '?coupon=SURVEY');
-    $('[data-proto]', res).hidden = !!window.AQ_ASSESSMENT_ENDPOINT;
+  }
+
+  let revealTimers = [];
+  function playReveal(res, s) {
+    revealTimers.forEach(clearTimeout); revealTimers = [];
+    const at = (ms, fn) => revealTimers.push(setTimeout(fn, ms));
+    const gauge = $('.qa-gauge', res), lvl = $('.qa-level', res), num = $('[data-score]', res);
+    [...res.children].forEach((el, i) => el.style.setProperty('--i', i));
+    res.classList.remove('is-in', 'is-burst', 'is-drop', 'is-filled'); res.classList.add('is-intro');
+    lvl.style.transition = 'none'; lvl.style.transform = 'translateY(150px)'; num.textContent = '0';
+    gauge.style.transition = 'none'; gauge.style.transform = '';
+    if (form.getBoundingClientRect().top < 0) scrollTo({ top: 0, behavior: 'instant' });
+    const g = gauge.getBoundingClientRect(), c = form.getBoundingClientRect();
+    const vt = Math.max(c.top, 80), vb = Math.min(c.bottom, innerHeight), cx = c.left + c.width / 2, cy = (vt + vb) / 2 - 10;
+    const scale = Math.min(2, (Math.min(innerHeight, c.height) * .42) / g.height);
+    gauge.style.transform = `translate(${cx - (g.left + g.width / 2)}px, ${cy - (g.top + g.height / 2)}px) scale(${scale})`;
+    void gauge.offsetWidth;
+    at(60, () => res.classList.add('is-drop'));                         // drop falls (CSS, 650 ms)
+    at(700, () => {                                                     // splash, then fill + count up
+      lvl.style.transition = 'transform 1500ms cubic-bezier(.22,1,.36,1)';
+      lvl.style.transform = `translateY(${150 - (s === 0 ? 10 : 20 + s * 19)}px)`;
+      for (let k = 1; k <= s; k++) at(700 + k * (1300 / Math.max(s, 1)), () => (num.textContent = String(k)));
+    });
+    at(1250, () => res.classList.add('is-filled'));
+    at(2350, () => {                                                    // glide into place, spray of mist, content in
+      gauge.style.transition = 'transform 900ms cubic-bezier(.65,0,.35,1)'; gauge.style.transform = '';
+      res.classList.add('is-burst');
+    });
+    at(2650, () => res.classList.add('is-in'));
+    at(3600, () => res.classList.remove('is-intro'));
   }
 
   /* Copy code */
@@ -226,16 +270,19 @@
     setTimeout(() => (out.textContent = 'Copy'), 2200);
   });
 
-  /* Lead submission (placeholder until a destination is chosen) */
+  /* Submission: Netlify Forms (leads with details) + Netlify Database (every completed assessment). Never blocks the result. */
   function send() {
-    const url = window.AQ_ASSESSMENT_ENDPOINT; if (!url) return;
-    const s = score(), data = {
-      firstname: $('#qa-fn').value.trim(), lastname: $('#qa-ln').value.trim(), email: $('#qa-em').value.trim(), phone: $('#qa-ph').value.trim(),
-      xerostomia_cause: $('input[name="cause"]:checked')?.value || '', xerostomia_cause_other: otherIn.value.trim(),
-      answers: Object.fromEntries(QUESTIONS.map(q => [q, $(`input[name="${q}"]:checked`)?.value === '1' ? 'Yes' : 'No'])),
-      score: s, severity: ['none', 'mild', 'moderate', 'severe'][level(s)],
-      marketing_opt_in: !!$('input[name="marketing_opt_in"]').checked, page: location.href, submitted_at: new Date().toISOString(),
-    };
-    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), keepalive: true }).catch(() => {});
+    const s = score(), ans = Object.fromEntries(QUESTIONS.map(q => [q, $(`input[name="${q}"]:checked`)?.value === '1' ? 'Yes' : 'No']));
+    const cause = $('input[name="cause"]:checked')?.value || '', bot = $('input[name="bot-field"]').value;
+    const lead = skipped ? {} : { firstname: $('#qa-fn').value.trim(), lastname: $('#qa-ln').value.trim(), email: $('#qa-em').value.trim(), phone: $('#qa-ph').value.trim() };
+    const optIn = !skipped && $('input[name="marketing_opt_in"]').checked, severity = ['none', 'mild', 'moderate', 'severe'][level(s)];
+    fetch(base + 'api/assessment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
+      body: JSON.stringify({ ...lead, xerostomia_cause: cause, xerostomia_cause_other: otherIn.value.trim(), answers: ans, skipped, marketing_opt_in: optIn, page: location.pathname, 'bot-field': bot }) }).catch(() => {});
+    if (skipped) return;
+    const names = { q1: 'q1_parched', q2: 'q2_sleep', q3: 'q3_washroom', q4: 'q4_eating', q5: 'q5_speaking', q6: 'q6_diagnosed' };
+    const body = new URLSearchParams({ 'form-name': 'dry-mouth-assessment', ...lead, xerostomia_cause: cause, xerostomia_cause_other: otherIn.value.trim(),
+      ...Object.fromEntries(QUESTIONS.map(q => [names[q], ans[q]])), score: String(s), severity, marketing_opt_in: optIn ? 'yes' : 'no',
+      page: location.pathname, subject: `Dry mouth assessment: ${severity} (${s}/6)`, 'bot-field': bot });
+    fetch(base || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString(), keepalive: true }).catch(() => {});
   }
 })();
