@@ -552,3 +552,11 @@ html { overflow-x: clip; }
 /* Dark colour scheme: glass surfaces (glass buttons, cards) are dark tinted, never light grey */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass-tint: rgba(18,38,80,.55); --glass-line: rgba(255,255,255,.12); --glass-edge: rgba(255,255,255,.28); --glass-sheen: rgba(255,255,255,.14); } }
 :root[data-theme="dark"] { --glass-tint: rgba(18,38,80,.55); --glass-line: rgba(255,255,255,.12); --glass-edge: rgba(255,255,255,.28); --glass-sheen: rgba(255,255,255,.14); }
+
+/* "Keep scrolling" hint for the pinned anatomy steps (Dapo 2026-11-11): sits at the end of the progress bars, so it never
+   overlaps the bottle or the cards; hidden on the last step. Pure CSS chevron (no SVG to show unstyled). */
+.anatomy-progress { align-items: center; }
+.keep-scrolling { flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: 10px; font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--sky-300); opacity: .85; transition: opacity 400ms var(--ease-liquid); white-space: nowrap; }
+.keep-scrolling b { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); animation: aq-nudge 1.6s var(--ease-liquid) infinite; }
+@keyframes aq-nudge { 0%, 100% { translate: 0 0 } 50% { translate: 0 4px } }
+.anatomy[data-step="4"] .keep-scrolling { opacity: 0; }
