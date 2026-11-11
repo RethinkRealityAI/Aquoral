@@ -74,6 +74,21 @@ Aquoral Canada is calm, clinical and quietly premium. It keeps the packaging's o
 - On dark grounds, use a white or `tide-100` wordmark with the `orchid-300` dot, once the client supplies a reversed version.
 - Leave clear space equal to the height of the dot on all sides.
 
+## Light and dark themes
+
+Both themes are built in. The tokens in `aquoral-tokens.css` define every semantic colour twice: light values on `:root`, dark values under `prefers-color-scheme: dark` and `html[data-theme="dark"]`. `html[data-theme="light"]` forces light on a dark device. Always use the semantic tokens (`surface`, `ink`, `brand`, `line` and so on), never raw hexes, so a component works in both themes for free.
+
+How the website applies it:
+
+- **Default follows the device.** With no stored choice, `html` has no `data-theme` and the media query decides.
+- **A visitor's choice is remembered** in `localStorage` under `aq-theme` (`light` or `dark`). Choosing Auto removes the key.
+- **No flash on load.** This must be the first script in `<head>`, before any stylesheet:
+  `<script>try{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>`
+- **Controls.** The header has a switch (`button.theme-toggle[role=switch][data-theme-toggle]`: sun on a day-sky track, moon on a night track). The phone menu has an Appearance control (`.theme-choice`, Auto / Light / Dark radio group) so a visitor can hand the choice back to their device. Switching spreads the new theme out from the control with a View Transition; under reduced motion it is a short cross-fade. Open tabs stay in sync.
+- **White islands in the dark theme.** To keep dark pages from becoming one block of navy, a section marked `data-island` (and every inner-page `.page-hero`) becomes a rounded white panel on the navy page in the dark theme, with the light tokens inside it. In the light theme it is an ordinary section. The home page alternates: How it works (white), Why Aquoral (navy), Institut Pasteur (blue), Everyday relief (white), How to use (navy), Learn (white).
+- **3D stage sections** (hero, anatomy, who it helps, order) and the Institut Pasteur section are dark in both themes by design.
+- **Header glass** is dark liquid glass over dark grounds and clear light glass over white islands, so it never turns grey.
+
 ## Iconography
 
 - Use Lucide outline icons at 1.75px stroke, 24px default size, coloured with `ink` or `accent`. Pair every icon with a visible text label.

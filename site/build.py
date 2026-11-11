@@ -60,6 +60,16 @@ def icon(name, cls='icon'):
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
+# Light / dark theme (2026-11-11). Default follows the device; a choice is kept in localStorage('aq-theme')
+# and applied by the inline <head> script before CSS loads, so the page never flashes the wrong theme.
+SUN = '<svg class="tt-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>'
+MOON = '<svg class="tt-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>'
+THEME_SWITCH = ('<button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Dark mode" data-theme-toggle>'
+                f'<span class="tt-track" aria-hidden="true"><span class="tt-stars"></span><span class="tt-thumb">{SUN}{MOON}</span></span></button>')
+THEME_CHOICE = ('<div class="theme-choice" role="radiogroup" aria-label="Appearance"><span class="tc-label" aria-hidden="true">Appearance</span><div class="tc-seg">'
+                + ''.join(f'<button type="button" role="radio" aria-checked="false" data-theme-set="{v}">{l}</button>' for v, l in [('system', 'Auto'), ('light', 'Light'), ('dark', 'Dark')])
+                + '<span class="tc-pill" aria-hidden="true"></span></div></div>')
+
 def layout(meta, body, base):
     nav_links = ''.join(f'<li><a href="{base}{href}"{" aria-current=\"page\"" if meta.get("nav") == key else ""}>{label}</a></li>' for key, label, href in NAV)
     mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
@@ -71,6 +81,7 @@ def layout(meta, body, base):
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
+<script>try{{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}}catch(e){{}}</script>
 <script type="importmap">{{"imports":{{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}}}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -92,6 +103,7 @@ def layout(meta, body, base):
     <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
+      {THEME_SWITCH}
       <a class="btn btn-primary btn-sm" href="{base}order.html">Order {icon("arrow-right")}</a>
       <button class="btn btn-glass btn-sm menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">{icon("menu")}</button>
     </div>
@@ -100,6 +112,7 @@ def layout(meta, body, base):
 <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
   <button class="btn btn-glass btn-sm close menu-close" type="button" aria-label="Close menu" style="width:48px;padding:0;color:#fff">{icon("x")}</button>
   <ul>{mobile_links}</ul>
+  {THEME_CHOICE}
 </div>
 <main id="main">
 {body}
