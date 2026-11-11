@@ -81,11 +81,15 @@ main, .site-footer { position: relative; z-index: 1; }
 /* Logo lockup: the packaging marks (orchid dot | divider | cobalt spoke wheel) sit above the wordmark, as on the carton */
 .brand-lockup { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; line-height: 0; }
 .brand-lockup .wordmark { width: 86px; height: 31px; }
-.brand-marks { display: block; height: 12px; width: auto; margin-left: 3px; overflow: visible; }
+.brand-marks { display: block; height: 13px; width: auto; margin-left: 3px; overflow: visible; }
 .bm-dot { fill: var(--orchid-500); }
 .bm-bar { fill: currentColor; opacity: .85; }
 .bm-wheel { fill: var(--tide-600); }
-.on-dark .bm-wheel, .site-footer .bm-wheel { stroke: rgba(255,255,255,.55); stroke-width: .6; }
+.bm-spokes { stroke: #fff; }
+/* On navy grounds the cobalt disc disappears, so the wheel inverts: white disc, cobalt spokes */
+.on-dark .bm-wheel { fill: #fff; } .on-dark .bm-spokes { stroke: var(--tide-600); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .site-footer .bm-wheel { fill: #fff; } :root:not([data-theme="light"]) .site-footer .bm-spokes { stroke: var(--tide-600); } }
+:root[data-theme="dark"] .site-footer .bm-wheel { fill: #fff; } :root[data-theme="dark"] .site-footer .bm-spokes { stroke: var(--tide-600); }
 .nav-links { display: flex; gap: 2px; list-style: none; margin: 0 auto; padding: 0; }
 .nav-links a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 15px; border-radius: 999px; color: inherit; text-decoration: none; font: 500 16px/1 var(--font-display); white-space: nowrap; }
 .nav-links a:hover { background: color-mix(in srgb, currentColor 9%, transparent); }
@@ -95,7 +99,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .nav-end .menu-btn { display: none; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 999px; border: 1px solid transparent; font: 600 17px/1.2 var(--font-display); letter-spacing: -.005em; text-decoration: none; cursor: pointer; transition: transform 180ms var(--ease-surface, ease), background 180ms, box-shadow 180ms; white-space: nowrap; }
 .btn svg { width: 20px; height: 20px; flex: none; }
-.btn-primary { background: var(--action); color: var(--on-action); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 12px 30px -12px color-mix(in srgb, var(--action) 80%, transparent); }
+.btn-primary { background: var(--action); color: var(--on-action); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 10px 24px -12px rgba(11,24,51,.45); } /* neutral lift, no coloured halo (it smeared pink through the glass header) */
 .btn-primary:hover { background: var(--action-hover); color: var(--on-action); transform: translateY(-1px); }
 .btn-primary:hover svg:last-child { transform: translateX(3px); } .btn-primary svg { transition: transform 300ms var(--ease-surface, ease); }
 .btn-glass { background: var(--glass-tint); color: var(--ink); border-color: var(--glass-line); border-top-color: var(--glass-edge); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); box-shadow: inset 0 1px 0 var(--glass-sheen); }
@@ -425,6 +429,9 @@ sup a { text-decoration: none; font-size: .7em; color: var(--brand); }
 .hero-hot .hero-facts { display: block; margin: 0; height: 0; }
 .hero-hot .hero-facts .fact-pill { position: fixed; left: 0; top: 0; z-index: 4; opacity: 0; will-change: transform, opacity; background: color-mix(in srgb, var(--tide-900) 55%, transparent); padding: 8px 16px 8px 8px; }
 .hero-hot.stage-failed .hero-facts .fact-pill { position: static; opacity: 1; }
+/* Light theme: the hotspot pills are white glass with navy text and a solid brand-blue icon chip (the navy tint read as dull grey on the daylight stage) */
+@media not all and (prefers-color-scheme: dark) { :root.hero-hot:not([data-theme="dark"]) .hero-facts .fact-pill { background: rgba(255,255,255,.86); color: var(--tide-900); border-color: rgba(18,38,80,.10); border-top-color: #fff; box-shadow: 0 10px 24px -12px rgba(18,38,80,.35); } }
+:root.hero-hot[data-theme="light"] .hero-facts .fact-pill { background: rgba(255,255,255,.86); color: var(--tide-900); border-color: rgba(18,38,80,.10); border-top-color: #fff; box-shadow: 0 10px 24px -12px rgba(18,38,80,.35); }
 .hot-lines { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0; overflow: visible; }
 .hot-lines path { stroke: var(--sky-300); stroke-width: 1.5; stroke-dasharray: 3 4; fill: none; opacity: .8; }
 .hot-lines circle { fill: #fff; filter: drop-shadow(0 0 6px var(--sky-300)); }

@@ -65,8 +65,7 @@ def icon(name, cls='icon'):
 # Logo marks from the packaging (Dapo 2026-11-11): orchid dot, divider bar, cobalt eight-spoke wheel, set above the wordmark.
 BRAND_MARKS = ('<svg class="brand-marks" viewBox="0 0 36 16" aria-hidden="true" focusable="false">'
                '<circle class="bm-dot" cx="6.5" cy="8" r="6.2"/><rect class="bm-bar" x="14.6" y="0" width="1.7" height="16" rx=".5"/>'
-               '<circle class="bm-wheel" cx="27.5" cy="8" r="7.5"/><circle cx="27.5" cy="8" r="6.3" fill="none" stroke="#fff" stroke-width=".5"/>'
-               '<path d="M27.5 1.9v12.2M21.4 8h12.2M23.19 3.69l8.62 8.62M31.81 3.69l-8.62 8.62" fill="none" stroke="#fff" stroke-width=".8" stroke-linecap="round"/></svg>')
+               '<circle class="bm-wheel" cx="27.5" cy="8" r="7.5"/><path d="M27.5 2.4v11.2M21.9 8h11.2M23.54 4.04l7.92 7.92M31.46 4.04l-7.92 7.92" class="bm-spokes" fill="none" stroke-width="1.05" stroke-linecap="round"/></svg>')
 
 def lockup(extra=''):
     return f'<span class="brand-lockup {extra}" role="img" aria-label="Aquoral">{BRAND_MARKS}<span class="wordmark" aria-hidden="true"></span></span>'
