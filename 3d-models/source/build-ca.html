@@ -10,7 +10,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // ---------- brand colours sampled from the current US pack ----------
-const NAVY = '#284D97', PINK = '#C02888', INK = '#1B2129', GREY = '#3a4048';
+const NAVY = '#284D97', PINK = '#E0218A', INK = '#1B2129', GREY = '#3a4048';
 const FONT = '"Liberation Sans", Arial, Helvetica, sans-serif';
 
 const wordmarkImg = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/wordmark.png'; });
@@ -21,13 +21,18 @@ function tinted(img, color) {
 }
 const WM = tinted(wordmarkImg, NAVY);
 function wordmark(ctx, x, y, w) { ctx.drawImage(WM, x, y, w, w * WM.height / WM.width); }
-function icon(ctx, x, y, s) { // pink dot | navy ring with "go"
+function spokeWheel(ctx, cx, cy, R) { // matches commercial/edit/aquoral-spoke-wheel.svg (viewBox 48, r22)
+  const k = R / 22; ctx.save();
+  ctx.fillStyle = '#254C9E'; ctx.beginPath(); ctx.arc(cx, cy, 22 * k, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 1.5 * k; ctx.beginPath(); ctx.arc(cx, cy, 18.5 * k, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 2.25 * k; ctx.lineCap = 'round';
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 4, dx = Math.cos(a) * 18 * k, dy = Math.sin(a) * 18 * k; ctx.beginPath(); ctx.moveTo(cx - dx, cy - dy); ctx.lineTo(cx + dx, cy + dy); ctx.stroke(); }
+  ctx.restore();
+}
+function icon(ctx, x, y, s) { // packaging mark: magenta dot | navy bar | spoke wheel
   ctx.fillStyle = PINK; ctx.beginPath(); ctx.arc(x + s * 0.5, y + s * 0.5, s * 0.5, 0, 7); ctx.fill();
-  ctx.fillStyle = GREY; ctx.fillRect(x + s * 1.22, y - s * 0.12, s * 0.09, s * 1.24);
-  ctx.strokeStyle = NAVY; ctx.lineWidth = s * 0.1;
-  ctx.beginPath(); ctx.arc(x + s * 2.15, y + s * 0.5, s * 0.5, 0, 7); ctx.stroke();
-  ctx.fillStyle = NAVY; ctx.font = `${s * 0.42}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('ʟgo', x + s * 2.15, y + s * 0.53); ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#254C9E'; ctx.fillRect(x + s * 1.12, y + s * 0.02, s * 0.2, s * 0.96);
+  spokeWheel(ctx, x + s * 2.05, y + s * 0.5, s * 0.5);
 }
 function text(ctx, str, x, y, size, { color = INK, weight = '400', align = 'left' } = {}) {
   ctx.fillStyle = color; ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.fillText(str, x, y);
@@ -193,6 +198,7 @@ pack.add(b2, bt);
 window.OUT = {
   'aquoral-bottle-ca.glb': await toGLB(bottle),
   'aquoral-box-ca.glb': await toGLB(box),
+  'renders/bottle-ca-front.png': render(bottle, { az: 0 }),
   'renders/pack-34-ca.png': render(pack, { w: 1400, h: 1200, az: -20, el: 12 }),
   'textures/bottle-label-ca.png': bottleLabel().toDataURL('image/png').split(',')[1],
   'textures/box-front-ca.png': boxFront().toDataURL('image/png').split(',')[1],
