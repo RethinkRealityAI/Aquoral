@@ -310,39 +310,6 @@ async function boot() {
   const crown = Array.from({ length: 14 }, (_, i) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), dropMat); const a = i / 14 * Math.PI * 2 + Math.random() * .3;
     m.userData = { a, v: .5 + Math.random() * .45, up: .75 + Math.random() * .55, s: .009 + Math.random() * .01 }; m.visible = false; bottleG.add(m); return m; });
 
-  /* Spray mist: two puffs from the pump nozzle, looping while step 02 ("Two sprays") is active.
-     Stateless shader: each particle belongs to puff 0 or 1 and replays its path every SPRAY_T seconds. */
-  const SPRAY_N = HIGH ? 260 : 160, SPRAY_T = 2.8;
-  // cone axis: out of the nozzle (+z), angled toward the open side so the mist fans out across the frame
-  const sprayAxis = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(.62, .12, .78).normalize());
-  const sg = new THREE.BufferGeometry(), sp = new Float32Array(SPRAY_N * 3), sd = new Float32Array(SPRAY_N * 4);
-  for (let i = 0; i < SPRAY_N; i++) {
-    const th = Math.random() * Math.PI * 2, cone = Math.sqrt(Math.random()) * .42;   // cone half-angle ~24 deg
-    const v = new THREE.Vector3(Math.sin(cone) * Math.cos(th), Math.sin(cone) * Math.sin(th), Math.cos(cone)).applyQuaternion(sprayAxis);
-    sp.set([v.x, v.y, v.z], i * 3);
-    sd.set([i % 2, Math.random(), .55 + Math.random() * .6, Math.random() * .12], i * 4);  // puff, seed, speed, emit delay
-  }
-  sg.setAttribute('position', new THREE.BufferAttribute(sp, 3)); sg.setAttribute('d', new THREE.BufferAttribute(sd, 4));
-  const sprayMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uK: { value: 0 }, uPx: { value: 1 }, uColor: { value: new THREE.Color(0xd9f1ff) }, uOrigin: { value: new THREE.Vector3() }, uPeriod: { value: SPRAY_T } },
-    vertexShader: `attribute vec4 d; uniform float uTime,uPx,uPeriod; uniform vec3 uOrigin; varying float vA;
-      void main(){ float age = mod(uTime - d.x*.5 - d.w, uPeriod); float life = 1.5 + d.y*.6;
-        float travel = (1. - exp(-age*3.)) * .42 * d.z;            // fast burst, then drag
-        vec3 dir = normalize(position);
-        vec3 p = uOrigin + dir*travel + vec3(sin(uTime*.9 + d.y*40.)*.012*age, .02*age*age - .005*age, 0.);
-        vec4 mv = modelViewMatrix*vec4(p,1.); gl_Position = projectionMatrix*mv;
-        gl_PointSize = (2.5 + d.y*5.5) * (1. + age*.8) * uPx * (10. / -mv.z);
-        vA = smoothstep(0.,.05,age) * (1. - smoothstep(life*.45, life, age)) * (.35 + .65*d.y); }`,
-    fragmentShader: `uniform vec3 uColor; uniform float uK; varying float vA;
-      void main(){ float r = length(gl_PointCoord-.5); float a = smoothstep(.5,.05,r);
-        gl_FragColor = vec4(uColor, a * vA * uK * .9);
-        #include <colorspace_fragment>
-      }`
-  });
-  const spray = new THREE.Points(sg, sprayMat); spray.renderOrder = 6; spray.frustumCulled = false; bottleG.add(spray);
-  let sprayK = 0, sprayTime = 0;
-
   /* Post */
   let composer = null, bloom = null;
   if (HIGH) {
@@ -558,14 +525,6 @@ async function boot() {
 
     elapsed += reduceMotion ? dt * .25 : dt;
     floorMat.uniforms.uTime.value = elapsed; if (reflector) reflector.material.uniforms.uTime.value = elapsed; motesMat.uniforms.uTime.value = elapsed; gridMat.uniforms.uTime.value = elapsed;
-
-    const sprayOn = activeBeat === 1 && cur.grid > .5 && cur.explode > .6 ? 1 : 0;
-    sprayK += (sprayOn - sprayK) * Math.min(1, dt * 4); sprayTime += dt;
-    spray.visible = sprayK > .01;
-    if (spray.visible) {
-      sprayMat.uniforms.uK.value = sprayK; sprayMat.uniforms.uTime.value = sprayTime;
-      sprayMat.uniforms.uOrigin.value.copy(anchors.nozzle); sprayMat.uniforms.uPx.value = renderer.getPixelRatio() * (vh / 900);
-    }
 
     rig.updateMatrixWorld(true);
     updateOverlays(); updateHot(elapsed);

@@ -9,7 +9,7 @@ Placeholders: {{icon:name}} inline Lucide-style icons, {{base}} relative root ("
   python3 build.py --artifact -> dist/ plus assets/js/models.js with the GLBs inlined as base64
                                  (artifact hosting does not serve .glb)
 """
-import base64, json, pathlib, re, shutil, sys
+import base64, hashlib, json, pathlib, re, shutil, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 SRC, DIST = HERE / 'src', HERE / 'dist'
@@ -150,6 +150,11 @@ def build():
         meta = json.loads(m.group(1)); body = raw[m.end():]
         out = DIST / rel; out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(render(layout(meta, body, base), base)); count += 1
+    # Cache-bust: tag every local CSS/JS reference with a hash of the built assets, so browsers never pair a new
+    # page with a stale cached stylesheet or script (2026-11-11: that rendered new markup unstyled on phones).
+    h = hashlib.sha1(b''.join(f.read_bytes() for f in sorted((DIST / 'assets').rglob('*')) if f.suffix in ('.css', '.js'))).hexdigest()[:10]
+    for f in DIST.rglob('*.html'):
+        f.write_text(re.sub(r'((?:href|src)="(?:\.\./)*assets/(?:css|js)/[\w.-]+\.(?:css|js))"', rf'\1?v={h}"', f.read_text()))
     if ARTIFACT:   # the artifact host wraps the entry page in its own skeleton
         ix = DIST / 'index.html'; t = ix.read_text()
         t = t.replace('<!doctype html>\n<html lang="en-CA" class="no-js">\n<head>\n', '').replace('</head>\n<body', '<div hidden></div><body-x', 1)

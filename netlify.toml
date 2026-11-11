@@ -15,11 +15,8 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-
+# No long-lived cache on /assets: CSS/JS names are not hashed, so a one-hour cache paired new pages with
+# stale stylesheets on phones (2026-11-11). build.py also appends ?v=<hash> to every CSS/JS reference.
 [[headers]]
   for = "/assets/models/*.glb"
   [headers.values]

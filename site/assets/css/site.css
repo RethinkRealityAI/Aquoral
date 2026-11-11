@@ -464,39 +464,6 @@ html { overflow-x: clip; }
 .anatomy-pin { height: 100vh; height: 100svh; }   /* small viewport on phones, so the card is never under the browser bar */
 .anatomy .stage-slot { position: relative; }
 
-/* Step 03: floating glass panel, lipid film forming over the moisture layer */
-.film-viz { position: absolute; top: 6%; left: 0; width: min(230px, 38%); padding: 12px 12px 10px; border-radius: 20px; pointer-events: none; z-index: 2;
-  background: color-mix(in srgb, var(--tide-900, #0B1833) 42%, transparent); border: 1px solid rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.34);
-  -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 24px 50px -24px rgba(0,0,0,.7);
-  opacity: 0; transform: translateY(14px) scale(.96); transition: opacity 500ms var(--ease-liquid), transform 600ms var(--ease-liquid); }
-.anatomy[data-step="2"] .film-viz { opacity: 1; transform: none; animation: aq-float 5s ease-in-out infinite; }
-@keyframes aq-float { 0%, 100% { translate: 0 0 } 50% { translate: 0 -6px } }
-.film-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--sky-300); }
-.film-state { position: relative; display: grid; } .film-state b { grid-area: 1 / 1; font-weight: 500; text-align: right; color: #fff; }
-.film-viz svg { display: block; width: 100%; height: auto; border-radius: 12px; background: linear-gradient(180deg, rgba(163,218,244,.06), rgba(163,218,244,.14)); }
-.film-cap { margin: 8px 2px 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-muted); }
-.film-viz * { animation-duration: 6s; animation-iteration-count: infinite; animation-timing-function: var(--ease-liquid, ease); }
-.fv-water { transform-box: fill-box; transform-origin: 50% 100%; animation-name: fv-water; }
-.fv-film { fill: none; stroke: url(#fvFilm); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 4px rgba(255,255,255,.8)); animation-name: fv-film; }
-.fv-esc circle, .fv-held circle { fill: #CDEEFF; transform-box: fill-box; transform-origin: center; opacity: 0; }
-.fv-esc circle { animation-name: fv-esc; } .fv-esc circle:nth-child(2) { animation-delay: .35s; } .fv-esc circle:nth-child(3) { animation-delay: .7s; } .fv-esc circle:nth-child(4) { animation-delay: .2s; }
-.fv-held circle { animation-name: fv-held; } .fv-held circle:nth-child(2) { animation-delay: .3s; } .fv-held circle:nth-child(3) { animation-delay: .6s; }
-.film-state .s-a { animation-name: fv-a; } .film-state .s-b { animation-name: fv-b; }
-@keyframes fv-water { 0% { transform: scaleY(1) } 32% { transform: scaleY(.45) } 58%, 94% { transform: scaleY(1) } 100% { transform: scaleY(1) } }
-@keyframes fv-film { 0%, 34% { stroke-dashoffset: 1; opacity: 1 } 58%, 92% { stroke-dashoffset: 0; opacity: 1 } 100% { stroke-dashoffset: 0; opacity: 0 } }
-@keyframes fv-esc { 0% { opacity: 0; transform: translateY(0) } 4% { opacity: 1 } 24% { opacity: 0; transform: translateY(-62px) scale(.6) } 100% { opacity: 0 } }
-@keyframes fv-held { 0%, 56% { opacity: 0; transform: translateY(2px) } 62% { opacity: 1 } 72% { transform: translateY(-5px) } 80% { transform: translateY(0) } 88% { transform: translateY(-3px); opacity: 1 } 95%, 100% { opacity: 0; transform: translateY(0) } }
-@keyframes fv-a { 0%, 32% { opacity: 1 } 38%, 100% { opacity: 0 } }
-@keyframes fv-b { 0%, 36% { opacity: 0 } 44%, 94% { opacity: 1 } 100% { opacity: 0 } }
-
-/* Subtle "keep scrolling" cue while the pinned anatomy still has steps left */
-.keep-scroll { position: absolute; right: 0; bottom: 4px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px 7px 12px; border-radius: 999px; pointer-events: none;
-  font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: #fff;
-  background: rgba(11,24,51,.5); border: 1px solid rgba(163,218,244,.3); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); opacity: .9; transition: opacity 400ms; }
-.keep-scroll svg { width: 14px; height: 14px; fill: none; stroke: var(--sky-300); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: aq-nudge 1.6s ease-in-out infinite; }
-@keyframes aq-nudge { 0%, 100% { transform: translateY(-2px) } 50% { transform: translateY(3px) } }
-.anatomy[data-step="4"] .keep-scroll { opacity: 0; }
-
 @media (max-width: 860px) {
   .anatomy-grid { grid-template-rows: auto minmax(0, 1fr) auto auto; padding-bottom: 14px; }
   .anatomy-progress { grid-row: 4; margin-top: 8px; }
@@ -506,9 +473,5 @@ html { overflow-x: clip; }
   .beat .value { font-size: 24px; } .beat .value small { font-size: 11px; margin-top: 4px; }
   .beat .detail p { font-size: 15px; line-height: 1.45; margin-top: 6px; }
   .beat.is-active .callout-card { animation: aq-beat-in 450ms var(--ease-liquid); }
-  .film-viz { top: 0; left: 0; right: auto; width: 168px; padding: 10px 10px 8px; border-radius: 16px; }
-  .film-cap { display: none; }
-  .film-head { font-size: 10px; letter-spacing: .1em; }
-  .keep-scroll { bottom: 8px; }
 }
 @keyframes aq-beat-in { from { opacity: 0; transform: translateY(10px) } }
