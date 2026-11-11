@@ -50,11 +50,13 @@ const KEYS = ['x', 'y', 's', 'box', 'floor', 'grid', 'explode', 'orbit', 'bx', '
 
 async function boot() {
   const css = (n, fb) => (getComputedStyle(root).getPropertyValue(n).trim() || fb);
-  const COL = {
+  const readCol = () => ({
     top: css('--stage-top', '#04131D'), bot: css('--stage-bot', '#0A2A3D'), halo: css('--stage-halo', '#15608A'),
     rim: css('--stage-rim', '#5FE0D6'), water: css('--stage-water', '#D9FBF8'), floor: css('--stage-floor', '#04131D'),
     caustic: css('--stage-caustic', '#5FE0D6'), mote: css('--stage-mote', '#CFF7F3'), grid: css('--stage-grid', '#5FE0D6')
-  };
+  });
+  let COL = readCol();
+  const isLightTheme = () => { const t = root.dataset.theme; return t === 'light' || (t !== 'dark' && !matchMedia('(prefers-color-scheme: dark)').matches); };
   const C = k => new THREE.Color(COL[k]);
 
   let renderer;
@@ -97,20 +99,20 @@ async function boot() {
   const rimL = new THREE.SpotLight(C('rim'), 2.9, 0, Math.PI / 6, .7, 0);
   const rimR = new THREE.SpotLight(C('rim'), 2.3, 0, Math.PI / 6, .7, 0);
   scene.add(key, key.target, rimL, rimL.target, rimR, rimR.target);
-  scene.add(new THREE.HemisphereLight(0x1b6189, 0x081d2b, .16));
+  const hemi = new THREE.HemisphereLight(0x1b6189, 0x081d2b, .16); scene.add(hemi);
 
   /* Backdrop: sweep with a halo that follows the product */
   const backdrop = new THREE.Mesh(new THREE.SphereGeometry(80, 64, 32), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, toneMapped: false,
-    uniforms: { uTop: { value: C('top') }, uBot: { value: C('bot') }, uHalo: { value: C('halo') }, uHaloDir: { value: new THREE.Vector3(0, 0, -1) }, uHaloK: { value: .6 }, uHaloW: { value: 9 } },
+    uniforms: { uTop: { value: C('top') }, uBot: { value: C('bot') }, uHalo: { value: C('halo') }, uHaloDir: { value: new THREE.Vector3(0, 0, -1) }, uHaloK: { value: .6 }, uHaloW: { value: 9 }, uGain: { value: 1 } },
     vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
-    fragmentShader: `uniform vec3 uTop,uBot,uHalo,uHaloDir; uniform float uHaloK,uHaloW; varying vec3 vDir;
+    fragmentShader: `uniform vec3 uTop,uBot,uHalo,uHaloDir; uniform float uHaloK,uHaloW,uGain; varying vec3 vDir;
       void main(){
         float y = clamp(vDir.y*1.6+.35, 0., 1.);
         vec3 c = mix(uBot, uTop, smoothstep(0.,1.,y));
         float d = distance(vDir, uHaloDir);
         c = mix(c, uHalo, uHaloK * exp(-d*d*uHaloW));
-        gl_FragColor = vec4(c, 1.);
+        gl_FragColor = vec4(c * uGain, 1.);
         #include <colorspace_fragment>
       }`
   }));
@@ -242,8 +244,9 @@ async function boot() {
   boxContact.rotation.x = -Math.PI / 2; boxContact.position.y = .003; boxContact.renderOrder = 3; boxG.add(boxContact);
 
   /* Liquid materials */
-  const addFresnel = (mat, rim, k) => { mat.onBeforeCompile = sh => {
-    sh.uniforms.uRim = { value: new THREE.Color(rim) }; sh.uniforms.uRimK = { value: k };
+  const fresnelU = [];
+  const addFresnel = (mat, rim, k) => { const u = { value: new THREE.Color(rim) }; fresnelU.push({ u, base: new THREE.Color(rim) }); mat.onBeforeCompile = sh => {
+    sh.uniforms.uRim = u; sh.uniforms.uRimK = { value: k };
     sh.fragmentShader = 'uniform vec3 uRim; uniform float uRimK;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
       `float fr = pow(1.0 - abs(dot(normalize(-vViewPosition), normal)), 2.4); outgoingLight += uRim * fr * uRimK;
        #include <opaque_fragment>`); }; };
@@ -321,6 +324,31 @@ async function boot() {
     composer.addPass(new OutputPass());
   }
   const draw = () => composer ? composer.render() : renderer.render(scene, camera);
+
+  /* Light / dark stage (Dapo 2026-11-11: the switch turns the whole site, 3D stage included).
+     Dark: deep-ocean studio. Light: an airy daylight studio with the same water floor, cobalt rims so the clear
+     droplet and the white bottle still read against a pale backdrop. */
+  const tide900 = new THREE.Color('#122650'), tide600 = new THREE.Color('#254C9E');
+  let haloBase = .6;
+  const applyStageTheme = () => {
+    COL = readCol(); const light = isLightTheme();
+    const u = backdrop.material.uniforms; u.uTop.value.set(COL.top); u.uBot.value.set(COL.bot); u.uHalo.value.set(COL.halo); haloBase = light ? .85 : .6; u.uGain.value = light ? 1.3 : 1;
+    gridMat.uniforms.uColor.value.set(COL.grid);
+    floorMat.uniforms.uFloor.value.set(COL.floor); floorMat.uniforms.uCaustic.value.set(COL.caustic); floorMat.uniforms.uFar.value.set(COL.bot);
+    motesMat.uniforms.uColor.value.set(COL.mote); motesMat.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending; motesMat.needsUpdate = true;
+    rimL.color.set(COL.rim); rimR.color.set(COL.rim);
+    shadowMat.color.copy(light ? tide900 : new THREE.Color(COL.top)); shadowMat.opacity = light ? .22 : .55;
+    hemi.color.set(light ? 0xffffff : 0x1b6189); hemi.groundColor.set(light ? 0xcfe3f1 : 0x081d2b); hemi.intensity = light ? .7 : .16;
+    renderer.toneMappingExposure = light ? 1.02 : .86;
+    if (bloom) bloom.strength = light ? .03 : .1;
+    fresnelU.forEach(f => f.u.value.copy(light ? tide600 : f.base));
+    [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#3D63B5' : COL.rim));
+    if (reflector) reflector.material.uniforms.color.value.set(light ? 0xdbe8f2 : 0x8899a0);
+    document.body.classList.toggle('stage-light', light);
+  };
+  applyStageTheme();
+  document.addEventListener('aq:theme', applyStageTheme);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyStageTheme);
 
   /* Size */
   let vw = 0, vh = 0;
@@ -520,7 +548,7 @@ async function boot() {
     const b = camera.position.dot(hv), cc = camera.position.lengthSq() - 80 * 80, tt = -b + Math.sqrt(b * b - cc);
     backdrop.material.uniforms.uHaloDir.value.copy(camera.position).addScaledVector(hv, tt).normalize();
     backdrop.material.uniforms.uHaloW.value = lerp(9, 22, cur.grid);
-    backdrop.material.uniforms.uHaloK.value = .6 * Math.max(.25, presence);
+    backdrop.material.uniforms.uHaloK.value = haloBase * Math.max(.25, presence);
 
     if (playing && heroW < .35) introFinish();   // visitor scrolled on: don't make them watch it later
     if (playing) { intro += dt; introUpdate(intro); if (intro >= Math.max(t5, t6)) introFinish(); }

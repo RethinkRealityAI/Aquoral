@@ -98,7 +98,7 @@ def layout(meta, body, base):
 <script>document.documentElement.classList.replace('no-js','js')</script>
 <a class="skip-link" href="#main">Skip to content</a>
 {stage_html}
-<header class="site-header{" on-dark" if meta.get("headerDark", stage) else ""}" id="top">
+<header class="site-header" id="top">
   <div class="bar">
     <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
     <ul class="nav-links">{nav_links}</ul>
@@ -121,8 +121,8 @@ def layout(meta, body, base):
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <span class="wordmark" role="img" aria-label="Aquoral" style="height:34px;width:150px;margin-bottom:16px"></span>
-        <p style="max-width:26rem;margin:0;color:#A9B8D2;font-size:16px">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
+        <span class="wordmark footer-mark" role="img" aria-label="Aquoral"></span>
+        <p class="footer-blurb">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>
       <div><h3>Dry mouth</h3><ul><li><a href="{base}dry-mouth.html">Causes and who it helps</a></li><li><a href="{base}medications.html">Medications</a></li><li><a href="{base}conditions/cancer.html">Cancer treatment</a></li><li><a href="{base}conditions/sjogrens.html">Sjögren’s</a></li><li><a href="{base}conditions/cpap.html">CPAP and sleep apnea</a></li><li><a href="{base}conditions/diabetes.html">Diabetes</a></li><li><a href="{base}learn.html">Articles</a></li></ul></div>

@@ -10,23 +10,19 @@
   $('.menu-close')?.addEventListener('click', () => setMenu(false));
   addEventListener('keydown', e => { if (e.key === 'Escape' && menu?.classList.contains('open')) setMenu(false); });
 
-  /* Header turns light/dark with the section under it */
+  /* Header glass follows the section under it. The whole site follows the theme (Dapo 2026-11-11: a true swap), except the
+     inverted panels ([data-island] and inner-page heroes), which are white in the dark theme and navy in the light theme. */
   const header = $('.site-header');
-  const darkSecs = $$('[data-stage-section], .site-footer, [data-dark]');
-  const islands = $$('[data-island], .page-hero');
+  const inverted = $$('[data-island], .page-hero');
   const onScroll = () => {
     if (!header) return;
-    const y = 40; let dark = false;
-    for (const s of darkSecs) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { dark = true; break; } }
-    // In the dark colour scheme every section is dark, so the bar always uses the dark liquid glass
-    const t = document.documentElement.dataset.theme;
-    // except over a white island (data-island), where it switches to clear light glass instead of a grey smear
+    const y = 40, t = document.documentElement.dataset.theme;
     const themeDark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
-    let island = false;
-    if (themeDark) for (const s of islands) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { island = true; break; } }
-    if (themeDark) dark = !island;
+    let inv = false;
+    for (const s of inverted) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { inv = true; break; } }
+    const dark = themeDark !== inv;
     header.classList.toggle('on-dark', dark);
-    header.classList.toggle('on-light', island);
+    header.classList.toggle('on-light', !dark);
   };
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
@@ -42,6 +38,7 @@
     $$('[data-theme-set]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themeSet === c)));
     $$('.tc-seg').forEach(s => s.style.setProperty('--i', ['system', 'light', 'dark'].indexOf(c)));
     onScroll();
+    document.dispatchEvent(new CustomEvent('aq:theme'));
   };
   const setTheme = (v, from) => {
     const apply = () => { if (v === 'system') delete root.dataset.theme; else root.dataset.theme = v; store(v === 'system' ? null : v); syncTheme(); };
