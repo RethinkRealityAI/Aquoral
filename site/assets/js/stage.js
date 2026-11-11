@@ -44,6 +44,8 @@ const POSES = {
   explore: { fit: 1.25, fitW: .9, spin: 1, box: 0, floor: 0, grid: 0, explode: 0, orbit: 1, bx: 0, bz: 0, xx: .42, xz: -.55, xyaw: -.5 , twin: 0 },
   order:   { fit: 1.05, fitW: .9, spin: 1, box: 1, floor: 1, grid: 0, explode: 0, orbit: 0, bx: -.13, bz: .16, xx: .3, xz: -.42, xyaw: -.45 , twin: 0 }
 };
+/* Laptop/desktop (Dapo 2026-11-11): bigger bottle in the droplet orbit and the anatomy schematic. Phones keep their poses. */
+if (!isPhone && innerWidth > 1080) { POSES.explore.fit = .96; POSES.anatomy.fit = 1.08; }
 const KEYS = ['x', 'y', 's', 'box', 'floor', 'grid', 'explode', 'orbit', 'bx', 'bz', 'xx', 'xz', 'xyaw', 'spin', 'twin'];
 
 async function boot() {

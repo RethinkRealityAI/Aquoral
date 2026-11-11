@@ -17,6 +17,9 @@
     if (!header) return;
     const y = 40; let dark = false;
     for (const s of darkSecs) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { dark = true; break; } }
+    // In the dark colour scheme every section is dark, so the bar always uses the dark liquid glass
+    const t = document.documentElement.dataset.theme;
+    if (t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)) dark = true;
     header.classList.toggle('on-dark', dark);
   };
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
@@ -198,4 +201,11 @@
     const loop = now => { raf = requestAnimationFrame(loop); const dt = Math.min(.05, (now - (last || now)) / 1000); last = now; draw(dt); };
     new IntersectionObserver(([e]) => { if (e.isIntersecting && !run) { run = true; last = 0; raf = requestAnimationFrame(loop); } else if (!e.isIntersecting && run) { run = false; cancelAnimationFrame(raf); } }).observe(card);
   }
+})();
+
+/* Exclusive technology orb: play only while on screen (autoplays under reduced motion too, per Dapo) */
+(() => {
+  const v = document.querySelector('.tech-vid'); if (!v) return;
+  v.muted = true;
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
 })();
