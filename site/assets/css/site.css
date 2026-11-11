@@ -38,9 +38,13 @@ body.has-stage { background: var(--stage-top); }
 
 /* Fixed 3D canvas behind everything; reading sections are opaque and sit above it */
 #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; outline: none; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease-liquid); }
-.stage-ready #stage { opacity: 1; }
+.stage-ready #stage, .stage-live #stage { opacity: 1; }
+#stage { transition-duration: 600ms; }
+/* Before the stage script paints its first water frame, keep the hero fact pills out of the empty layout (they become
+   floating hotspots beside the bottle once the stage is up; the 4 s site.js fallback or a stage failure shows them). */
+html.js:not(.hero-hot):not(.intro-revealed):not(.stage-failed) body.has-stage .hero-facts { visibility: hidden; }
 .stage-poster { position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: radial-gradient(45% 55% at 68% 55%, color-mix(in srgb, var(--stage-halo) 70%, transparent), transparent 70%), linear-gradient(180deg, var(--stage-top), var(--stage-bot)); }
+  background: radial-gradient(45% 55% at 68% 55%, color-mix(in srgb, var(--stage-halo) 70%, transparent), transparent 70%), linear-gradient(180deg, var(--stage-top), var(--stage-bot) 62%, var(--stage-floor) 100%); }
 .stage-poster .loader { position: absolute; left: 68%; top: 52%; width: 22px; height: 30px; translate: -50% -50%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background: radial-gradient(circle at 35% 35%, #fff, var(--stage-rim) 60%); box-shadow: 0 0 30px var(--stage-rim); animation: aq-drop-pulse 1.4s var(--ease-wave) infinite; transition: opacity 400ms; }
 .stage-ready .stage-poster .loader { opacity: 0; }

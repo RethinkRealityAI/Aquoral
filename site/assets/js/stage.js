@@ -33,9 +33,8 @@ const ease = {
 const damp = (a, b, k, dt) => lerp(a, b, 1 - Math.exp(-k * dt));
 const dampAngle = (a, b, k, dt) => { let d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; return a + d * (1 - Math.exp(-k * dt)); };
 
-if (canvas) boot().catch(err => { console.error(err); fail(); });
 
-function fail() { root.classList.remove('stage-ready'); root.classList.add('stage-failed'); document.dispatchEvent(new Event('aq:intro-done')); }
+function fail() { root.classList.remove('stage-ready', 'stage-live'); root.classList.add('stage-failed'); document.dispatchEvent(new Event('aq:intro-done')); }
 
 /* ---------- Poses: what each slot asks of the product ---------- */
 const POSES = {
@@ -47,6 +46,41 @@ const POSES = {
 };
 /* Laptop/desktop (Dapo 2026-11-11): bigger bottle in the droplet orbit and the anatomy schematic. Phones keep their poses. */
 if (!isPhone && innerWidth > 1080) { POSES.explore.fit = .96; POSES.anatomy.fit = 1.08; }
+/* Water surface (Dapo 2026-11-11: the floor should read as real rippling water, keep the gloss and reflections).
+   One analytic height field, in floor-local units (bottle height = 1), shared by the mirror and the pool shading:
+   four wind-wave trains of different lengths, a few rain-drop ring ripples that pop up at random spots and spread
+   out, and the intro splash ring. Only the gradient is evaluated (no textures, no extra passes), so it costs a few
+   dozen ALU ops per pixel and runs on phones. */
+const WATER_GLSL = `
+  uniform float uTime, uSplash; uniform vec2 uSplashC;
+  float wHash(float n){ return fract(sin(n * 127.1) * 43758.5453); }
+  vec2 wTrain(vec2 p, vec2 d, float k, float w, float a, float ph){ return d * (a * k * cos(dot(p, d) * k + uTime * w + ph)); }
+  vec2 wRing(vec2 p, vec2 c, float age, float a){
+    if (age < 0. || age > 3.2) return vec2(0.);
+    vec2 q = p - c; float r = length(q) + 1e-4, x = r - (.06 + age * .62);
+    float env = exp(-x * x * 26.) * exp(-age * 1.15) / (1. + r * 1.6);
+    return q / r * (-a * 34. * env * sin(x * 34.));
+  }
+  vec2 waterGrad(vec2 p){
+    vec2 g = wTrain(p, vec2(.94, .34), 6.9, 1.9, .010, 0.);
+    g += wTrain(p, vec2(-.57, .82), 11.4, 2.5, .0055, 1.7);
+    g += wTrain(p, vec2(.28, -.96), 19., 3.3, .0022, 4.1);
+    g += wTrain(p, vec2(-.9, -.43), 31., 4.4, .0008, 2.3);
+    for (int i = 0; i < 3; i++) {             // rain-drop rings, each on its own 3.6 s cycle
+      float fi = float(i), tt = uTime + fi * 1.2, cyc = floor(tt / 3.6), age = tt - cyc * 3.6;
+      float h1 = wHash(cyc * 3.1 + fi * 17.3), h2 = wHash(cyc * 5.7 + fi * 9.1);
+      float ang = h1 * 6.2832, rad = .75 + h2 * 2.6;
+      g += wRing(p, vec2(cos(ang) * rad * 1.3, sin(ang) * rad * .8 + .5), age, .0045);
+    }
+    g += wRing(p, uSplashC, uSplash, .014) + wRing(p, uSplashC, uSplash - .22, .008);
+    return g;
+  }
+  float waterSpec(vec3 n, vec3 V){              // key-light glints (sharp) plus a soft sky sheen
+    vec3 R = reflect(-V, n);
+    vec3 L1 = normalize(vec3(-.32, .42, .85)), L2 = normalize(vec3(.55, .3, .78));
+    return pow(max(dot(R, L1), 0.), 220.) * 2.4 + pow(max(dot(R, L2), 0.), 90.) * .7 + pow(max(dot(R, L1), 0.), 18.) * .06;
+  }
+`;
 const KEYS = ['x', 'y', 's', 'box', 'floor', 'grid', 'explode', 'orbit', 'bx', 'bz', 'xx', 'xz', 'xyaw', 'spin', 'twin'];
 
 async function boot() {
@@ -56,6 +90,16 @@ async function boot() {
     rim: css('--stage-rim', '#5FE0D6'), water: css('--stage-water', '#D9FBF8'), floor: css('--stage-floor', '#04131D'),
     caustic: css('--stage-caustic', '#5FE0D6'), mote: css('--stage-mote', '#CFF7F3'), grid: css('--stage-grid', '#5FE0D6')
   });
+  /* Start fetching the models first: the water stage below renders while they download */
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  async function loadGLB(name) {
+    const inline = window.AQ_GLB?.[name];
+    if (inline) { const bin = Uint8Array.from(atob(inline), c => c.charCodeAt(0)); return loader.parseAsync(bin.buffer, ''); }
+    const base = document.querySelector('meta[name="aq-base"]')?.content || '';
+    return loader.loadAsync(`${base}assets/models/${name}.glb`);
+  }
+  const modelsP = Promise.all([loadGLB('bottle'), loadGLB('box')]);
+  modelsP.catch(() => {});
   let COL = readCol();
   const isLightTheme = () => { const t = root.dataset.theme; return t === 'light' || (t !== 'dark' && !matchMedia('(prefers-color-scheme: dark)').matches); };
   const C = k => new THREE.Color(COL[k]);
@@ -145,45 +189,50 @@ async function boot() {
   /* Floor group: reflector + caustic pool + shadow; follows the product base */
   const floorG = new THREE.Group(); scene.add(floorG);
   let reflector = null;
-  if (HIGH) {
-    // Water-over-pool reflector: the mirror image is gently displaced by slow procedural swells so it shimmers like shallow water
+  /* Mirror: desktops always; phones too (lower resolution) unless ?q=low or the frame-rate guard below switches it off */
+  const REFL = HIGH || params.get('q') !== 'low';
+  const RS = HIGH ? 1 : .75, rtW = () => Math.round(Math.min(1536, (canvas.clientWidth || innerWidth) * RS)), rtH = () => Math.round(Math.min(1536, (canvas.clientHeight || innerHeight) * RS));
+  const waterU = { uTime: { value: 0 }, uSplash: { value: -10 }, uSplashC: { value: new THREE.Vector2() } };   // shared by both water shaders
+  if (REFL) {
     const waterShader = {
       name: 'AqWaterReflector',
-      uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, uTime: { value: 0 } },
-      vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec2 vP;
+      uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, uDeep: { value: C('floor') }, uLight: { value: 0 }, ...waterU },
+      vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec2 vP; varying vec3 vW;
         #include <common>
         #include <logdepthbuf_pars_vertex>
-        void main(){ vUv = textureMatrix * vec4(position, 1.); vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+        void main(){ vUv = textureMatrix * vec4(position, 1.); vP = position.xy; vW = (modelMatrix * vec4(position, 1.)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
         #include <logdepthbuf_vertex>
         }`,
-      fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float uTime; varying vec4 vUv; varying vec2 vP;
+      fragmentShader: `uniform vec3 color, uDeep; uniform sampler2D tDiffuse; uniform float uLight; varying vec4 vUv; varying vec2 vP; varying vec3 vW;
         #include <logdepthbuf_pars_fragment>
-        vec2 swell(vec2 p, float t){ vec2 g = vec2(0.);
-          vec2 d1 = normalize(vec2(1., .35)), d2 = normalize(vec2(-.6, 1.)), d3 = normalize(vec2(.2, -1.));
-          g += d1 * cos(dot(p, d1) * 3.1 + t * .9) * .55; g += d2 * cos(dot(p, d2) * 4.3 - t * 1.2) * .35; g += d3 * cos(dot(p, d3) * 7.7 + t * 1.6) * .18;
-          float r = length(p); g += normalize(p + .0001) * cos(r * 9. - t * 2.2) * .12 * exp(-r * .5);   // soft rings around the product
-          return g; }
+        ${WATER_GLSL}
         float blendOverlay(float b, float s){ return b < .5 ? 2. * b * s : 1. - 2. * (1. - b) * (1. - s); }
         vec3 blendOverlay(vec3 b, vec3 s){ return vec3(blendOverlay(b.r, s.r), blendOverlay(b.g, s.g), blendOverlay(b.b, s.b)); }
         void main(){
           #include <logdepthbuf_fragment>
-          vec2 n = swell(vP, uTime);
-          vec4 uv = vUv; uv.xy += n * .028 * uv.w;
-          vec4 base = texture2DProj(tDiffuse, uv);
-          float glint = pow(clamp(.5 + .5 * n.x, 0., 1.), 14.) * .18 * exp(-length(vP) * .35);
-          gl_FragColor = vec4(blendOverlay(base.rgb, color) + glint, 1.);
+          vec2 g = waterGrad(vP);
+          vec3 n = normalize(vec3(-g.x, 1., g.y));             // floor-local x,y map to world x,-z
+          vec3 V = normalize(cameraPosition - vW);
+          float F = .03 + .97 * pow(1. - clamp(dot(n, V), 0., 1.), 5.);   // water Fresnel: glossy at grazing angles
+          vec4 uv = vUv; uv.xy += g * .16 * uv.w * smoothstep(7.5, 3., length(vP));   // ripples bend the mirror image (gently, so the reflection stays whole)
+          vec3 refl = blendOverlay(texture2DProj(tDiffuse, uv).rgb, color);
+          vec3 col = mix(uDeep * mix(.55, 1.05, uLight), refl, clamp(F * 1.35 + .18, 0., 1.));
+          col += mix(vec3(.82, .93, 1.), vec3(1.), uLight) * waterSpec(n, V) * exp(-length(vP) * .22);
+          gl_FragColor = vec4(col, 1.);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }`
     };
-    reflector = new Reflector(new THREE.CircleGeometry(9, 64), { textureWidth: Math.min(1536, innerWidth), textureHeight: Math.min(1536, innerHeight), color: 0x8899a0, clipBias: .003, shader: waterShader });
+    reflector = new Reflector(new THREE.CircleGeometry(9, 96), { textureWidth: rtW(), textureHeight: rtH(), color: 0x8899a0, clipBias: .003, shader: waterShader });
     reflector.rotation.x = -Math.PI / 2; floorG.add(reflector);
+    Object.assign(reflector.material.uniforms, waterU);   // Reflector clones its uniforms; share the live ones
   }
   const floorMat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uFloor: { value: C('floor') }, uCaustic: { value: C('caustic') }, uRefl: { value: HIGH ? 1 : 0 }, uCausticK: { value: 0 }, uFar: { value: C('bot') }, uK: { value: 1 } },
-    vertexShader: `varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
-    fragmentShader: `uniform float uTime,uRefl,uCausticK,uK; uniform vec3 uFloor,uCaustic,uFar; varying vec2 vP;
+    uniforms: { uFloor: { value: C('floor') }, uCaustic: { value: C('caustic') }, uRefl: { value: REFL ? 1 : 0 }, uCausticK: { value: 0 }, uFar: { value: C('bot') }, uSky: { value: C('halo') }, uK: { value: 1 }, ...waterU },
+    vertexShader: `varying vec2 vP; varying vec3 vW; void main(){ vP = position.xy; vW = (modelMatrix * vec4(position,1.)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
+    fragmentShader: `uniform float uRefl,uCausticK,uK; uniform vec3 uFloor,uCaustic,uFar,uSky; varying vec2 vP; varying vec3 vW;
+      ${WATER_GLSL}
       float caustic(vec2 p){ vec2 q = p*5.; float t = uTime*.35, c = 0.;
         for(int i=0;i<3;i++){ q += vec2(sin(q.y*1.7+t), cos(q.x*1.5-t*1.1))*.55; c += .5/length(vec2(sin(q.x), cos(q.y))+.001); t*=1.27; }
         return pow(clamp(c*.18-.22,0.,1.), 2.6); }
@@ -191,12 +240,16 @@ async function boot() {
         float r = length(vP);
         float pool = exp(-r*r*.45);
         vec3 col = mix(uFar, uFloor, smoothstep(9., 1.4, r));
-        col += uCaustic * caustic(vP) * pool * uCausticK * .55;
+        col += uCaustic * caustic(vP) * pool * uCausticK * .4;
         col *= mix(1., 1.14, pool);
-        // shallow-water sheen: slow interfering swells catch the light (also gives phones, which have no mirror, a water read)
-        float sw = sin(dot(vP, vec2(2.9, 1.)) + uTime * .9) * .55 + sin(dot(vP, vec2(-2.6, 4.1)) - uTime * 1.2) * .35 + sin(length(vP) * 9. - uTime * 2.2) * .25 * exp(-length(vP) * .5);
-        col += vec3(.55, .78, .95) * pow(clamp(.5 + .5 * sw, 0., 1.), 10.) * pool * .14 * uK;
-        float a = uRefl > .5 ? mix(.64, 1., smoothstep(.6, 4., r)) : 1.;
+        float a = 1.;
+        if (uRefl > .5) a = mix(.3, 1., smoothstep(.9, 4.6, r));   // the mirror underneath carries the water look near the product
+        else {                                                      // no mirror: fake it with Fresnel towards the backdrop glow + glints
+          vec2 g = waterGrad(vP); vec3 n = normalize(vec3(-g.x, 1., g.y)), V = normalize(cameraPosition - vW);
+          float F = .03 + .97 * pow(1. - clamp(dot(n, V), 0., 1.), 5.);
+          col = mix(col, mix(uFar, uSky, .7 * pool + .2), clamp(F * 1.2, 0., .85));
+          col += vec3(.85, .94, 1.) * waterSpec(n, V) * exp(-r * .25) * .8;
+        }
         a = mix(1., a, smoothstep(.7, 1., uK));
         a *= smoothstep(19., 9., r) * smoothstep(0., .7, uK);
         gl_FragColor = vec4(col, a);
@@ -235,6 +288,28 @@ async function boot() {
   });
   const motes = new THREE.Points(mg, motesMat); motes.renderOrder = 4;
 
+  /* Light / dark stage (Dapo 2026-11-11: the switch turns the whole site, 3D stage included).
+     Dark: deep-ocean studio. Light: an airy daylight studio with the same water floor, cobalt rims so the clear
+     droplet and the white bottle still read against a pale backdrop. This part covers the water stage, which
+     renders before the models arrive; applyStageTheme (further down) adds the product-side colours. */
+  const tide900 = new THREE.Color('#122650'), tide600 = new THREE.Color('#254C9E');
+  let haloBase = .6;
+  const applyEnvTheme = () => {
+    COL = readCol(); const light = isLightTheme();
+    const u = backdrop.material.uniforms; u.uTop.value.set(COL.top); u.uBot.value.set(COL.bot); u.uHalo.value.set(COL.halo); haloBase = light ? .85 : .6; u.uGain.value = light ? 1.3 : 1;
+    gridMat.uniforms.uColor.value.set(COL.grid);
+    floorMat.uniforms.uFloor.value.set(COL.floor); floorMat.uniforms.uCaustic.value.set(COL.caustic); floorMat.uniforms.uFar.value.set(COL.bot); floorMat.uniforms.uSky.value.set(COL.halo);
+    motesMat.uniforms.uColor.value.set(COL.mote); motesMat.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending; motesMat.needsUpdate = true;
+    shadowMat.color.copy(light ? tide900 : new THREE.Color(COL.top)); shadowMat.opacity = light ? .22 : .55;
+    hemi.color.set(light ? 0xffffff : 0x1b6189); hemi.groundColor.set(light ? 0xcfe3f1 : 0x081d2b); hemi.intensity = light ? .7 : .16;
+    renderer.toneMappingExposure = light ? 1.02 : .86;
+    if (reflector) { const ru = reflector.material.uniforms; ru.color.value.set(light ? 0xdbe8f2 : 0x8899a0); ru.uDeep.value.set(COL.floor); ru.uLight.value = light ? 1 : 0; }
+    document.body.classList.toggle('stage-light', light);
+    return light;
+  };
+  applyEnvTheme();
+  document.addEventListener('aq:theme', applyEnvTheme);
+
   /* Rig: rig (world placement) > turn (yaw) > bottleG / boxG */
   const rig = new THREE.Group(), turn = new THREE.Group(), bottleG = new THREE.Group(), boxG = new THREE.Group();
   rig.add(turn, motes); turn.add(bottleG, boxG); scene.add(rig);
@@ -243,6 +318,51 @@ async function boot() {
   contact.rotation.x = -Math.PI / 2; contact.position.y = .003; contact.renderOrder = 3; bottleG.add(contact);
   const boxContact = new THREE.Mesh(new THREE.PlaneGeometry(1, .62), contactMat.clone());
   boxContact.rotation.x = -Math.PI / 2; boxContact.position.y = .003; boxContact.renderOrder = 3; boxG.add(boxContact);
+
+  /* ---------- Water first (Dapo 2026-11-11) ----------
+     The reflective water floor and the drifting bubbles show from the very first frame, while the models are still
+     downloading; the droplet intro then plays on top of water that is already alive. Only the backdrop, the floor
+     and the bubbles are drawn until the intro starts. */
+  const preHero = document.querySelector('.stage-slot[data-slot="hero"]');
+  let preroll = !!preHero && preHero.getBoundingClientRect().top > -(canvas.clientHeight || innerHeight) * .3;
+  let preW = 0, preH = 0, preT = 0, preLast = performance.now();
+  const preKeep = new Set([backdrop, floorG]);
+  function prePlace() {
+    const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
+    if (w !== preW || h !== preH) {
+      preW = w; preH = h; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+      motesMat.uniforms.uPx.value = renderer.getPixelRatio() * (h / 900); reflector?.getRenderTarget().setSize(rtW(), rtH());
+    }
+    const r = preHero.getBoundingClientRect(), P = POSES.hero;
+    const sH = r.height / h * WORLD_H, sW = r.width / h * WORLD_H, sc = Math.min(sH / P.fit, sW / P.fitW);
+    const x = (r.left + r.width / 2 - w / 2) / h * WORLD_H, y = -(r.bottom - h / 2) / h * WORLD_H + (sH - sc * P.fit) * .5;
+    rig.position.set(x, y, 0); rig.scale.setScalar(sc); floorG.position.set(x, y, 0); floorG.scale.setScalar(sc);
+    const c = new THREE.Vector3(x, y + sc * .5, 0), hv = c.sub(camera.position).normalize();
+    const b = camera.position.dot(hv), tt = -b + Math.sqrt(b * b - (camera.position.lengthSq() - 80 * 80));
+    backdrop.material.uniforms.uHaloDir.value.copy(camera.position).addScaledVector(hv, tt).normalize();
+    backdrop.material.uniforms.uHaloK.value = haloBase;
+  }
+  function preFrame(now) {
+    if (!preroll || root.classList.contains('stage-failed')) return;
+    requestAnimationFrame(preFrame);
+    const dt = Math.min(.05, (now - preLast) / 1000); preLast = now;
+    if (document.hidden) return;
+    preT += reduceMotion ? dt * .5 : dt;   // same pace as the main loop
+    waterU.uTime.value = preT; motesMat.uniforms.uTime.value = preT;
+    prePlace();
+    // draw only the water stage; anything the boot adds meanwhile stays hidden in this pass
+    const vis = scene.children.map(o => o.visible), rvis = rig.children.map(o => o.visible), rv = rig.visible;
+    scene.children.forEach(o => { o.visible = preKeep.has(o) || o === rig; }); rig.children.forEach(o => { o.visible = o === motes; }); rig.visible = true;
+    try { renderer.render(scene, camera); } finally {
+      scene.children.forEach((o, i) => { o.visible = vis[i] ?? o.visible; }); rig.children.forEach((o, i) => { o.visible = rvis[i] ?? o.visible; }); rig.visible = rv;
+    }
+    root.classList.add('stage-live');
+  }
+  const endPreroll = () => { preroll = false; };
+  if (preroll) {
+    floorMat.uniforms.uCausticK.value = .6; floorMat.uniforms.uK.value = 1; motesMat.uniforms.uK.value = 1;
+    requestAnimationFrame(preFrame);
+  }
 
   /* Liquid materials */
   const fresnelU = [];
@@ -261,14 +381,7 @@ async function boot() {
   const DROP_A = new THREE.Color(0xffffff), DROP_B = DROP_A; /* clear water droplet (Dapo 2026-11-11: not magenta) */
 
   /* Models */
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  async function loadGLB(name) {
-    const inline = window.AQ_GLB?.[name];
-    if (inline) { const bin = Uint8Array.from(atob(inline), c => c.charCodeAt(0)); return loader.parseAsync(bin.buffer, ''); }
-    const base = document.querySelector('meta[name="aq-base"]')?.content || '';
-    return loader.loadAsync(`${base}assets/models/${name}.glb`);
-  }
-  const [bG, xG] = await Promise.all([loadGLB('bottle'), loadGLB('box')]);
+  const [bG, xG] = await modelsP;
   const UNIT = 1 / .087;  // metres → bottle heights (bottle is 87 mm tall)
   const prep = (m, kind) => {
     m.traverse(o => {
@@ -638,26 +751,12 @@ async function boot() {
   }
   const draw = () => composer ? composer.render() : renderer.render(scene, camera);
 
-  /* Light / dark stage (Dapo 2026-11-11: the switch turns the whole site, 3D stage included).
-     Dark: deep-ocean studio. Light: an airy daylight studio with the same water floor, cobalt rims so the clear
-     droplet and the white bottle still read against a pale backdrop. */
-  const tide900 = new THREE.Color('#122650'), tide600 = new THREE.Color('#254C9E');
-  let haloBase = .6;
   const applyStageTheme = () => {
-    COL = readCol(); const light = isLightTheme();
-    const u = backdrop.material.uniforms; u.uTop.value.set(COL.top); u.uBot.value.set(COL.bot); u.uHalo.value.set(COL.halo); haloBase = light ? .85 : .6; u.uGain.value = light ? 1.3 : 1;
-    gridMat.uniforms.uColor.value.set(COL.grid);
-    floorMat.uniforms.uFloor.value.set(COL.floor); floorMat.uniforms.uCaustic.value.set(COL.caustic); floorMat.uniforms.uFar.value.set(COL.bot);
-    motesMat.uniforms.uColor.value.set(COL.mote); motesMat.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending; motesMat.needsUpdate = true;
+    const light = applyEnvTheme();
     rimL.color.set(COL.rim); rimR.color.set(COL.rim);
-    shadowMat.color.copy(light ? tide900 : new THREE.Color(COL.top)); shadowMat.opacity = light ? .22 : .55;
-    hemi.color.set(light ? 0xffffff : 0x1b6189); hemi.groundColor.set(light ? 0xcfe3f1 : 0x081d2b); hemi.intensity = light ? .7 : .16;
-    renderer.toneMappingExposure = light ? 1.02 : .86;
     if (bloom) bloom.strength = light ? .03 : .1;
     fresnelU.forEach(f => f.u.value.copy(light ? tide600 : f.base));
     [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#3D63B5' : COL.rim));
-    if (reflector) reflector.material.uniforms.color.value.set(light ? 0xdbe8f2 : 0x8899a0);
-    document.body.classList.toggle('stage-light', light);
   };
   applyStageTheme();
   document.addEventListener('aq:theme', applyStageTheme);
@@ -674,7 +773,7 @@ async function boot() {
     renderer.setSize(vw, vh, false); composer?.setSize(vw, vh); bloom?.resolution.set(vw, vh);
     camera.aspect = vw / vh; camera.updateProjectionMatrix();
     motesMat.uniforms.uPx.value = renderer.getPixelRatio() * (vh / 900);
-    reflector?.getRenderTarget().setSize(Math.min(1536, vw), Math.min(1536, vh));
+    reflector?.getRenderTarget().setSize(rtW(), rtH());
   }
   addEventListener('resize', resize); resize();
   const px2w = (px, py) => [(px - vw / 2) / vh * WORLD_H, -(py - vh / 2) / vh * WORLD_H];
@@ -759,7 +858,7 @@ async function boot() {
   /* Intro timeline (~2.5 s) */
   const T = { delay: .1, fall: .5, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
   const t0 = T.delay, t1 = t0 + T.fall, t2 = t1 + T.splash * .4, t3 = t2 + T.build, t4 = t3 + T.solidify, t5 = t4 + T.pop, t6 = t4 + T.box;
-  let intro = 0, playing = false, introDone = false;
+  let intro = 0, playing = false, introDone = false, splashAt = -1;
   const boxIntro = { k: 1 };
   function setBoxFade(k) {
     boxIntro.k = k;
@@ -791,8 +890,12 @@ async function boot() {
     const bx = ease.out(seg(t, t4 - .1, t6));
     setBoxFade(bx); boxG.position.y = (1 - bx) * -.08;
     contact.material.opacity = Math.max(seg(t, t2, t3) * .6, ease.out(p));
-    floorMat.uniforms.uCausticK.value = Math.max(seg(t, t1, t1 + 1) * .6, ease.out(seg(t, t3, t5)));
-    motesMat.uniforms.uK.value = ease.inOut(seg(t, t1, t5));
+    floorMat.uniforms.uCausticK.value = Math.max(.6, ease.out(seg(t, t3, t5)));   // water and bubbles are already alive (shown before the intro)
+    motesMat.uniforms.uK.value = 1;
+    if (t >= t1 && splashAt < 0) {   // the drop lands: a real ring ripple runs through the water surface
+      splashAt = elapsed; bottleG.getWorldPosition(tmp);
+      waterU.uSplashC.value.set((tmp.x - floorG.position.x) / floorG.scale.x, -(tmp.z - floorG.position.z) / floorG.scale.x);
+    }
     if (t >= t4 && !root.classList.contains('intro-revealed')) { root.classList.add('intro-revealed'); }
   }
   function introFinish() {
@@ -806,7 +909,7 @@ async function boot() {
 
   /* Frame */
   const hv = new THREE.Vector3(), tmp = new THREE.Vector3(), ndc = new THREE.Vector3();
-  let lastS = 0, elapsed = 0, errors = 0, onScreen = true, last = performance.now();
+  let lastS = 0, elapsed = 0, errors = 0, onScreen = true, last = performance.now(), reflOff = false, fpsN = 0, fpsSum = 0, fpsPrev = performance.now();
   const stageSections = [...document.querySelectorAll('[data-stage-section]')];
   const io = new IntersectionObserver(es => { for (const e of es) e.target.__vis = e.isIntersecting; onScreen = stageSections.some(s => s.__vis); }, { rootMargin: '10% 0px' });
   stageSections.forEach(s => io.observe(s));
@@ -846,7 +949,7 @@ async function boot() {
     floorG.position.set(cur.x, cur.y, 0); floorG.scale.setScalar(cur.s);
     floorMat.uniforms.uK.value = cur.floor * presence;
     floorG.visible = cur.floor > .01;
-    if (reflector) reflector.visible = cur.floor > .7;
+    if (reflector) reflector.visible = cur.floor > .7 && !reflOff;
     shadowMat.opacity = .55 * cur.floor;
     contact.visible = boxContact.visible = cur.floor > .05;
     boxContact.material.opacity = contact.material.opacity * bk;
@@ -870,8 +973,8 @@ async function boot() {
     if (playing && heroW < .35) introFinish();   // visitor scrolled on: don't make them watch it later
     if (playing) { intro += dt; introUpdate(intro); if (intro >= Math.max(t5, t6)) introFinish(); }
 
-    elapsed += reduceMotion ? dt * .25 : dt;
-    floorMat.uniforms.uTime.value = elapsed; if (reflector) reflector.material.uniforms.uTime.value = elapsed; motesMat.uniforms.uTime.value = elapsed; gridMat.uniforms.uTime.value = elapsed;
+    elapsed += reduceMotion ? dt * .5 : dt;   // calmer under reduced motion, but still alive (Dapo wants the stage to animate)
+    waterU.uTime.value = elapsed; waterU.uSplash.value = splashAt < 0 ? -10 : elapsed - splashAt; motesMat.uniforms.uTime.value = elapsed; gridMat.uniforms.uTime.value = elapsed;
 
     rig.updateMatrixWorld(true);
     anatomyFX(dt);
@@ -979,6 +1082,12 @@ async function boot() {
     try {
       step(dt);
       if (onScreen || playing) draw();
+      /* Phones: the water mirror costs a second scene render. If the phone can't hold ~40 fps with it, drop to the
+         mirror-free water shading (still rippling, glossy and lit) instead of stuttering. */
+      if (reflector && !HIGH && !reflOff && introDone && onScreen && cur.floor > .7) {
+        fpsN += 1; fpsSum += (now - fpsPrev); if (fpsN >= 90) { if (fpsSum / fpsN > 25) { reflOff = true; floorMat.uniforms.uRefl.value = 0; } fpsN = 0; fpsSum = 0; }
+      }
+      fpsPrev = now;
     } catch (e) { console.error(e); if (++errors > 5) fail(); }
   }
 
@@ -994,6 +1103,7 @@ async function boot() {
 
   const atTop = heroSlot && heroSlot.el.getBoundingClientRect().top > -vh * .3;
   const startIntro = () => {
+    endPreroll(); elapsed = preT;
     if (!atTop) { introFinish(); }   // the droplet intro is short (~2.5 s) and plays once, so it runs under reduced motion too (no splash crown)
     else { product.visible = false; setBoxFade(0); intro = 0; playing = true; introUpdate(0); }
     root.classList.add('stage-ready');
@@ -1013,3 +1123,5 @@ async function boot() {
     document.body.append(box);
   }
 }
+
+if (canvas) boot().catch(err => { console.error(err); fail(); });
