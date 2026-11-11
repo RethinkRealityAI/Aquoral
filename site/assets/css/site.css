@@ -579,3 +579,9 @@ html { overflow-x: clip; }
     grid-template-columns: minmax(0, 1fr) minmax(480px, calc(580px * var(--ax, 1))); }
   .anatomy-side { zoom: var(--ax, 1); }
 }
+/* Who it helps (Dapo 2026-11-11): cause icons match the commercial's set (assets/icons/causes, inlined by build.py as
+   {{cause:name}}): navy line art with white and pale-sky fills, sitting on the light droplet chips. */
+.orbit-btn .ic .cause-icon { width: 26px; height: 26px; display: block; }
+.orbit-panel .ic-lg:has(.cause-icon) { background: radial-gradient(circle at 35% 30%, #fff 0, var(--sky-200) 40%, var(--sky-400) 100%); border-radius: 50%; }
+.orbit-panel .ic-lg .cause-icon { width: 36px; height: 36px; display: block; }
+@media (max-width: 860px) { .orbit-panel .ic-lg .cause-icon { width: 27px; height: 27px; } }
