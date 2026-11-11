@@ -1,0 +1,196 @@
+{
+  "name": "Aquoral Canada",
+  "version": "2.0.0-fluid",
+  "extends": "../aquoral-tokens.json",
+  "note": "Colour source of truth is the root token set. Values here are references to root primitives ({tide-600}) or derivations; v2 defines no colour primitives.",
+  "fonts": {
+    "display": {
+      "family": "Sora",
+      "weights": "300-800 variable",
+      "use": "display, headings, stats, buttons, nav"
+    },
+    "text": {
+      "family": "Atkinson Hyperlegible Next",
+      "weights": "200-800 variable + italic",
+      "use": "all running text, forms, safety info"
+    },
+    "mono": {
+      "family": "Geist Mono",
+      "weights": "300-600 variable",
+      "use": "eyebrows, labels, schematic callouts, units, dosage"
+    },
+    "import": "https://fonts.googleapis.com/css2?family=Sora:wght@300..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Geist+Mono:wght@300..600&display=swap"
+  },
+  "derived": {
+    "abyss": "color-mix(in oklab, {tide-950} 72%, #000)",
+    "stage-glow": "color-mix(in srgb, {tide-600} 60%, transparent)",
+    "stage-sky": "color-mix(in srgb, {sky-400} 22%, transparent)"
+  },
+  "semantic": {
+    "brand-strong": {
+      "light": "{tide-700}",
+      "dark": "{tide-200}",
+      "usage": "Link hover, pressed brand text"
+    },
+    "surface-tint": {
+      "light": "{sky-100}",
+      "dark": "mix({tide-900} 80%, {sky-400})",
+      "usage": "Quote and notice grounds, icon tiles"
+    },
+    "surface-inverse": {
+      "light": "{tide-950}",
+      "dark": "{pearl-0}",
+      "usage": "Announcement bar"
+    },
+    "on-inverse": {
+      "light": "{pearl-0}",
+      "dark": "{tide-900}",
+      "usage": "Text on surface-inverse"
+    },
+    "action (dark override)": {
+      "light": "{tide-600} (root)",
+      "dark": "{sky-300}",
+      "usage": "v2 makes the stage primary a luminous sky fill with tide-950 text (11.6:1)"
+    },
+    "accent-glow": {
+      "light": "{tide-500}",
+      "dark": "{sky-300}",
+      "usage": "Non-text graphics: leader lines, hotspot drop, rings. 5.7:1 / 11.6:1"
+    },
+    "halo": {
+      "light": "{sky-300}",
+      "dark": "{sky-400}",
+      "usage": "Decorative light behind product, ripple ring"
+    },
+    "highlight": {
+      "light": "{tide-600}",
+      "dark": "{sky-300}",
+      "usage": "Highlighted words in display headings (sky text only on the dark stage)"
+    },
+    "caustic": {
+      "light": "{sky-300} @0.20",
+      "dark": "{sky-300} @0.09",
+      "usage": "Caustic texture colour and opacity"
+    },
+    "glass-tint": {
+      "light": "{pearl-0} 80%",
+      "dark": "{tide-950} 80%",
+      "usage": "Liquid glass fill; passes AA alone over any backdrop"
+    },
+    "glass-tint-solid": {
+      "light": "{pearl-0} 96%",
+      "dark": "{tide-950} 96%",
+      "usage": "Fallback without backdrop-filter"
+    },
+    "glass-edge": {
+      "light": "{pearl-0} 95%",
+      "dark": "{pearl-0} 26%",
+      "usage": "Bright top border"
+    },
+    "glass-line": {
+      "light": "{tide-900} 11%",
+      "dark": "{pearl-0} 11%",
+      "usage": "Glass border"
+    },
+    "glass-sheen": {
+      "light": "{pearl-0} 90%",
+      "dark": "{pearl-0} 15%",
+      "usage": "Inset top highlight"
+    },
+    "glass-blur": {
+      "light": "blur(22px) saturate(180%)",
+      "dark": "same",
+      "usage": "backdrop-filter"
+    }
+  },
+  "type": {
+    "t-display-xl": "Sora 750, clamp(46px, 5.6vw + .5rem, 112px)/0.96, -0.045em",
+    "t-display-l": "Sora 700, clamp(40px, 4vw + .75rem, 76px)/1.0, -0.04em",
+    "t-heading-1": "Sora 700, clamp(34px, 2.4vw + 1rem, 56px)/1.06, -0.035em",
+    "t-heading-2": "Sora 650, clamp(28px, 1.4vw + 1rem, 40px)/1.12, -0.03em",
+    "t-heading-3": "Sora 600, 25px/1.24, -0.02em",
+    "t-heading-4": "Sora 600, 20px/1.35",
+    "t-stat": "Sora 700, clamp(52px, 4vw + 1rem, 88px)/0.95, -0.05em, tabular",
+    "t-lead": "Atkinson 400, clamp(19px, .4vw + 17px, 22px)/1.5",
+    "t-body": "Atkinson 400, 18px/1.6",
+    "t-body-s": "Atkinson 400, 16px/1.55 (minimum for sentences)",
+    "t-caption": "Atkinson 400, 16px/1.45",
+    "t-button": "Sora 600, 17px",
+    "t-eyebrow": "Geist Mono 500, 14px, +0.14em, caps",
+    "t-label": "Geist Mono 500, 14px, +0.08em, caps",
+    "t-data": "Geist Mono 400, 16px, tabular",
+    "t-data-l": "Geist Mono 400, 24px, tabular"
+  },
+  "shape": {
+    "radius-s": "8px",
+    "radius-m": "14px",
+    "radius-l": "24px",
+    "radius-xl": "36px",
+    "radius-pill": "999px (root)",
+    "target": "48px",
+    "control-h": "52px",
+    "container": "1400px",
+    "gutter": "clamp(16px, 4vw, 48px)"
+  },
+  "motion": {
+    "ease-liquid": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "ease-wave": "cubic-bezier(0.65, 0, 0.35, 1)",
+    "ease-surface": "cubic-bezier(0.34, 1.4, 0.64, 1)",
+    "ease-drip": "cubic-bezier(0.55, 0, 0.8, 0.25)",
+    "durations": {
+      "dur-instant": "120ms",
+      "dur-fast": "180ms",
+      "dur-base": "320ms",
+      "dur-slow": "640ms",
+      "dur-flow": "1100ms",
+      "dur-ripple": "2600ms",
+      "dur-drop": "1800ms",
+      "dur-hero": "4400ms"
+    },
+    "reveal": {
+      "reveal-distance": "28px",
+      "reveal-blur": "6px",
+      "stagger": "70ms",
+      "ripple-scale": "2.4",
+      "flow-from": "300"
+    },
+    "reduced": {
+      "dur-fast": "120ms",
+      "dur-base": "240ms",
+      "dur-slow": "400ms",
+      "dur-flow": "400ms",
+      "dur-ripple": "5200ms",
+      "dur-drop": "600ms",
+      "dur-hero": "1200ms",
+      "reveal-distance": "0px",
+      "reveal-blur": "0px",
+      "stagger": "30ms",
+      "ripple-scale": "1.5",
+      "flow-from": "650"
+    }
+  },
+  "icons": {
+    "library": "Lucide outline (lucide-static 0.469.0), stroke 1.75, 24px",
+    "map": {
+      "dry-mouth-relief": "droplets",
+      "lubrication": "waves",
+      "moisture-lock-film": "layers",
+      "long-lasting": "clock-4",
+      "pocket-travel": "luggage",
+      "sugar-free": "candy-off (only if label claims it)",
+      "speaking": "speech",
+      "eating-swallowing": "utensils",
+      "sleep": "moon-star",
+      "cancer-therapy": "ribbon",
+      "sjogrens": "eye",
+      "medication-side-effects": "pill",
+      "ageing": "sunset",
+      "protection": "shield-check"
+    },
+    "logo-derived": [
+      ".aq-dot",
+      ".aq-bar",
+      ".aq-wheel"
+    ]
+  }
+}

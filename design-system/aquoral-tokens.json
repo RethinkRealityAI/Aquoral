@@ -1,0 +1,653 @@
+{
+  "name": "Aquoral Canada",
+  "version": 2,
+  "color": {
+    "themes": [
+      {
+        "id": "light",
+        "name": "Light"
+      },
+      {
+        "id": "dark",
+        "name": "Dark"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "tide-50",
+        "value": {
+          "light": "#F0F4FB"
+        },
+        "usage": "Lightest Tide tint. Section washes behind ink text."
+      },
+      {
+        "name": "tide-100",
+        "value": {
+          "light": "#DDE6F6"
+        },
+        "usage": "Ice tint, matching the pale periwinkle of the carton. Selected rows, info backgrounds."
+      },
+      {
+        "name": "tide-200",
+        "value": {
+          "light": "#BFCFEE"
+        },
+        "usage": "Soft Tide. Decorative fills, liquid and illustration only; not for text on light grounds."
+      },
+      {
+        "name": "tide-300",
+        "value": {
+          "light": "#93AEE0"
+        },
+        "usage": "Tide on dark grounds: links, primary button fill and liquid glow in the dark theme."
+      },
+      {
+        "name": "tide-400",
+        "value": {
+          "light": "#6185CB"
+        },
+        "usage": "Mid Tide. Illustration, 3D rim light, charts; never body text on white."
+      },
+      {
+        "name": "tide-500",
+        "value": {
+          "light": "#3D63B5"
+        },
+        "usage": "Focus ring on light grounds (5.4:1 on the page ground)."
+      },
+      {
+        "name": "tide-600",
+        "value": {
+          "light": "#254C9E"
+        },
+        "usage": "Brand cobalt, the wordmark colour. Primary button fill (white label 8.1:1), links, brand text."
+      },
+      {
+        "name": "tide-700",
+        "value": {
+          "light": "#1D3D82"
+        },
+        "usage": "Primary button hover and pressed."
+      },
+      {
+        "name": "tide-800",
+        "value": {
+          "light": "#18326A"
+        },
+        "usage": "Deep Tide for large dark panels on light pages."
+      },
+      {
+        "name": "tide-900",
+        "value": {
+          "light": "#122650"
+        },
+        "usage": "Ink. Headlines and body text on light grounds; raised surface in the dark theme."
+      },
+      {
+        "name": "tide-950",
+        "value": {
+          "light": "#0B1833"
+        },
+        "usage": "Deepest Tide. Dark-theme page ground and the hero stage."
+      },
+      {
+        "name": "orchid-50",
+        "value": {
+          "light": "#FBF0F6"
+        },
+        "usage": "Orchid tint. Background behind orchid text in chips and callouts."
+      },
+      {
+        "name": "orchid-100",
+        "value": {
+          "light": "#F6DCEA"
+        },
+        "usage": "Stronger Orchid tint for highlighted states."
+      },
+      {
+        "name": "orchid-300",
+        "value": {
+          "light": "#E59AC2"
+        },
+        "usage": "Orchid on dark grounds: chips, stat bars, the droplet glow."
+      },
+      {
+        "name": "orchid-500",
+        "value": {
+          "light": "#D42A8E"
+        },
+        "usage": "The brand dot, a touch calmer than the print magenta (#E32C94). Use only for the dot, the hero droplet and small marks; never for text below 24px or large fills."
+      },
+      {
+        "name": "orchid-600",
+        "value": {
+          "light": "#A51F72"
+        },
+        "usage": "Orchid text and icons on white and orchid-50 (6.9:1 on white)."
+      },
+      {
+        "name": "orchid-700",
+        "value": {
+          "light": "#861B5E"
+        },
+        "usage": "Orchid text on orchid-100 and pressed states."
+      },
+      {
+        "name": "sky-50",
+        "value": {
+          "light": "#F2F9FE"
+        },
+        "usage": "Faintest Sky. Section wash on the white page."
+      },
+      {
+        "name": "sky-100",
+        "value": {
+          "light": "#E6F4FC"
+        },
+        "usage": "Swirl back layer; tinted bands behind ink text (13:1)."
+      },
+      {
+        "name": "sky-200",
+        "value": {
+          "light": "#C9E9F9"
+        },
+        "usage": "Swirl middle layer and liquid fills. Decorative only."
+      },
+      {
+        "name": "sky-300",
+        "value": {
+          "light": "#A3DAF4"
+        },
+        "usage": "Swirl front layer, sampled from the label. Decorative only, never text."
+      },
+      {
+        "name": "sky-400",
+        "value": {
+          "light": "#6FC2EC"
+        },
+        "usage": "Swirl ribbon edges and 3D liquid highlights. Decorative only."
+      },
+      {
+        "name": "pearl-0",
+        "value": {
+          "light": "#FFFFFF"
+        },
+        "usage": "Pure white. Raised cards on the light theme; the carton's white."
+      },
+      {
+        "name": "pearl-25",
+        "value": {
+          "light": "#F7F8FB"
+        },
+        "usage": "Light-theme page ground."
+      },
+      {
+        "name": "pearl-100",
+        "value": {
+          "light": "#E9ECF2"
+        },
+        "usage": "Subtle dividers and disabled fills."
+      },
+      {
+        "name": "pearl-200",
+        "value": {
+          "light": "#D5DAE4"
+        },
+        "usage": "Hairlines between content blocks."
+      },
+      {
+        "name": "pearl-400",
+        "value": {
+          "light": "#7E889A"
+        },
+        "usage": "Control borders on light grounds (3.4:1 on the page ground)."
+      },
+      {
+        "name": "pearl-600",
+        "value": {
+          "light": "#4D5669"
+        },
+        "usage": "Secondary text on light grounds (6.9:1 on the page ground)."
+      },
+      {
+        "name": "pearl-700",
+        "value": {
+          "light": "#3A4252"
+        },
+        "usage": "Long-form body text alternative to ink."
+      },
+      {
+        "name": "surface",
+        "value": {
+          "light": "{pearl-0}",
+          "dark": "{tide-950}"
+        },
+        "usage": "Page ground: clean white, as Dapo asked."
+      },
+      {
+        "name": "surface-raised",
+        "value": {
+          "light": "{pearl-0}",
+          "dark": "{tide-900}"
+        },
+        "usage": "Cards and panels; on the white page they separate by shadow-1 or a line border, not by tint."
+      },
+      {
+        "name": "surface-sunken",
+        "value": {
+          "light": "{sky-50}",
+          "dark": "#0F1F42"
+        },
+        "usage": "Tinted bands that group related content; pairs with the swirl edge."
+      },
+      {
+        "name": "line",
+        "value": {
+          "light": "{pearl-200}",
+          "dark": "#22365F"
+        },
+        "usage": "Hairlines and dividers; decorative, never the only boundary of a control."
+      },
+      {
+        "name": "line-strong",
+        "value": {
+          "light": "{pearl-400}",
+          "dark": "#6E80A6"
+        },
+        "usage": "Input and checkbox borders (3:1+ on surface and surface-raised in both themes)."
+      },
+      {
+        "name": "ink",
+        "value": {
+          "light": "{tide-900}",
+          "dark": "#EEF2FA"
+        },
+        "usage": "Headlines and body copy on surface, surface-raised and surface-sunken."
+      },
+      {
+        "name": "ink-muted",
+        "value": {
+          "light": "{pearl-600}",
+          "dark": "#AEB9D0"
+        },
+        "usage": "Secondary text, captions, footnotes on any surface (6.6:1+ both themes)."
+      },
+      {
+        "name": "brand",
+        "value": {
+          "light": "{tide-600}",
+          "dark": "{tide-300}"
+        },
+        "usage": "Links and brand-coloured text on any surface."
+      },
+      {
+        "name": "action",
+        "value": {
+          "light": "{tide-600}",
+          "dark": "{tide-300}"
+        },
+        "usage": "Primary button fill, the brand cobalt. One primary action per view."
+      },
+      {
+        "name": "action-hover",
+        "value": {
+          "light": "{tide-700}",
+          "dark": "#B4C7EA"
+        },
+        "usage": "Primary button hover and pressed."
+      },
+      {
+        "name": "on-action",
+        "value": {
+          "light": "{pearl-0}",
+          "dark": "{tide-950}"
+        },
+        "usage": "Label and icon colour on an action fill (8.1:1 light, 7.9:1 dark)."
+      },
+      {
+        "name": "accent",
+        "value": {
+          "light": "{orchid-600}",
+          "dark": "{orchid-300}"
+        },
+        "usage": "The magenta accent: benefit chips, check icons, stat bars, the droplet. Small doses only."
+      },
+      {
+        "name": "accent-soft",
+        "value": {
+          "light": "{orchid-50}",
+          "dark": "#3A1430"
+        },
+        "usage": "Background behind accent or ink text in chips and callouts."
+      },
+      {
+        "name": "swirl-1",
+        "value": {
+          "light": "{sky-100}",
+          "dark": "#12264D"
+        },
+        "usage": "Swirl back ribbon."
+      },
+      {
+        "name": "swirl-2",
+        "value": {
+          "light": "{sky-200}",
+          "dark": "#183466"
+        },
+        "usage": "Swirl middle ribbon."
+      },
+      {
+        "name": "swirl-3",
+        "value": {
+          "light": "{sky-300}",
+          "dark": "#22457F"
+        },
+        "usage": "Swirl front ribbon."
+      },
+      {
+        "name": "swirl-sheen",
+        "value": {
+          "light": "{pearl-0}",
+          "dark": "{tide-400}"
+        },
+        "usage": "Thin sheen line that rides the swirl, as on the label."
+      },
+      {
+        "name": "focus",
+        "value": {
+          "light": "{tide-500}",
+          "dark": "{tide-300}"
+        },
+        "usage": "Keyboard focus ring, 3px solid with 2px offset (4.5:1+ on every surface)."
+      },
+      {
+        "name": "success",
+        "value": {
+          "light": "#1E7A4F",
+          "dark": "#6FCF97"
+        },
+        "usage": "Success text and icons; always paired with a word or icon."
+      },
+      {
+        "name": "success-soft",
+        "value": {
+          "light": "#DDF3E6",
+          "dark": "#0F3324"
+        },
+        "usage": "Success message background."
+      },
+      {
+        "name": "warning",
+        "value": {
+          "light": "#8A5000",
+          "dark": "#F2B94B"
+        },
+        "usage": "Warning text and icons; always paired with a word or icon."
+      },
+      {
+        "name": "warning-soft",
+        "value": {
+          "light": "#FCEFD6",
+          "dark": "#3A2A0A"
+        },
+        "usage": "Warning message background."
+      },
+      {
+        "name": "danger",
+        "value": {
+          "light": "#B3261E",
+          "dark": "#FF8A80"
+        },
+        "usage": "Errors and contraindication markers; always with a word or icon."
+      },
+      {
+        "name": "danger-soft",
+        "value": {
+          "light": "#FBE3E1",
+          "dark": "#3D1513"
+        },
+        "usage": "Error message background."
+      }
+    ]
+  },
+  "type": {
+    "fonts": [],
+    "families": {
+      "display": "\"Sora\", \"Segoe UI\", system-ui, sans-serif",
+      "sans": "\"Atkinson Hyperlegible Next\", \"Segoe UI\", system-ui, sans-serif",
+      "mono": "\"Geist Mono\", ui-monospace, \"SFMono-Regular\", Menlo, monospace"
+    },
+    "groups": [
+      {
+        "name": "Display",
+        "family": "display",
+        "styles": [
+          {
+            "name": "display-xl",
+            "fontSize": "72px",
+            "lineHeight": "76px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.03em",
+            "usage": "Hero headline only, one per page. Fluid: clamp(44px, 6vw + 1rem, 72px).",
+            "sample": "Relief that stays."
+          },
+          {
+            "name": "display-l",
+            "fontSize": "56px",
+            "lineHeight": "60px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.025em",
+            "usage": "Section openers on the landing page.",
+            "sample": "Lasting protection for dry mouth"
+          },
+          {
+            "name": "heading-1",
+            "fontSize": "44px",
+            "lineHeight": "50px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.02em",
+            "usage": "Page titles on inner pages.",
+            "sample": "How Aquoral works"
+          },
+          {
+            "name": "heading-2",
+            "fontSize": "34px",
+            "lineHeight": "40px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.015em",
+            "usage": "Section headings.",
+            "sample": "Two sprays, up to six hours"
+          },
+          {
+            "name": "heading-3",
+            "fontSize": "26px",
+            "lineHeight": "32px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.01em",
+            "usage": "Card and sub-section headings.",
+            "sample": "Forms a protective film"
+          },
+          {
+            "name": "stat",
+            "fontSize": "64px",
+            "lineHeight": "64px",
+            "fontWeight": 600,
+            "letterSpacing": "-0.03em",
+            "usage": "Evidence figures, always with a label and a citation marker.",
+            "sample": "84%"
+          }
+        ]
+      },
+      {
+        "name": "Text",
+        "family": "sans",
+        "styles": [
+          {
+            "name": "lead",
+            "fontSize": "21px",
+            "lineHeight": "32px",
+            "fontWeight": 400,
+            "usage": "Intro paragraph under a display heading. Max 60 characters per line.",
+            "sample": "A lipid-based spray that lubricates and shields the mouth for up to six hours."
+          },
+          {
+            "name": "body",
+            "fontSize": "18px",
+            "lineHeight": "28px",
+            "fontWeight": 400,
+            "usage": "Default running text. 18px minimum for patient-facing copy.",
+            "sample": "Aquoral forms a thin lipid film on the oral mucosa that limits moisture loss."
+          },
+          {
+            "name": "body-s",
+            "fontSize": "16px",
+            "lineHeight": "24px",
+            "fontWeight": 400,
+            "usage": "Dense UI text, table cells, form hints. Never below 16px for patients.",
+            "sample": "Two sprays, three to four times a day."
+          },
+          {
+            "name": "label",
+            "fontSize": "14px",
+            "lineHeight": "20px",
+            "fontWeight": 700,
+            "letterSpacing": "0.08em",
+            "usage": "Uppercase eyebrows and section labels.",
+            "sample": "DRY MOUTH RELIEF"
+          },
+          {
+            "name": "button",
+            "fontSize": "17px",
+            "lineHeight": "24px",
+            "fontWeight": 700,
+            "letterSpacing": "0.01em",
+            "usage": "Button and link-button labels, sentence case.",
+            "sample": "Find a pharmacy"
+          },
+          {
+            "name": "caption",
+            "fontSize": "14px",
+            "lineHeight": "20px",
+            "fontWeight": 400,
+            "usage": "Footnotes, citations and image captions. Use ink-muted.",
+            "sample": "Mouly S. et al., 2007. Randomised trial, n=150."
+          }
+        ]
+      },
+      {
+        "name": "Data",
+        "family": "mono",
+        "styles": [
+          {
+            "name": "data",
+            "fontSize": "15px",
+            "lineHeight": "22px",
+            "fontWeight": 400,
+            "letterSpacing": "0.01em",
+            "usage": "Dosage, licence numbers, lot codes and other values people copy or compare.",
+            "sample": "2 sprays × 3–4/day · 2 × 10 mL"
+          }
+        ]
+      }
+    ]
+  },
+  "spacing": {
+    "tokens": [
+      {
+        "name": "space-1",
+        "value": "4px",
+        "usage": "Icon-to-label gaps."
+      },
+      {
+        "name": "space-2",
+        "value": "8px",
+        "usage": "Tight stacks: label to input, chip padding."
+      },
+      {
+        "name": "space-3",
+        "value": "12px",
+        "usage": "Button vertical padding; list item gaps."
+      },
+      {
+        "name": "space-4",
+        "value": "16px",
+        "usage": "Mobile side gutter; card inner gaps."
+      },
+      {
+        "name": "space-5",
+        "value": "24px",
+        "usage": "Card padding; paragraph rhythm."
+      },
+      {
+        "name": "space-6",
+        "value": "32px",
+        "usage": "Desktop side gutter; grid gaps."
+      },
+      {
+        "name": "space-7",
+        "value": "48px",
+        "usage": "Between groups inside a section."
+      },
+      {
+        "name": "space-8",
+        "value": "64px",
+        "usage": "Section padding on mobile."
+      },
+      {
+        "name": "space-9",
+        "value": "96px",
+        "usage": "Section padding on desktop."
+      },
+      {
+        "name": "space-10",
+        "value": "144px",
+        "usage": "Hero breathing room above the fold."
+      }
+    ]
+  },
+  "radius": {
+    "tokens": [
+      {
+        "name": "radius-s",
+        "value": "6px",
+        "usage": "Inputs, chips, small tags."
+      },
+      {
+        "name": "radius-m",
+        "value": "12px",
+        "usage": "Buttons and form controls."
+      },
+      {
+        "name": "radius-l",
+        "value": "24px",
+        "usage": "Cards, panels and media frames."
+      },
+      {
+        "name": "radius-pill",
+        "value": "999px",
+        "usage": "Pills, the language switch, droplet badges."
+      }
+    ]
+  },
+  "shadow": {
+    "note": "Shadows are tinted with Tide, never neutral black. Use sparingly: elevation means it floats above the page.",
+    "tokens": [
+      {
+        "name": "shadow-1",
+        "value": {
+          "light": "0 1px 2px rgba(13,45,65,0.06), 0 2px 8px rgba(13,45,65,0.06)",
+          "dark": "0 1px 2px rgba(0,0,0,0.4)"
+        },
+        "usage": "Resting cards."
+      },
+      {
+        "name": "shadow-float",
+        "value": {
+          "light": "0 24px 64px -16px rgba(13,45,65,0.22)",
+          "dark": "0 24px 64px -16px rgba(0,0,0,0.6)"
+        },
+        "usage": "The 3D product stage and modal panels."
+      }
+    ]
+  }
+}

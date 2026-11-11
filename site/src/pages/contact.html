@@ -1,0 +1,10 @@
+<!--{"title": "Contact Aquoral Canada", "description": "Questions about Aquoral or your order? Contact Aquoral Canada.", "nav": ""}-->
+<section class="page-hero"><div class="wrap"><p class="crumbs"><a href="{{base}}index.html">Home</a> / Contact</p><p class="eyebrow">Contact</p><h1 class="h-display" style="font-size:clamp(40px,4vw + 1rem,80px)">We’re here to help.</h1><p class="lead">Questions about Aquoral, your order or how to use it? Get in touch.</p></div></section>
+<section class="section section-solid"><div class="wrap" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px">
+<form onsubmit="event.preventDefault();this.querySelector('.ok').hidden=false" novalidate>
+<div class="field-row"><div class="field"><label for="cn">Name</label><input id="cn" autocomplete="name" required></div><div class="field"><label for="ce">Email</label><input id="ce" type="email" autocomplete="email" required></div></div>
+<div class="field"><label for="ct">Topic</label><select id="ct"><option>Product question</option><option>My order</option><option>Media or partnerships</option><option>Something else</option></select></div>
+<div class="field"><label for="cm">Message</label><textarea id="cm" rows="6" style="padding:14px 16px;border-radius:14px;border:1.5px solid var(--line-strong);font:400 18px/1.5 var(--font-sans)"></textarea></div>
+<button class="btn btn-primary">Send message {{icon:arrow-right}}</button><p class="ok muted" hidden style="margin-top:14px">Prototype: messages aren’t sent yet.</p></form>
+<div class="aside-card" style="align-self:start"><h3 class="h3">Aquoral Canada</h3><p class="muted">Customer care: <span class="verify">phone and email to be confirmed</span></p><p class="muted">Report a side effect: contact us or your health professional. You can also report to Health Canada through MedEffect Canada.</p></div>
+</div></section>

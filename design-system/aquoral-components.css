@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&family=Geist+Mono:wght@400;600&family=Sora:wght@400..700&display=swap');
+/* Aquoral Canada components. Colours, type and sizes come from tokens.css. */
+body { margin: 0; background: var(--surface); color: var(--ink); font-family: var(--font-sans); font-size: 18px; line-height: 28px; }
+.aq-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; padding: var(--space-4); }
+.aq-stack { display: grid; gap: var(--space-4); padding: var(--space-4); }
+.aq-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
+
+/* Button */
+.aq-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 52px; padding: 0 var(--space-5); border-radius: var(--radius-m); border: 1.5px solid transparent; font: 700 17px/24px var(--font-sans); letter-spacing: 0.01em; cursor: pointer; text-decoration: none; transition: background-color 160ms cubic-bezier(0.22,1,0.36,1), border-color 160ms, color 160ms; }
+.aq-btn:focus-visible, .aq-input:focus-visible, .aq-lang button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.aq-btn-primary { background: var(--action); color: var(--on-action); }
+.aq-btn-primary:hover { background: var(--action-hover); }
+.aq-btn-secondary { background: transparent; color: var(--brand); border-color: var(--brand); }
+.aq-btn-secondary:hover { background: var(--surface-sunken); }
+.aq-btn-quiet { background: transparent; color: var(--brand); padding: 0 var(--space-3); text-decoration: underline; text-underline-offset: 4px; }
+.aq-btn[disabled] { background: var(--surface-sunken); color: var(--ink-muted); border-color: var(--line); cursor: not-allowed; }
+
+/* Chip */
+.aq-chip { display: inline-flex; align-items: center; gap: var(--space-2); padding: 6px 14px; border-radius: var(--radius-pill); font: 700 14px/20px var(--font-sans); letter-spacing: 0.02em; }
+.aq-chip-accent { background: var(--accent-soft); color: var(--accent); }
+.aq-chip-neutral { background: var(--surface-sunken); color: var(--ink); }
+.aq-chip svg { width: 16px; height: 16px; flex: none; }
+
+/* Stat */
+.aq-stat { display: grid; gap: var(--space-2); max-width: 240px; }
+.aq-stat-value { font-family: var(--font-display); font-weight: 600; font-size: 64px; line-height: 64px; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+.aq-stat-value sup { font-family: var(--font-sans); font-size: 16px; color: var(--brand); vertical-align: top; margin-left: 2px; }
+.aq-stat-label { font-size: 16px; line-height: 24px; color: var(--ink-muted); }
+.aq-stat-bar { height: 4px; border-radius: var(--radius-pill); background: var(--line); overflow: hidden; }
+.aq-stat-bar span { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+
+/* Benefit card */
+.aq-card { background: var(--surface-raised); border-radius: var(--radius-l); padding: var(--space-5); box-shadow: var(--shadow-1); display: grid; gap: var(--space-3); align-content: start; min-width: 0; }
+.aq-card-icon { width: 48px; height: 48px; border-radius: var(--radius-pill); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.aq-card h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 26px; line-height: 32px; color: var(--ink); }
+.aq-card p { margin: 0; font-size: 18px; line-height: 28px; color: var(--ink-muted); }
+
+/* Safety information */
+.aq-isi { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-l); padding: var(--space-5); display: grid; gap: var(--space-3); }
+.aq-isi-label { font: 700 14px/20px var(--font-sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); display: flex; gap: var(--space-2); align-items: center; }
+.aq-isi p { margin: 0; font-size: 16px; line-height: 24px; color: var(--ink); max-width: 65ch; }
+.aq-isi strong { color: var(--danger); }
+.aq-isi a { color: var(--brand); text-underline-offset: 3px; }
+
+/* Field */
+.aq-field { display: grid; gap: var(--space-2); max-width: 420px; }
+.aq-field label { font: 700 16px/24px var(--font-sans); color: var(--ink); }
+.aq-input { min-height: 52px; padding: 0 var(--space-4); border-radius: var(--radius-m); border: 1.5px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); font: 400 18px/28px var(--font-sans); }
+.aq-hint { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.aq-field[data-invalid] .aq-input { border-color: var(--danger); border-width: 2px; }
+.aq-error { font-size: 14px; line-height: 20px; color: var(--danger); font-weight: 700; display: flex; gap: var(--space-1); align-items: center; }
+
+/* Language switch */
+.aq-lang { display: inline-flex; padding: 4px; border-radius: var(--radius-pill); border: 1.5px solid var(--line-strong); background: var(--surface-raised); gap: 4px; }
+.aq-lang button { min-width: 48px; min-height: 40px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--ink); font: 700 15px/20px var(--font-sans); letter-spacing: 0.04em; cursor: pointer; }
+.aq-lang button[aria-pressed="true"] { background: var(--action); color: var(--on-action); }
+
+/* Swirl band: the label's ribbons, drifting. Three layers at different speeds give depth. */
+.aq-swirl { position: relative; height: clamp(120px, 16vw, 240px); overflow: hidden; pointer-events: none; }
+.aq-swirl-layer { position: absolute; top: 0; left: 0; width: 200%; height: 100%; will-change: transform; animation: aq-drift 64s linear infinite; }
+.aq-swirl-l1 path { fill: var(--swirl-1); }
+.aq-swirl-l2 { animation-duration: 46s; animation-direction: reverse; }
+.aq-swirl-l2 path { fill: var(--swirl-2); fill-opacity: .85; }
+.aq-swirl-l3 { animation-duration: 34s; }
+.aq-swirl-l3 path { fill: var(--swirl-3); fill-opacity: .7; }
+.aq-swirl-sheen path { fill: none; stroke: var(--swirl-sheen); stroke-width: 2; stroke-opacity: .8; vector-effect: non-scaling-stroke; }
+.aq-swirl-sheen path.thin { stroke-width: 1.25; stroke-opacity: .6; }
+@keyframes aq-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Swirl edge: shapes the top of a section, an image or a video with the swirl's crest. */
+.aq-swirl-edge { -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201440%20320%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2C130.5C10%2C132.5%2040%2C139.5%2060%2C142.9C80%2C146.2%20100%2C148.9%20120%2C150.7C140%2C152.6%20160%2C153.6%20180%2C154.0C200%2C154.5%20220%2C154.2%20240%2C153.6C260%2C153.1%20280%2C152.0%20300%2C150.9C320%2C149.9%20340%2C148.6%20360%2C147.5C380%2C146.5%20400%2C145.4%20420%2C144.6C440%2C143.8%20460%2C143.2%20480%2C142.6C500%2C142.1%20520%2C141.8%20540%2C141.3C560%2C140.9%20580%2C140.5%20600%2C139.7C620%2C138.9%20640%2C138.0%20660%2C136.5C680%2C135.0%20700%2C133.0%20720%2C130.5C740%2C127.9%20760%2C124.7%20780%2C121.1C800%2C117.5%20820%2C113.1%20840%2C108.7C860%2C104.3%20880%2C99.3%20900%2C94.7C920%2C90.0%20940%2C85.0%20960%2C80.9C980%2C76.7%201000%2C72.7%201020%2C69.8C1040%2C66.9%201060%2C64.6%201080%2C63.5C1100%2C62.5%201120%2C62.4%201140%2C63.5C1160%2C64.5%201180%2C66.8%201200%2C69.9C1220%2C73.0%201240%2C77.3%201260%2C82.0C1280%2C86.6%201300%2C92.3%201320%2C97.7C1340%2C103.2%201360%2C109.3%201380%2C114.8C1400%2C120.2%201430%2C127.9%201440%2C130.5V320H0Z%22/%3E%3C/svg%3E") top / 100% clamp(48px, 7vw, 96px) no-repeat, linear-gradient(#000, #000) 0 calc(clamp(48px, 7vw, 96px) - 1px) / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201440%20320%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2C130.5C10%2C132.5%2040%2C139.5%2060%2C142.9C80%2C146.2%20100%2C148.9%20120%2C150.7C140%2C152.6%20160%2C153.6%20180%2C154.0C200%2C154.5%20220%2C154.2%20240%2C153.6C260%2C153.1%20280%2C152.0%20300%2C150.9C320%2C149.9%20340%2C148.6%20360%2C147.5C380%2C146.5%20400%2C145.4%20420%2C144.6C440%2C143.8%20460%2C143.2%20480%2C142.6C500%2C142.1%20520%2C141.8%20540%2C141.3C560%2C140.9%20580%2C140.5%20600%2C139.7C620%2C138.9%20640%2C138.0%20660%2C136.5C680%2C135.0%20700%2C133.0%20720%2C130.5C740%2C127.9%20760%2C124.7%20780%2C121.1C800%2C117.5%20820%2C113.1%20840%2C108.7C860%2C104.3%20880%2C99.3%20900%2C94.7C920%2C90.0%20940%2C85.0%20960%2C80.9C980%2C76.7%201000%2C72.7%201020%2C69.8C1040%2C66.9%201060%2C64.6%201080%2C63.5C1100%2C62.5%201120%2C62.4%201140%2C63.5C1160%2C64.5%201180%2C66.8%201200%2C69.9C1220%2C73.0%201240%2C77.3%201260%2C82.0C1280%2C86.6%201300%2C92.3%201320%2C97.7C1340%2C103.2%201360%2C109.3%201380%2C114.8C1400%2C120.2%201430%2C127.9%201440%2C130.5V320H0Z%22/%3E%3C/svg%3E") top / 100% clamp(48px, 7vw, 96px) no-repeat, linear-gradient(#000, #000) 0 calc(clamp(48px, 7vw, 96px) - 1px) / 100% 100% no-repeat; }
+.aq-swirl-edge-flip { transform: scaleY(-1); }
+
+/* Eyebrow: the logo's dot and bar ahead of a section label. */
+.aq-eyebrow { display: inline-flex; align-items: center; gap: 10px; font: 700 14px/20px var(--font-sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); }
+.aq-dot { width: 10px; height: 10px; border-radius: var(--radius-pill); background: var(--orchid-500); flex: none; }
+.aq-bar { width: 2px; height: 16px; border-radius: var(--radius-pill); background: var(--brand); flex: none; }
+.aq-dotlist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.aq-dotlist li { display: grid; grid-template-columns: 10px 1fr; gap: var(--space-3); align-items: baseline; }
+.aq-dotlist li::before { content: ""; width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--accent); transform: translateY(-1px); }
+
+/* Spoke wheel: the logo's eight-spoke disc, as loader, marker and watermark. */
+.aq-wheel { width: 48px; height: 48px; display: block; }
+.aq-wheel-disc { fill: var(--brand); }
+.aq-wheel-ring, .aq-wheel-spokes path { fill: none; stroke: var(--surface-raised); stroke-width: 2.25; stroke-linecap: round; }
+.aq-wheel-ring { stroke-width: 1.5; }
+.aq-wheel-spin { animation: aq-turn 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite; transform-origin: 50% 50%; }
+.aq-wheel-watermark { width: min(560px, 80vw); height: auto; opacity: .06; animation: aq-turn 180s linear infinite; }
+@keyframes aq-turn { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aq-swirl-layer, .aq-wheel-watermark { animation: none; }
+  .aq-wheel-spin { animation-duration: 6s; animation-timing-function: steps(8); }
+}

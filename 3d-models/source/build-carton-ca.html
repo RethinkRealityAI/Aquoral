@@ -1,0 +1,157 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Canadian Aquoral carton, artwork redrawn from Shamil's packaging sheet (2026-11-11).
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const NAVY = '#1F3F8F', HEADER = '#1A3E8C', PINK = '#E0218A', INK = '#1E2229', GREY = '#3C424A', SKY = '#CFE6F5';
+const FONT = '"Liberation Sans", Arial, Helvetica, sans-serif';
+const BOX = { w: 52, h: 92, d: 26 }, PX = 20; // mm, px per mm
+const wmImg = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/wordmark.png'; });
+function tint(img, color) { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
+const WM = tint(wmImg, NAVY);
+const mm = v => v * PX;
+function canvas(wmm, hmm, bg = '#fbfcfd') { const c = document.createElement('canvas'); c.width = Math.round(mm(wmm)); c.height = Math.round(mm(hmm)); const x = c.getContext('2d'); x.fillStyle = bg; x.fillRect(0, 0, c.width, c.height); return [c, x]; }
+function T(x, s, X, Y, sizeMm, { color = INK, weight = '400', align = 'center' } = {}) { x.fillStyle = color; x.font = `${weight} ${mm(sizeMm)}px ${FONT}`; x.textAlign = align; x.fillText(s, mm(X), mm(Y)); }
+function wordmark(x, X, Y, Wmm) { x.drawImage(WM, mm(X), mm(Y), mm(Wmm), mm(Wmm) * WM.height / WM.width); return Wmm * WM.height / WM.width; }
+// New logo mark from Shamil's sheet: magenta dot, navy bar, navy circle with asterisk
+function mark(x, X, Y, s) {
+  const S = mm(s), x0 = mm(X), y0 = mm(Y);
+  x.fillStyle = PINK; x.beginPath(); x.arc(x0 + S * .5, y0 + S * .5, S * .5, 0, 7); x.fill();
+  x.fillStyle = NAVY; x.fillRect(x0 + S * 1.12, y0 + S * .02, S * .2, S * .96);
+  x.beginPath(); x.arc(x0 + S * 2.05, y0 + S * .5, S * .5, 0, 7); x.fill();
+  x.strokeStyle = '#fff'; x.lineWidth = S * .07; x.lineCap = 'round';
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 4; x.beginPath(); x.moveTo(x0 + S * 2.05 - Math.cos(a) * S * .34, y0 + S * .5 - Math.sin(a) * S * .34); x.lineTo(x0 + S * 2.05 + Math.cos(a) * S * .34, y0 + S * .5 + Math.sin(a) * S * .34); x.stroke(); }
+  x.beginPath(); x.arc(x0 + S * 2.05, y0 + S * .5, S * .1, 0, 7); x.fillStyle = '#fff'; x.fill();
+}
+function rrect(x, X, Y, W, H, R) { x.beginPath(); x.roundRect(mm(X), mm(Y), mm(W), mm(H), mm(R)); }
+
+function front() {
+  const [c, x] = canvas(BOX.w, BOX.h); const cx = BOX.w / 2;
+  mark(x, 8.5, 12.5, 3.6);
+  const h = wordmark(x, 7, 16.2, 37.5);
+  T(x, 'artificial saliva', 44.5, 16.2 + h + 1.2, 3.1, { color: NAVY, align: 'right' });
+  T(x, 'PROTECTIVE ORAL SPRAY', cx, 16.2 + h + 5.6, 2.55, { color: GREY });
+  T(x, 'Relieves Symptoms', cx, 50, 3.0); T(x, 'of Dry Mouth', cx, 54, 3.0);
+  T(x, 'GLUTEN FREE', cx, 64.5, 2.3, { weight: '700' });
+  T(x, 'Net Contents:', cx, 77.5, 2.25, { weight: '700' });
+  T(x, '2 Canisters', cx, 81, 2.2); T(x, '10ml (0.338 fl oz) each', cx, 84.5, 2.2);
+  return c;
+}
+function wave(x, X, Y, W, H) {
+  x.save(); rrect(x, X, Y, W, H, 2.4); x.clip();
+  for (let k = 0; k < 6; k++) {
+    x.beginPath(); const y0 = Y + H * (0.80 + k * 0.025);
+    x.moveTo(mm(X), mm(Y + H)); x.lineTo(mm(X), mm(y0));
+    x.bezierCurveTo(mm(X + W * .3), mm(y0 - 6 + k), mm(X + W * .6), mm(y0 + 5 - k), mm(X + W), mm(y0 - 4 + k * .6));
+    x.lineTo(mm(X + W), mm(Y + H)); x.closePath(); x.fillStyle = `rgba(150,200,235,${0.06 + k * 0.02})`; x.fill();
+  }
+  x.restore();
+}
+function back() {
+  const [c, x] = canvas(BOX.w, BOX.h);
+  const L = { x: 3.5, y: 4, w: BOX.w - 7, h: BOX.h - 8 }; const cx = L.x + L.w / 2;
+  // sticker with soft edge
+  x.save(); x.shadowColor = 'rgba(20,40,70,.18)'; x.shadowBlur = mm(.8); x.shadowOffsetY = mm(.2);
+  rrect(x, L.x, L.y, L.w, L.h, 2.4); x.fillStyle = '#ffffff'; x.fill(); x.restore();
+  rrect(x, L.x, L.y, L.w, L.h, 2.4); x.strokeStyle = '#d9dee4'; x.lineWidth = mm(.15); x.stroke();
+  wave(x, L.x, L.y, L.w, L.h);
+  // navy header with pointer
+  const H = { x: L.x + 2.2, y: L.y + 2.2, w: L.w - 4.4, h: 14 };
+  rrect(x, H.x, H.y, H.w, H.h, 1.8); x.fillStyle = HEADER; x.fill();
+  x.beginPath(); x.moveTo(mm(cx - 1.6), mm(H.y + H.h - .1)); x.lineTo(mm(cx), mm(H.y + H.h + 1.6)); x.lineTo(mm(cx + 1.6), mm(H.y + H.h - .1)); x.fill();
+  T(x, 'Product Information', cx, H.y + 4.6, 2.75, { color: '#fff', weight: '700' });
+  T(x, 'Renseignements sur le produit', cx, H.y + 8.3, 2.55, { color: '#fff', weight: '700' });
+  T(x, 'English / Français', cx, H.y + 12.1, 2.05, { color: '#fff' });
+  mark(x, 12.5, 23.5, 2.6);
+  const h = wordmark(x, 11, 26.4, 30);
+  T(x, 'artificial saliva', 40.5, 26.4 + h + 0.9, 2.2, { color: NAVY, align: 'right' });
+  T(x, 'PROTECTIVE ORAL SPRAY', cx, 26.4 + h + 4.2, 2.05, { color: GREY });
+  const en = ['Complete directions, ingredients,', 'precautions and other important', 'information inside.'];
+  en.forEach((s, i) => T(x, s, cx, 50 + i * 3.1, 2.05));
+  x.fillStyle = '#9aa7b8'; x.fillRect(mm(cx - 14), mm(59.6), mm(28), mm(.15));
+  const fr = ['Mode d’emploi complet, ingrédients,', 'précautions et autres renseignements', 'importants à l’intérieur.'];
+  fr.forEach((s, i) => T(x, s, cx, 64.4 + i * 3.1, 2.05));
+  T(x, 'Peel here', L.x + L.w - 7, 79.6, 2.0, { color: HEADER, weight: '700', align: 'right' });
+  T(x, 'Soulever ici', L.x + L.w - 7, 82.6, 2.0, { color: HEADER, weight: '700', align: 'right' });
+  x.beginPath(); x.moveTo(mm(L.x + L.w - 5.8), mm(78)); x.lineTo(mm(L.x + L.w - 3.6), mm(80.2)); x.lineTo(mm(L.x + L.w - 5.8), mm(82.4)); x.fillStyle = HEADER; x.fill();
+  T(x, 'AE2790 0001', L.x + L.w - 3, L.y + L.h - 1.4, 1.2, { color: GREY, align: 'right' });
+  return c;
+}
+// UPC-A barcode for GTIN 196852643219 (check digit verified)
+function upc(x, X, Y, modMm, barH, digits) {
+  const Lc = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011'];
+  const Rc = Lc.map(s => s.replace(/./g, b => b === '0' ? '1' : '0'));
+  let bits = '101'; for (let i = 0; i < 6; i++) bits += Lc[+digits[i]]; bits += '01010'; for (let i = 6; i < 12; i++) bits += Rc[+digits[i]]; bits += '101';
+  x.fillStyle = '#111';
+  for (let i = 0; i < bits.length; i++) if (bits[i] === '1') { const guard = i < 3 || (i >= 45 && i < 50) || i >= 92; x.fillRect(mm(X + i * modMm), mm(Y), Math.ceil(mm(modMm)), mm(barH + (guard ? 1.2 : 0))); }
+  x.font = `${mm(1.7)}px ${FONT}`; x.textAlign = 'center';
+  x.fillText(digits[0], mm(X - 1.4), mm(Y + barH + 1.4));
+  x.fillText(digits.slice(1, 6), mm(X + 24 * modMm), mm(Y + barH + 2.2));
+  x.fillText(digits.slice(6, 11), mm(X + 71 * modMm), mm(Y + barH + 2.2));
+  x.fillText(digits[11], mm(X + 95 * modMm + 1.4), mm(Y + barH + 1.4));
+  return 95 * modMm;
+}
+function sideIcons() { // +X side: warnings, storage, barcode, ink swatches
+  const [c, x] = canvas(BOX.d, BOX.h); x.strokeStyle = INK; x.fillStyle = INK; x.lineWidth = mm(.35); x.lineJoin = 'round';
+  // caution triangle
+  x.beginPath(); x.moveTo(mm(5.5), mm(6)); x.lineTo(mm(9), mm(12)); x.lineTo(mm(2), mm(12)); x.closePath(); x.stroke();
+  T(x, '!', 5.5, 11.3, 3.6, { weight: '700' });
+  ['Caution –', 'See instructions', 'for use'].forEach((s, i) => T(x, s, 10.5, 7.4 + i * 1.7, 1.35, { align: 'left' }));
+  // GHS flammable diamond
+  x.save(); x.translate(mm(5.5), mm(20)); x.rotate(Math.PI / 4); x.strokeStyle = '#D1202F'; x.lineWidth = mm(.55); x.strokeRect(-mm(3), -mm(3), mm(6), mm(6)); x.restore();
+  x.beginPath(); x.moveTo(mm(5.5), mm(17.6)); x.bezierCurveTo(mm(7.2), mm(19.2), mm(7), mm(21.4), mm(5.5), mm(22)); x.bezierCurveTo(mm(4), mm(21.4), mm(3.8), mm(19.6), mm(5.5), mm(17.6)); x.fill();
+  x.fillRect(mm(3.6), mm(22.3), mm(3.8), mm(.5));
+  T(x, 'Flammable', 10.5, 21.2, 1.55, { align: 'left' });
+  // thermometer
+  x.beginPath(); x.roundRect(mm(4.6), mm(27.5), mm(1.6), mm(7), mm(.8)); x.stroke(); x.beginPath(); x.arc(mm(5.4), mm(35.3), mm(1.3), 0, 7); x.fill();
+  x.beginPath(); x.moveTo(mm(2), mm(33)); x.lineTo(mm(3.4), mm(31)); x.lineTo(mm(4.2), mm(32)); x.stroke();
+  T(x, '25°C', 8, 29.4, 1.55, { align: 'left' }); T(x, '77°F', 8, 31.2, 1.55, { align: 'left' });
+  T(x, 'Storage', 8, 36.6, 1.55, { align: 'left' });
+  // barcode rotated, reading bottom-to-top
+  x.save(); x.translate(mm(7), mm(80)); x.rotate(-Math.PI / 2); upc(x, 2, 0, 0.33, 9.5, '196852643219'); x.restore();
+  // ink swatches
+  [['#111', 3.5, 85], ['#E0218A', 6.5, 85], ['#1F78D1', 9.5, 85], ['#8a8f96', 3.5, 88], ['#F2A01F', 6.5, 88]].forEach(([col, X, Y]) => { x.fillStyle = col; x.beginPath(); x.arc(mm(X), mm(Y), mm(1.1), 0, 7); x.fill(); });
+  return c;
+}
+function sideBrand() {
+  const [c, x] = canvas(BOX.d, BOX.h); x.save(); x.translate(c.width / 2, c.height / 2); x.rotate(-Math.PI / 2);
+  const W = mm(46), H = W * WM.height / WM.width; x.drawImage(WM, -W / 2, -H / 2 - mm(1.5), W, H);
+  x.fillStyle = GREY; x.font = `${mm(2.2)}px ${FONT}`; x.textAlign = 'center'; x.fillText('PROTECTIVE ORAL SPRAY', 0, H / 2 + mm(2.5)); x.restore(); return c;
+}
+function top() { const [c, x] = canvas(BOX.w, BOX.d); mark(x, 9, 9.3, 2.4); wordmark(x, 17, 8.5, 25); return c; }
+function bottom() { const [c, x] = canvas(BOX.w, BOX.d); T(x, 'Made for K Pharmaceuticals · Imported by K Pharmaceuticals Canada Inc., Toronto ON', BOX.w / 2, 12.5, 1.25, { color: GREY }); T(x, 'LOT / EXP', BOX.w / 2, 16, 1.3, { color: GREY, weight: '700' }); return c; }
+
+function tex(c) { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function buildBox() {
+  const g = new THREE.BoxGeometry(BOX.w, BOX.h, BOX.d); g.scale(.001, .001, .001); g.translate(0, BOX.h / 2000, 0);
+  const m = (c, name) => new THREE.MeshStandardMaterial({ name, map: tex(c), roughness: 0.6 });
+  const box = new THREE.Mesh(g, [m(sideIcons(), 'SideRight'), m(sideBrand(), 'SideLeft'), m(top(), 'Top'), m(bottom(), 'Bottom'), m(front(), 'Front'), m(back(), 'BackLabel')]);
+  box.name = 'Carton'; const root = new THREE.Group(); root.name = 'AquoralCartonCA'; root.add(box); return root;
+}
+const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); r.toneMapping = THREE.NeutralToneMapping;
+const env = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+function shot(obj, az, el = 10, w = 1000, h = 1300, bg = null) {
+  r.setSize(w, h); const s = new THREE.Scene(); s.environment = env; s.add(obj);
+  const b = new THREE.Box3().setFromObject(obj), c = b.getCenter(new THREE.Vector3()), z = b.getSize(new THREE.Vector3());
+  const cam = new THREE.PerspectiveCamera(22, w / h, 0.001, 10); const d = Math.max(z.y, z.x * h / w * 1.2) * 1.18 / 2 / Math.tan(THREE.MathUtils.degToRad(11));
+  const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(el);
+  cam.position.set(c.x + Math.sin(a) * Math.cos(e) * d, c.y + Math.sin(e) * d, c.z + Math.cos(a) * Math.cos(e) * d); cam.lookAt(c);
+  if (bg === null) r.setClearColor(0, 0); else r.setClearColor(bg, 1); r.render(s, cam); return r.domElement.toDataURL('image/png').split(',')[1];
+}
+const box = buildBox();
+const bottle = (await new GLTFLoader().loadAsync('assets/bottle.glb')).scene;
+const pack = new THREE.Group(); const b2 = box.clone(true); b2.rotation.y = -0.45; b2.position.set(-0.012, 0, -0.016); const bt = bottle.clone(true); bt.position.set(0.026, 0, 0.012); pack.add(b2, bt);
+const glb = await new GLTFExporter().parseAsync(box, { binary: true, maxTextureSize: 2048 });
+window.OUT = {
+  'aquoral-carton-ca.glb': btoa(new Uint8Array(glb).reduce((s, b) => s + String.fromCharCode(b), '')),
+  'renders/carton-ca-front.png': shot(box, 0), 'renders/carton-ca-back.png': shot(box, 180), 'renders/carton-ca-side.png': shot(box, 90),
+  'renders/carton-ca-34.png': shot(box, 35, 12), 'renders/carton-ca-back-34.png': shot(box, 215, 12), 'renders/hero-pack-ca.png': shot(pack, -10, 10, 1400, 1200),
+};
+window.DONE = true;
+</script></body></html>

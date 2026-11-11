@@ -1,0 +1,178 @@
+/* Aquoral Canada design tokens v2 (calibrated to the carton) — generated from tokens.json. Fonts: see README. */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&family=Geist+Mono:wght@400;600&family=Sora:wght@400..700&display=swap');
+:root {
+  --tide-50: #F0F4FB;
+  --tide-100: #DDE6F6;
+  --tide-200: #BFCFEE;
+  --tide-300: #93AEE0;
+  --tide-400: #6185CB;
+  --tide-500: #3D63B5;
+  --tide-600: #254C9E;
+  --tide-700: #1D3D82;
+  --tide-800: #18326A;
+  --tide-900: #122650;
+  --tide-950: #0B1833;
+  --orchid-50: #FBF0F6;
+  --orchid-100: #F6DCEA;
+  --orchid-300: #E59AC2;
+  --orchid-500: #D42A8E;
+  --orchid-600: #A51F72;
+  --orchid-700: #861B5E;
+  --sky-50: #F2F9FE;
+  --sky-100: #E6F4FC;
+  --sky-200: #C9E9F9;
+  --sky-300: #A3DAF4;
+  --sky-400: #6FC2EC;
+  --pearl-0: #FFFFFF;
+  --pearl-25: #F7F8FB;
+  --pearl-100: #E9ECF2;
+  --pearl-200: #D5DAE4;
+  --pearl-400: #7E889A;
+  --pearl-600: #4D5669;
+  --pearl-700: #3A4252;
+  --surface: var(--pearl-0);
+  --surface-raised: var(--pearl-0);
+  --surface-sunken: var(--sky-50);
+  --line: var(--pearl-200);
+  --line-strong: var(--pearl-400);
+  --ink: var(--tide-900);
+  --ink-muted: var(--pearl-600);
+  --brand: var(--tide-600);
+  --action: var(--tide-600);
+  --action-hover: var(--tide-700);
+  --on-action: var(--pearl-0);
+  --accent: var(--orchid-600);
+  --accent-soft: var(--orchid-50);
+  --swirl-1: var(--sky-100);
+  --swirl-2: var(--sky-200);
+  --swirl-3: var(--sky-300);
+  --swirl-sheen: var(--pearl-0);
+  --focus: var(--tide-500);
+  --success: #1E7A4F;
+  --success-soft: #DDF3E6;
+  --warning: #8A5000;
+  --warning-soft: #FCEFD6;
+  --danger: #B3261E;
+  --danger-soft: #FBE3E1;
+  /* Deprecated v1 names, kept so existing builds keep working. Use tide-*, sky-*, orchid-* and accent instead. */
+  --lagoon-100: var(--sky-100);
+  --lagoon-300: var(--sky-300);
+  --lagoon-500: var(--sky-400);
+  --lagoon-600: var(--tide-600);
+  --lagoon-700: var(--tide-700);
+  --coral-100: var(--orchid-50);
+  --coral-400: var(--orchid-300);
+  --coral-600: var(--orchid-600);
+  --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 144px;
+  --radius-s: 6px;
+  --radius-m: 12px;
+  --radius-l: 24px;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(13,45,65,0.06), 0 2px 8px rgba(13,45,65,0.06);
+  --shadow-float: 0 24px 64px -16px rgba(13,45,65,0.22);
+  --warm: var(--accent);
+  --warm-soft: var(--accent-soft);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 640ms;
+  --dur-drop: 1800ms;
+  --dur-hero: 4400ms;
+  --measure: 65ch;
+  --container: 1200px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: var(--tide-950);
+    --surface-raised: var(--tide-900);
+    --surface-sunken: #0F1F42;
+    --line: #22365F;
+    --line-strong: #6E80A6;
+    --ink: #EEF2FA;
+    --ink-muted: #AEB9D0;
+    --brand: var(--tide-300);
+    --action: var(--tide-300);
+    --action-hover: #B4C7EA;
+    --on-action: var(--tide-950);
+    --accent: var(--orchid-300);
+    --accent-soft: #3A1430;
+    --swirl-1: #12264D;
+    --swirl-2: #183466;
+    --swirl-3: #22457F;
+    --swirl-sheen: var(--tide-400);
+    --focus: var(--tide-300);
+    --success: #6FCF97;
+    --success-soft: #0F3324;
+    --warning: #F2B94B;
+    --warning-soft: #3A2A0A;
+    --danger: #FF8A80;
+    --danger-soft: #3D1513;
+    --warm: var(--accent);
+    --warm-soft: var(--accent-soft);
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-float: 0 24px 64px -16px rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --surface: var(--tide-950);
+  --surface-raised: var(--tide-900);
+  --surface-sunken: #0F1F42;
+  --line: #22365F;
+  --line-strong: #6E80A6;
+  --ink: #EEF2FA;
+  --ink-muted: #AEB9D0;
+  --brand: var(--tide-300);
+  --action: var(--tide-300);
+  --action-hover: #B4C7EA;
+  --on-action: var(--tide-950);
+  --accent: var(--orchid-300);
+  --accent-soft: #3A1430;
+  --swirl-1: #12264D;
+  --swirl-2: #183466;
+  --swirl-3: #22457F;
+  --swirl-sheen: var(--tide-400);
+  --focus: var(--tide-300);
+  --success: #6FCF97;
+  --success-soft: #0F3324;
+  --warning: #F2B94B;
+  --warning-soft: #3A2A0A;
+  --danger: #FF8A80;
+  --danger-soft: #3D1513;
+  --warm: var(--accent);
+  --warm-soft: var(--accent-soft);
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-float: 0 24px 64px -16px rgba(0,0,0,0.6);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; --dur-drop: 0ms; --dur-hero: 0ms; } }
+.t-display-xl { font-family: var(--font-display); font-size: 72px; line-height: 76px; font-weight: 600; letter-spacing: -0.03em; text-wrap: balance; }
+.t-display-l { font-family: var(--font-display); font-size: 56px; line-height: 60px; font-weight: 600; letter-spacing: -0.025em; text-wrap: balance; }
+.t-heading-1 { font-family: var(--font-display); font-size: 44px; line-height: 50px; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+.t-heading-2 { font-family: var(--font-display); font-size: 34px; line-height: 40px; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
+.t-heading-3 { font-family: var(--font-display); font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+.t-stat { font-family: var(--font-display); font-size: 64px; line-height: 64px; font-weight: 600; letter-spacing: -0.03em; text-wrap: balance; font-variant-numeric: lining-nums tabular-nums; }
+.t-lead { font-family: var(--font-sans); font-size: 21px; line-height: 32px; font-weight: 400; }
+.t-body { font-family: var(--font-sans); font-size: 18px; line-height: 28px; font-weight: 400; }
+.t-body-s { font-family: var(--font-sans); font-size: 16px; line-height: 24px; font-weight: 400; }
+.t-label { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.t-button { font-family: var(--font-sans); font-size: 17px; line-height: 24px; font-weight: 700; letter-spacing: 0.01em; }
+.t-caption { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 400; }
+.t-data { font-family: var(--font-mono); font-size: 15px; line-height: 22px; font-weight: 400; letter-spacing: 0.01em; }
+.t-display-xl { font-size: clamp(44px, 6vw + 1rem, 72px); line-height: 1.05; }
+.t-display-l { font-size: clamp(36px, 4vw + 1rem, 56px); line-height: 1.08; }
+.t-heading-1 { font-size: clamp(32px, 2.5vw + 1rem, 44px); line-height: 1.14; }

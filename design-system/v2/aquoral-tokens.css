@@ -1,0 +1,229 @@
+/* ==========================================================================
+   Aquoral Canada · Design System v2 ("Fluid") · tokens layer
+   COLOUR SOURCE OF TRUTH = ../aquoral-tokens.css (packaging-calibrated:
+   Tide cobalt, Orchid magenta, Sky, Pearl). This file defines NO colour
+   primitives. It adds: bolder type scale, liquid-glass tokens, a deep-ocean
+   stage theme usable on any element, motion tokens, shape overrides.
+   ========================================================================== */
+@import url("../aquoral-tokens.css");
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Geist+Mono:wght@300..600&display=swap');
+
+:root {
+  /* ---- Derived colours (from root primitives only) ---- */
+  --abyss: color-mix(in oklab, var(--tide-950) 72%, #000);      /* deepest 3D stage floor, never pure black */
+  --stage-glow: color-mix(in srgb, var(--tide-600) 60%, transparent);
+  --stage-sky: color-mix(in srgb, var(--sky-400) 22%, transparent);
+
+  /* ---- Type families (same as root; repeated so v2 stands alone if root changes) ---- */
+  --font-display: "Sora", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* ---- Layout + shape (v2 overrides root: wider cap, bolder pill controls) ---- */
+  --gutter: clamp(16px, 4vw, 48px);
+  --container: 1400px;       /* cap wide layouts at 1320–1480 */
+  --container-text: 760px;
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 24px;
+  --radius-xl: 36px;
+  --target: 48px;
+  --control-h: 52px;
+
+  /* ---- Motion: liquid ---- */
+  --ease-liquid: cubic-bezier(0.22, 1, 0.36, 1);       /* = root --ease-out. Entrances: pour in, settle */
+  --ease-wave: cubic-bezier(0.65, 0, 0.35, 1);         /* = root --ease-in-out. Loops, swells, crossfades */
+  --ease-surface: cubic-bezier(0.34, 1.4, 0.64, 1);    /* surface tension: tiny overshoot on press/pop */
+  --ease-drip: cubic-bezier(0.55, 0, 0.8, 0.25);       /* gravity: droplet fall, exits */
+  --dur-instant: 120ms;
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 640ms;
+  --dur-flow: 1100ms;     /* heading weight flow */
+  --dur-ripple: 2600ms;   /* hotspot ripple loop */
+  --dur-drop: 1800ms;
+  --dur-hero: 4400ms;
+  --reveal-distance: 28px;
+  --reveal-blur: 6px;
+  --stagger: 70ms;
+  --ripple-scale: 2.4;
+  --flow-from: 300;       /* heading weight at the start of a flow reveal */
+
+  /* ---- Texture: caustic light (a mask; coloured by --caustic) ---- */
+  --texture-caustic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0065 0.009' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 .1 .95 .1 0 0 0 0 .08 .7 .08 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+
+  /* ---- v2 semantic additions, LIGHT (clean white page) ---- */
+  --brand-strong: var(--tide-700);
+  --surface-tint: var(--sky-100);
+  --surface-inverse: var(--tide-950);
+  --on-inverse: var(--pearl-0);
+  --accent-glow: var(--tide-500);    /* non-text graphics: leader lines, rings, meters (5.7:1 on white) */
+  --halo: var(--sky-300);            /* soft light behind product / ripples, decorative only */
+  --highlight: var(--tide-600);      /* highlighted words in a heading */
+  --caustic: var(--sky-300);
+  --caustic-opacity: 0.2;
+  --glass-tint: color-mix(in srgb, var(--pearl-0) 80%, transparent);
+  --glass-tint-solid: color-mix(in srgb, var(--pearl-0) 96%, transparent);
+  --glass-edge: color-mix(in srgb, var(--pearl-0) 95%, transparent);
+  --glass-line: color-mix(in srgb, var(--tide-900) 11%, transparent);
+  --glass-sheen: color-mix(in srgb, var(--pearl-0) 90%, transparent);
+  --glass-shadow: 0 1px 1px color-mix(in srgb, var(--tide-900) 5%, transparent), 0 18px 48px -18px color-mix(in srgb, var(--tide-800) 30%, transparent);
+  --glass-blur: blur(22px) saturate(180%);
+  --shadow-1: 0 1px 2px color-mix(in srgb, var(--tide-900) 6%, transparent), 0 4px 14px -4px color-mix(in srgb, var(--tide-800) 12%, transparent);
+  --shadow-2: 0 2px 4px color-mix(in srgb, var(--tide-900) 6%, transparent), 0 18px 40px -16px color-mix(in srgb, var(--tide-800) 26%, transparent);
+  --shadow-float: 0 40px 90px -30px color-mix(in srgb, var(--tide-950) 45%, transparent);
+  --shadow-action: inset 0 1px 0 color-mix(in srgb, var(--pearl-0) 30%, transparent), 0 10px 26px -10px color-mix(in srgb, var(--tide-600) 70%, transparent);
+}
+
+/* ======== DARK: deep-ocean stage ========
+   Root already sets :root dark (prefers-color-scheme / data-theme). v2 adds its tokens for
+   those cases AND lets [data-theme="dark"] work on any element (a dark 3D section on a white page).
+   Values marked "mirror" repeat root's dark semantic values exactly; keep them in step. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-tint: color-mix(in oklab, var(--tide-900) 80%, var(--sky-400));
+    --surface-inverse: var(--pearl-0);
+    --on-inverse: var(--tide-900);
+    --brand-strong: var(--tide-200);
+    --action: var(--sky-300);
+    --action-hover: var(--sky-200);
+    --accent-glow: var(--sky-300);
+    --halo: var(--sky-400);
+    --highlight: var(--sky-300);
+    --caustic: var(--sky-300);
+    --caustic-opacity: 0.09;
+    --glass-tint: color-mix(in srgb, var(--tide-950) 80%, transparent);
+    --glass-tint-solid: color-mix(in srgb, var(--tide-950) 96%, transparent);
+    --glass-edge: color-mix(in srgb, var(--pearl-0) 26%, transparent);
+    --glass-line: color-mix(in srgb, var(--pearl-0) 11%, transparent);
+    --glass-sheen: color-mix(in srgb, var(--pearl-0) 15%, transparent);
+    --glass-shadow: 0 30px 70px -28px color-mix(in srgb, var(--abyss) 90%, transparent);
+    --shadow-2: 0 18px 44px -18px color-mix(in srgb, var(--abyss) 85%, transparent);
+    --shadow-action: inset 0 1px 0 color-mix(in srgb, var(--pearl-0) 55%, transparent), 0 10px 32px -8px color-mix(in srgb, var(--sky-300) 45%, transparent);
+  }
+}
+:root[data-theme="dark"], [data-theme="dark"] {
+  /* mirror of root dark semantics (needed for element-scoped dark) */
+  --surface: var(--tide-950);
+  --surface-raised: var(--tide-900);
+  --surface-sunken: #0F1F42;   /* mirror */
+  --line: #22365F;             /* mirror */
+  --line-strong: #6E80A6;      /* mirror */
+  --ink: #EEF2FA;              /* mirror */
+  --ink-muted: #AEB9D0;        /* mirror */
+  --brand: var(--tide-300);
+  --action: var(--sky-300);         /* v2: luminous sky fill on the stage (root dark uses tide-300) */
+  --action-hover: var(--sky-200);
+  --on-action: var(--tide-950);
+  --accent: var(--orchid-300);
+  --accent-soft: #3A1430;      /* mirror */
+  --warm: var(--accent);
+  --warm-soft: var(--accent-soft);
+  --swirl-1: #12264D; --swirl-2: #183466; --swirl-3: #22457F; --swirl-sheen: var(--tide-400); /* mirror */
+  --focus: var(--tide-300);
+  --success: #6FCF97; --success-soft: #0F3324; /* mirror */
+  --warning: #F2B94B; --warning-soft: #3A2A0A; /* mirror */
+  --danger: #FF8A80;  --danger-soft: #3D1513;  /* mirror */
+  /* v2 additions */
+  --surface-tint: color-mix(in oklab, var(--tide-900) 80%, var(--sky-400));
+  --surface-inverse: var(--pearl-0);
+  --on-inverse: var(--tide-900);
+  --brand-strong: var(--tide-200);
+  --accent-glow: var(--sky-300);
+  --halo: var(--sky-400);
+  --highlight: var(--sky-300);
+  --caustic: var(--sky-300);
+  --caustic-opacity: 0.09;
+  --glass-tint: color-mix(in srgb, var(--tide-950) 80%, transparent);
+  --glass-tint-solid: color-mix(in srgb, var(--tide-950) 96%, transparent);
+  --glass-edge: color-mix(in srgb, var(--pearl-0) 26%, transparent);
+  --glass-line: color-mix(in srgb, var(--pearl-0) 11%, transparent);
+  --glass-sheen: color-mix(in srgb, var(--pearl-0) 15%, transparent);
+  --glass-shadow: 0 30px 70px -28px color-mix(in srgb, var(--abyss) 90%, transparent);
+  --shadow-1: 0 1px 2px color-mix(in srgb, var(--abyss) 50%, transparent);
+  --shadow-2: 0 18px 44px -18px color-mix(in srgb, var(--abyss) 85%, transparent);
+  --shadow-float: 0 40px 90px -30px color-mix(in srgb, var(--abyss) 90%, transparent);
+  --shadow-action: inset 0 1px 0 color-mix(in srgb, var(--pearl-0) 55%, transparent), 0 10px 32px -8px color-mix(in srgb, var(--sky-300) 45%, transparent);
+  color-scheme: dark;
+}
+/* Element-scoped light (a white card or band inside a dark section) */
+[data-theme="light"] {
+  --surface: var(--pearl-0);
+  --surface-raised: var(--pearl-0);
+  --surface-sunken: var(--sky-50);
+  --line: var(--pearl-200);
+  --line-strong: var(--pearl-400);
+  --ink: var(--tide-900);
+  --ink-muted: var(--pearl-600);
+  --brand: var(--tide-600);
+  --action: var(--tide-600);
+  --action-hover: var(--tide-700);
+  --on-action: var(--pearl-0);
+  --accent: var(--orchid-600);
+  --accent-soft: var(--orchid-50);
+  --warm: var(--accent);
+  --warm-soft: var(--accent-soft);
+  --swirl-1: var(--sky-100); --swirl-2: var(--sky-200); --swirl-3: var(--sky-300); --swirl-sheen: var(--pearl-0);
+  --focus: var(--tide-500);
+  --success: #1E7A4F; --success-soft: #DDF3E6; /* mirror */
+  --warning: #8A5000; --warning-soft: #FCEFD6; /* mirror */
+  --danger: #B3261E;  --danger-soft: #FBE3E1;  /* mirror */
+  --surface-tint: var(--sky-100);
+  --surface-inverse: var(--tide-950);
+  --on-inverse: var(--pearl-0);
+  --brand-strong: var(--tide-700);
+  --accent-glow: var(--tide-500);
+  --halo: var(--sky-300);
+  --highlight: var(--tide-600);
+  --caustic: var(--sky-300);
+  --caustic-opacity: 0.2;
+  --glass-tint: color-mix(in srgb, var(--pearl-0) 80%, transparent);
+  --glass-tint-solid: color-mix(in srgb, var(--pearl-0) 96%, transparent);
+  --glass-edge: color-mix(in srgb, var(--pearl-0) 95%, transparent);
+  --glass-line: color-mix(in srgb, var(--tide-900) 11%, transparent);
+  --glass-sheen: color-mix(in srgb, var(--pearl-0) 90%, transparent);
+  --glass-shadow: 0 1px 1px color-mix(in srgb, var(--tide-900) 5%, transparent), 0 18px 48px -18px color-mix(in srgb, var(--tide-800) 30%, transparent);
+  --shadow-1: 0 1px 2px color-mix(in srgb, var(--tide-900) 6%, transparent), 0 4px 14px -4px color-mix(in srgb, var(--tide-800) 12%, transparent);
+  --shadow-2: 0 2px 4px color-mix(in srgb, var(--tide-900) 6%, transparent), 0 18px 40px -16px color-mix(in srgb, var(--tide-800) 26%, transparent);
+  --shadow-float: 0 40px 90px -30px color-mix(in srgb, var(--tide-950) 45%, transparent);
+  --shadow-action: inset 0 1px 0 color-mix(in srgb, var(--pearl-0) 30%, transparent), 0 10px 26px -10px color-mix(in srgb, var(--tide-600) 70%, transparent);
+  color-scheme: light;
+}
+[data-theme] { background-color: var(--surface); color: var(--ink); }
+
+/* Reduced motion: gentler, not gone (overrides root's 0ms). Fades stay; travel, blur and loops calm down. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 120ms;
+    --dur-base: 240ms;
+    --dur-slow: 400ms;
+    --dur-flow: 400ms;
+    --dur-ripple: 5200ms;
+    --dur-drop: 600ms;
+    --dur-hero: 1200ms;
+    --reveal-distance: 0px;
+    --reveal-blur: 0px;
+    --stagger: 30ms;
+    --ripple-scale: 1.5;
+    --flow-from: 650;
+    --ease-surface: var(--ease-liquid);
+  }
+}
+
+/* ======== Type scale v2 (overrides root t-*: heavier, larger, tighter) ======== */
+.t-display-xl { font-family: var(--font-display); font-weight: 750; font-size: clamp(46px, 5.6vw + 0.5rem, 112px); line-height: 0.96; letter-spacing: -0.045em; text-wrap: balance; }
+.t-display-l  { font-family: var(--font-display); font-weight: 700; font-size: clamp(40px, 4vw + 0.75rem, 76px); line-height: 1.0; letter-spacing: -0.04em; text-wrap: balance; }
+.t-heading-1  { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 2.4vw + 1rem, 56px); line-height: 1.06; letter-spacing: -0.035em; text-wrap: balance; }
+.t-heading-2  { font-family: var(--font-display); font-weight: 650; font-size: clamp(28px, 1.4vw + 1rem, 40px); line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
+.t-heading-3  { font-family: var(--font-display); font-weight: 600; font-size: 25px; line-height: 1.24; letter-spacing: -0.02em; text-wrap: balance; }
+.t-heading-4  { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.35; letter-spacing: -0.01em; }
+.t-stat       { font-family: var(--font-display); font-weight: 700; font-size: clamp(52px, 4vw + 1rem, 88px); line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums lining-nums; }
+.t-lead       { font-family: var(--font-sans); font-weight: 400; font-size: clamp(19px, 0.4vw + 17px, 22px); line-height: 1.5; }
+.t-body       { font-family: var(--font-sans); font-weight: 400; font-size: 18px; line-height: 1.6; }
+.t-body-s     { font-family: var(--font-sans); font-weight: 400; font-size: 16px; line-height: 1.55; }
+.t-button     { font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.2; letter-spacing: -0.005em; }
+.t-caption    { font-family: var(--font-sans); font-weight: 400; font-size: 16px; line-height: 1.45; }
+.t-eyebrow    { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 1.4; letter-spacing: 0.14em; text-transform: uppercase; }
+.t-label      { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 1.4; letter-spacing: 0.08em; text-transform: uppercase; }
+.t-data       { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 1.5; letter-spacing: 0; font-variant-numeric: tabular-nums slashed-zero; }
+.t-data-l     { font-family: var(--font-mono); font-weight: 400; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; font-variant-numeric: tabular-nums slashed-zero; }

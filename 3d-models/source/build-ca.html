@@ -1,0 +1,201 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:Pack;src:local("Liberation Sans")} body{margin:0;background:#888}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// ---------- brand colours sampled from the current US pack ----------
+const NAVY = '#284D97', PINK = '#C02888', INK = '#1B2129', GREY = '#3a4048';
+const FONT = '"Liberation Sans", Arial, Helvetica, sans-serif';
+
+const wordmarkImg = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/wordmark.png'; });
+function tinted(img, color) {
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d'); x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-in';
+  x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c;
+}
+const WM = tinted(wordmarkImg, NAVY);
+function wordmark(ctx, x, y, w) { ctx.drawImage(WM, x, y, w, w * WM.height / WM.width); }
+function icon(ctx, x, y, s) { // pink dot | navy ring with "go"
+  ctx.fillStyle = PINK; ctx.beginPath(); ctx.arc(x + s * 0.5, y + s * 0.5, s * 0.5, 0, 7); ctx.fill();
+  ctx.fillStyle = GREY; ctx.fillRect(x + s * 1.22, y - s * 0.12, s * 0.09, s * 1.24);
+  ctx.strokeStyle = NAVY; ctx.lineWidth = s * 0.1;
+  ctx.beginPath(); ctx.arc(x + s * 2.15, y + s * 0.5, s * 0.5, 0, 7); ctx.stroke();
+  ctx.fillStyle = NAVY; ctx.font = `${s * 0.42}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('ʟgo', x + s * 2.15, y + s * 0.53); ctx.textBaseline = 'alphabetic';
+}
+function text(ctx, str, x, y, size, { color = INK, weight = '400', align = 'left' } = {}) {
+  ctx.fillStyle = color; ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.fillText(str, x, y);
+}
+function canvas(w, h, bg = '#ffffff') {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.fillStyle = bg; x.fillRect(0, 0, w, h); return [c, x];
+}
+function tex(c) { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.flipY = true; return t; }
+
+// ---------- dimensions (mm, estimated from photo; confirm with client) ----------
+const R = 11, BODY_H = 48, CAP_Y0 = 48.6, CAP_H = 38.4; // bottle 22 x 87 mm
+const BOX = { w: 52, h: 92, d: 26 };
+
+// ---------- bottle label (wraps the body; u=0.5 faces +Z) ----------
+const LAB_Y0 = 2, LAB_Y1 = 46.5, LAB_H = LAB_Y1 - LAB_Y0;
+const PXMM = 32, LW = 2048, LH = Math.round(LAB_H * PXMM);
+function bottleLabel() {
+  const [c, x] = canvas(LW, LH, '#f6f8fa');
+  const L = 1024 - 285, Rr = 1024 + 285;
+  const y = mm => (mm - (48 - LAB_Y1)) * PXMM; // mm measured down from body top
+  text(x, 'GTIN 196852643219', L + 10, y(3.6), 48, { color: GREY });
+  icon(x, L + 40, y(5.6), 70);
+  wordmark(x, L - 8, y(9.0), 585);
+  text(x, 'artificial saliva', Rr, y(20.4), 73, { color: NAVY, align: 'right' });
+  text(x, 'PROTECTIVE ORAL SPRAY', Rr, y(23.0), 64, { color: NAVY, align: 'right' });
+  x.fillStyle = NAVY; x.fillRect(Rr + 18, y(24.2), 5, y(43.2) - y(24.2));
+  text(x, 'Relieves symptoms', Rr - 10, y(25.9), 53, { align: 'right' });
+  text(x, 'of dry mouth', Rr - 10, y(27.7), 53, { align: 'right' });
+  text(x, 'GLUTEN FREE', Rr - 10, y(32.4), 59, { weight: '700', align: 'right' });
+  text(x, '10ml (0.338 fl oz)', Rr - 10, y(42.4), 59, { weight: '700', align: 'right' });
+  return c;
+}
+
+// ---------- box faces (front replicates current US pack; others are brand stand-ins) ----------
+const BPX = 16;
+function boxFront() {
+  const W = BOX.w * BPX, H = BOX.h * BPX, k = W / 300; // ref photo: box front ≈ 300 px wide
+  const [c, x] = canvas(W, H);
+  const P = (rx, ry) => [(rx - 23) * k, (ry - 50) * k + 30];
+  let [px, py] = P(58, 72); text(x, 'GTIN 196852643219', px, py, 9.5 * k, { color: GREY });
+  [px, py] = P(62, 128); icon(x, px, py, 19 * k);
+  [px, py] = P(53, 148); wordmark(x, px, py, 218 * k);
+  [px, py] = P(270, 237); text(x, 'artificial saliva', px, py, 18 * k, { color: NAVY, align: 'right' });
+  [px, py] = P(270, 259); text(x, 'PROTECTIVE ORAL SPRAY', px, py, 15.6 * k, { color: NAVY, align: 'right' });
+  const [lx, ly0] = P(297, 312), [, ly1] = P(297, 552); x.fillStyle = NAVY; x.fillRect(lx, ly0, 1.6 * k, ly1 - ly0);
+  const cx = P(178, 0)[0];
+  const line = (s, ry, size, weight) => text(x, s, cx, P(0, ry)[1], size * k, { align: 'center', weight });
+  line('Relieves Symptoms', 333, 17.5, '400'); line('of Dry Mouth', 358, 17.5, '400');
+  line('GLUTEN FREE', 410, 13.5, '700');
+  line('Net Contents:', 507, 13.5, '700'); line('2 Canisters', 528, 13.5, '700'); line('10ml (0.338 fl oz) each', 550, 13.5, '700');
+  return c;
+}
+function boxBack() {
+  const W = BOX.w * BPX, H = BOX.h * BPX; const [c, x] = canvas(W, H);
+  icon(x, W * 0.1, H * 0.07, 50); wordmark(x, W * 0.1, H * 0.12, W * 0.55);
+  text(x, 'artificial saliva', W * 0.1, H * 0.25, 44, { color: NAVY });
+  x.fillStyle = '#e9eef6'; x.fillRect(W * 0.1, H * 0.3, W * 0.8, H * 0.55);
+  text(x, 'Directions · Ingredients · Warnings', W * 0.5, H * 0.58, 30, { color: '#7d8796', align: 'center' });
+  text(x, '(final dieline artwork pending)', W * 0.5, H * 0.61, 26, { color: '#9aa3ae', align: 'center' });
+  text(x, '2 × 10 mL (0.338 fl oz)', W * 0.1, H * 0.92, 40, { weight: '700' });
+  return c;
+}
+function boxSide(flip) {
+  const W = BOX.d * BPX, H = BOX.h * BPX; const [c, x] = canvas(W, H);
+  x.save(); x.translate(W / 2, H / 2); x.rotate(flip ? Math.PI / 2 : -Math.PI / 2);
+  const ww = H * 0.5; x.drawImage(WM, -ww / 2, -ww * WM.height / WM.width / 2 - 20, ww, ww * WM.height / WM.width);
+  x.fillStyle = NAVY; x.font = `40px ${FONT}`; x.textAlign = 'center'; x.fillText('PROTECTIVE ORAL SPRAY', 0, ww * WM.height / WM.width / 2 + 40);
+  x.restore(); return c;
+}
+function boxCap() {
+  const W = BOX.w * BPX, H = BOX.d * BPX; const [c, x] = canvas(W, H);
+  wordmark(x, W * 0.28, H * 0.22, W * 0.44); return c;
+}
+
+// ---------- geometry helpers ----------
+function lathe(points, segs, phiStart = Math.PI) {
+  return new THREE.LatheGeometry(points.map(([r, y]) => new THREE.Vector2(r, y)), segs, phiStart, Math.PI * 2);
+}
+function roundCorner(r0, y0, rad, fromAngle, toAngle, n = 8) { // arc helper for profiles
+  const pts = []; for (let i = 0; i <= n; i++) { const a = fromAngle + (toAngle - fromAngle) * i / n; pts.push([r0 + Math.cos(a) * rad, y0 + Math.sin(a) * rad]); } return pts;
+}
+const mm = g => { g.scale(0.001, 0.001, 0.001); return g; };
+
+function buildBottle() {
+  const root = new THREE.Group(); root.name = 'AquoralBottle';
+  const plastic = new THREE.MeshStandardMaterial({ name: 'BottleWhite', color: 0xf3f5f7, roughness: 0.38, metalness: 0 });
+  const capMat = new THREE.MeshStandardMaterial({ name: 'CapWhite', color: 0xf8f9fa, roughness: 0.5, metalness: 0 });
+  // Body
+  const bodyProf = [[0, 0], ...roundCorner(R - 1.4, 1.4, 1.4, -Math.PI / 2, 0), [R, BODY_H - 0.6], ...roundCorner(R - 0.6, BODY_H - 0.6, 0.6, 0, Math.PI / 2, 4), [7.6, BODY_H], [7.6, BODY_H + 0.8], [0, BODY_H + 0.8]];
+  const body = new THREE.Mesh(mm(lathe(bodyProf, 128)), plastic); body.name = 'Body';
+  // Label sleeve (opaque, printed artwork, UV v by height)
+  const labG = new THREE.CylinderGeometry(R + 0.02, R + 0.02, LAB_H, 192, 1, true, Math.PI, Math.PI * 2);
+  labG.translate(0, LAB_Y0 + LAB_H / 2, 0);
+  const label = new THREE.Mesh(mm(labG), new THREE.MeshStandardMaterial({ name: 'LabelPrint', map: tex(bottleLabel()), roughness: 0.42 })); label.name = 'Label';
+  // Pump actuator (visible when cap is removed)
+  const pumpProf = [[0, BODY_H + 0.8], [7.2, BODY_H + 0.8], [7.2, BODY_H + 3.2], [6.2, BODY_H + 3.4], [6.2, BODY_H + 13.5], ...roundCorner(4.2, BODY_H + 13.5, 2, 0, Math.PI / 2, 6), [0, BODY_H + 15.5]];
+  const pump = new THREE.Mesh(mm(lathe(pumpProf, 96)), plastic); pump.name = 'Pump';
+  const orifice = new THREE.Mesh(mm(new THREE.CircleGeometry(0.55, 24).translate(0, BODY_H + 11.5, 6.21)), new THREE.MeshStandardMaterial({ name: 'Orifice', color: 0x2a2f36, roughness: 0.6 }));
+  orifice.name = 'Nozzle';
+  // Cap: smooth band + 60 vertical ribs + rounded top
+  const C0 = CAP_Y0, C1 = CAP_Y0 + CAP_H, CR = R + 0.1, band = 6.8;
+  const capProf = [[0, C0], [CR - 0.3, C0], [CR, C0 + 0.3], [CR, C0 + band - 0.2], [CR - 0.15, C0 + band], [CR - 0.15, C0 + band + 0.01], ...Array.from({ length: 30 }, (_, i) => [CR, C0 + band + 0.4 + i * (C1 - 1.6 - C0 - band - 0.4) / 29]), ...roundCorner(CR - 1.6, C1 - 1.6, 1.6, 0, Math.PI / 2, 8), [0, C1]];
+  const capG = lathe(capProf, 360);
+  const p = capG.attributes.position, ribs = 60;
+  for (let i = 0; i < p.count; i++) {
+    const y = p.getY(i); if (y < C0 + band + 0.3 || y > C1 - 1.0) continue;
+    const xx = p.getX(i), zz = p.getZ(i), r = Math.hypot(xx, zz); if (r < 1) continue;
+    const phi = Math.atan2(xx, zz); const s = 0.5 + 0.5 * Math.cos(phi * ribs);
+    const fade = Math.min(1, (C1 - 1.0 - y) / 1.2); const nr = r - 0.28 * Math.pow(1 - s, 1.5) * fade;
+    p.setX(i, xx / r * nr); p.setZ(i, zz / r * nr);
+  }
+  capG.computeVertexNormals();
+  const cap = new THREE.Mesh(mm(capG), capMat); cap.name = 'Cap';
+  root.add(body, label, pump, orifice, cap);
+  return root;
+}
+
+function buildBox() {
+  const g = mm(new THREE.BoxGeometry(BOX.w, BOX.h, BOX.d)); g.translate(0, BOX.h / 2000, 0);
+  const m = (c, name) => new THREE.MeshStandardMaterial({ name, map: tex(c), roughness: 0.62 });
+  // BoxGeometry material order: +x, -x, +y, -y, +z, -z
+  const mats = [m(boxSide(false), 'BoxSideR'), m(boxSide(true), 'BoxSideL'), m(boxCap(), 'BoxTop'), m(boxCap(), 'BoxBottom'), m(boxFront(), 'BoxFront'), m(boxBack(), 'BoxBack')];
+  const box = new THREE.Mesh(g, mats); box.name = 'Box';
+  const root = new THREE.Group(); root.name = 'AquoralBox'; root.add(box); return root;
+}
+
+// ---------- export + renders ----------
+async function toGLB(obj) {
+  const ex = new GLTFExporter();
+  const buf = await ex.parseAsync(obj, { binary: true, maxTextureSize: 2048 });
+  return btoa(new Uint8Array(buf).reduce((s, b) => s + String.fromCharCode(b), ''));
+}
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.0;
+document.body.appendChild(renderer.domElement);
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+function render(obj, { w = 900, h = 1200, az = 0, el = 6, silhouette = false, fit = 1.15 } = {}) {
+  renderer.setSize(w, h);
+  const scene = new THREE.Scene(); scene.environment = envTex;
+  const o = obj.clone(true);
+  if (silhouette) o.traverse(n => { if (n.isMesh) n.material = new THREE.MeshBasicMaterial({ color: 0x000000 }); });
+  scene.add(o);
+  const bb = new THREE.Box3().setFromObject(o), c = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3());
+  let cam;
+  if (silhouette) { const hh = sz.y * 0.5 * fit, ww = hh * w / h; cam = new THREE.OrthographicCamera(-ww, ww, hh, -hh, 0.001, 10); cam.position.set(c.x, c.y, c.z + 1); }
+  else {
+    cam = new THREE.PerspectiveCamera(22, w / h, 0.001, 10);
+    const dist = (Math.max(sz.y, sz.x * h / w) * fit / 2) / Math.tan(THREE.MathUtils.degToRad(11));
+    const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(el);
+    cam.position.set(c.x + Math.sin(a) * Math.cos(e) * dist, c.y + Math.sin(e) * dist, c.z + Math.cos(a) * Math.cos(e) * dist);
+  }
+  cam.lookAt(c); renderer.setClearColor(0x000000, 0); renderer.render(scene, cam);
+  return renderer.domElement.toDataURL('image/png').split(',')[1];
+}
+
+const bottle = buildBottle(), box = buildBox();
+const noCap = bottle.clone(true); noCap.getObjectByName('Cap').removeFromParent();
+const pack = new THREE.Group(); pack.name = 'AquoralPack';
+const b2 = box.clone(true); b2.position.set(-0.014, 0, -0.012); const bt = bottle.clone(true); bt.position.set(0.024, 0, 0.012);
+pack.add(b2, bt);
+window.OUT = {
+  'aquoral-bottle-ca.glb': await toGLB(bottle),
+  'aquoral-box-ca.glb': await toGLB(box),
+  'renders/pack-34-ca.png': render(pack, { w: 1400, h: 1200, az: -20, el: 12 }),
+  'textures/bottle-label-ca.png': bottleLabel().toDataURL('image/png').split(',')[1],
+  'textures/box-front-ca.png': boxFront().toDataURL('image/png').split(',')[1],
+};
+window.DONE = true;
+</script></body></html>

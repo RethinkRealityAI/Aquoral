@@ -1,0 +1,82 @@
+<!--{"title": "Order Aquoral | Aquoral Canada", "description": "Order Aquoral protective oral spray online. Two 10 mL canisters per box, shipped across Canada. No prescription needed.", "nav": "", "bodyClass": "order-page"}-->
+<section class="page-hero" style="padding-bottom:40px"><div class="wrap"><p class="crumbs"><a href="{{base}}index.html">Home</a> / Order</p><p class="eyebrow">Order online</p><h1 class="h-display" style="font-size:clamp(40px,4vw + 1rem,76px)">Relief, delivered.</h1><p class="lead">Aquoral ships anywhere in Canada. No prescription needed.</p></div></section>
+
+<section class="section section-solid" style="padding-top:48px" data-order>
+  <div class="wrap order-layout">
+    <div class="order-visual"><img src="{{base}}assets/img/pack.png" alt="Aquoral box with two 10 mL canisters and a spray canister" width="1400" height="1200"></div>
+    <div>
+      <ol class="stepper" aria-label="Order steps"><li class="on">Choose</li><li>Shipping</li><li>Payment</li></ol>
+
+      <!-- Step 1 -->
+      <div data-step>
+        <h2 class="h2" tabindex="-1">Choose your Aquoral</h2>
+        <p class="muted" style="margin:-6px 0 22px;font-size:15px"><span class="verify">Placeholder prices (US list prices without the US medical-review fee). Final Canadian pricing to be confirmed.</span></p>
+        <fieldset class="opt-group">
+          <legend>Subscribe and save</legend>
+          <label class="opt"><span class="badge">Best value</span><input type="radio" name="plan" value="sub-monthly" data-price="55" data-save="0" data-label="box every month (12-month plan)" checked><div><b>Monthly subscription</b><span>1 box (2 canisters) every month · 12-month plan</span></div><span class="price">$55<small>/mo</small></span></label>
+          <label class="opt"><input type="radio" name="plan" value="sub-bimonthly" data-price="60" data-save="0" data-label="box every 2 months (12-month plan)"><div><b>Every 2 months</b><span>1 box (2 canisters) every 2 months · 12-month plan</span></div><span class="price">$60<small>/2 mo</small></span></label>
+        </fieldset>
+        <fieldset class="opt-group">
+          <legend>One-time purchase</legend>
+          <label class="opt"><input type="radio" name="plan" value="three" data-price="175" data-save="0" data-label="3-month supply (3 boxes, 6 canisters)"><div><b>3-month supply</b><span>3 boxes · 6 canisters · ships once</span></div><span class="price">$175</span></label>
+          <label class="opt"><input type="radio" name="plan" value="one" data-price="65" data-save="0" data-label="1-month supply (1 box, 2 canisters)"><div><b>1-month supply</b><span>1 box · 2 canisters · ships once</span></div><span class="price">$65</span></label>
+        </fieldset>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px"><span style="font:600 18px/1 var(--font-display)">Quantity</span>
+          <div class="qty"><button type="button" data-qty="minus" aria-label="Decrease quantity">−</button><output name="qty" aria-live="polite">1</output><button type="button" data-qty="plus" aria-label="Increase quantity">+</button></div></div>
+        <div class="summary" aria-live="polite">
+          <div class="row"><span data-sum="label">1 × 1 box</span><span data-sum="sub">$49.00</span></div>
+          <div class="row"><span>Savings</span><span data-sum="disc">$0.00</span></div>
+          <div class="row"><span>Shipping</span><span data-sum="ship">Calculated at checkout</span></div>
+          <div class="row total"><span>Subtotal</span><span data-sum="total">$49.00</span></div>
+        </div>
+        <button class="btn btn-primary" type="button" style="width:100%" data-next>Continue to shipping {{icon:arrow-right}}</button>
+        <div class="trust-row"><span>{{icon:truck}} Ships across Canada</span><span>{{icon:check-circle}} No prescription needed</span><span>{{icon:lock}} Secure checkout</span></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div data-step hidden>
+        <h2 class="h2" tabindex="-1">Where should we send it?</h2>
+        <form onsubmit="return false" novalidate>
+          <div class="field-row"><div class="field"><label for="fn">First name</label><input id="fn" autocomplete="given-name" required></div><div class="field"><label for="ln">Last name</label><input id="ln" autocomplete="family-name" required></div></div>
+          <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="ad">Street address</label><input id="ad" autocomplete="street-address" required></div>
+          <div class="field-row"><div class="field"><label for="ci">City</label><input id="ci" autocomplete="address-level2" required></div>
+            <div class="field"><label for="pr">Province or territory</label><select id="pr" autocomplete="address-level1" required><option value="">Choose</option><option>Alberta</option><option>British Columbia</option><option>Manitoba</option><option>New Brunswick</option><option>Newfoundland and Labrador</option><option>Northwest Territories</option><option>Nova Scotia</option><option>Nunavut</option><option>Ontario</option><option>Prince Edward Island</option><option>Quebec</option><option>Saskatchewan</option><option>Yukon</option></select></div></div>
+          <div class="field-row"><div class="field"><label for="pc">Postal code</label><input id="pc" autocomplete="postal-code" pattern="[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d" placeholder="A1A 1A1" required></div><div class="field"><label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel"></div></div>
+          <div class="field"><label for="cp">Coupon code (optional)</label><input id="cp" autocomplete="off"></div>
+          <div class="field"><label for="al">Any known allergies to ingredients such as aspartame or silicon dioxide? (optional)</label><input id="al" placeholder="List here, or leave blank"></div>
+          <fieldset class="opt-group consent">
+            <legend>Before you order</legend>
+            <label class="check"><input type="checkbox" required> <span>I understand Aquoral contains aspartame (a sweetener) and should not be used by people with PKU (phenylketonuria). I do not have PKU.</span></label>
+            <label class="check"><input type="checkbox" required> <span>I understand Aquoral is for relief of dry mouth symptoms, does not replace care from my healthcare provider, and I will stop use and contact a provider if I have side effects.</span></label>
+            <label class="check"><input type="checkbox"> <span>Send me order updates and occasional tips by email (optional, unsubscribe anytime).</span></label>
+          </fieldset>
+        </form>
+        <div style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn btn-quiet" type="button" data-back>Back</button><button class="btn btn-primary" type="button" style="flex:1" data-next>Continue to payment {{icon:arrow-right}}</button></div>
+      </div>
+
+      <!-- Step 3: placeholder -->
+      <div data-step hidden>
+        <h2 class="h2" tabindex="-1">Payment</h2>
+        <div class="placeholder-pay">
+          <span class="pill">{{icon:info}} Checkout coming soon</span>
+          <h3 class="h3">Secure online payment is being finalized</h3>
+          <p class="muted" style="margin:0 0 18px">This is where the payment step will go: card and wallet payments, taxes by province, and order confirmation. Nothing is charged in this preview.</p>
+          <div class="field"><label for="nt">Get notified when ordering opens</label><input id="nt" type="email" autocomplete="email" placeholder="you@example.com"></div>
+          <button class="btn btn-primary" type="button" onclick="this.nextElementSibling.hidden=false">Notify me {{icon:arrow-right}}</button>
+          <p class="muted" hidden style="margin-top:12px">Thanks. Prototype only: no email is stored.</p>
+        </div>
+        <button class="btn btn-quiet" type="button" data-back style="margin-top:16px">Back to shipping</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-solid section-sunken"><div class="wrap">
+  <div class="cards">
+    <div class="card"><span class="tag">In the box</span><h3>2 × 10 mL canisters</h3><p>Fine-mist pumps. Gluten free. Bilingual Canadian packaging.</p></div>
+    <div class="card"><span class="tag">Use</span><h3>2 sprays, 3–4 times a day</h3><p>Relief for 4 to 6 hours per use.</p></div>
+    <div class="card"><span class="tag">Questions</span><h3>We can help</h3><p><a href="{{base}}faq.html">Read the FAQ</a> or <a href="{{base}}contact.html">contact us</a>.</p></div>
+  </div>
+</div></section>
+<div class="wrap" style="padding-bottom:96px"><aside class="isi"><h2>Important safety information</h2><p>Aquoral relieves the symptoms of dry mouth. It does not treat the underlying cause. Read and follow the directions on the package. Do not use if you are allergic to any of its ingredients. Contains aspartame: not for people with phenylketonuria (PKU). Stop use and talk to a health professional if irritation occurs or symptoms persist. Keep out of reach of children.</p></aside></div>
