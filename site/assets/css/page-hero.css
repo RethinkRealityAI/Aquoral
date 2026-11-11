@@ -1,0 +1,59 @@
+/* ================= Inner-page hero: liquid glass + real-time droplet (Dapo 2026-11-11) =================
+   Replaces the wave/mountain swirl art on every inner page. The panel is one solid colour (navy in the
+   light theme, white in the dark theme, as before); a clear 3D droplet (assets/js/drop.js) floats in it,
+   and the panel edge gets a liquid-glass rim. Loaded after site.css. The !important flags below only
+   remove the old swirl image from the theme rules in site.css, which carry higher specificity. */
+
+.page-hero { --ph-inset-y: var(--panel-inset-y); --ph-inset-x: var(--panel-inset-x); --ph-radius: var(--panel-radius);
+  padding: calc(var(--nav-h) + 56px) 0 60px; min-height: clamp(380px, 46vh, 520px); display: flex; align-items: center; }
+.page-hero > .wrap { position: relative; z-index: 1; width: 100%; }
+
+/* One solid panel in both themes: no swirl, no wash. */
+.page-hero::before { content: ""; position: absolute; inset: var(--ph-inset-y) var(--ph-inset-x); z-index: -1; border-radius: var(--ph-radius);
+  background: var(--ph-bg, var(--tide-900)) !important; opacity: 1 !important; pointer-events: none; }
+@media not all and (prefers-color-scheme: dark) { :root:not([data-theme="dark"]) .page-hero { --ph-bg: var(--tide-900); --ph-rim: rgba(163,218,244,.22); --ph-hi: rgba(255,255,255,.28); } }
+:root[data-theme="light"] .page-hero { --ph-bg: var(--tide-900); --ph-rim: rgba(163,218,244,.22); --ph-hi: rgba(255,255,255,.28); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-hero { --ph-bg: #fff; --ph-rim: rgba(37,76,158,.14); --ph-hi: #fff; } }
+:root[data-theme="dark"] .page-hero { --ph-bg: #fff; --ph-rim: rgba(37,76,158,.14); --ph-hi: #fff; }
+
+/* The 3D layer fills the panel. It fades in once the droplet's first frame is ready. */
+.ph-fx { position: absolute; inset: var(--ph-inset-y) var(--ph-inset-x); z-index: -1; border-radius: var(--ph-radius); overflow: hidden; pointer-events: none; }
+.ph-fx canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .9s ease; }
+.ph-fx.is-ready canvas { opacity: 1; }
+/* Liquid-glass rim: a lit top edge, a faint inner line and a soft lower bounce, drawn above the canvas. */
+.ph-fx::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 1.5px 0 var(--ph-hi), inset 0 0 0 1px var(--ph-rim), inset 0 -18px 36px -30px var(--ph-hi), inset 0 0 0 6px rgba(255,255,255,.02); }
+
+/* Where the droplet sits (drop.js reads this box). Desktop: right side, vertically centred under the header. */
+.ph-anchor { position: absolute; right: max(4%, calc((100% - 1240px) / 2)); top: calc(var(--nav-h) + 4px); bottom: 20px; width: min(30%, 380px); pointer-events: none; }
+@media (min-width: 861px) {
+  .page-hero > .wrap > * { max-width: min(100%, 760px); }
+  .page-hero > .wrap { padding-right: min(30%, 380px); }
+}
+
+/* Breadcrumbs become a small liquid-glass chip. */
+.page-hero .crumbs { display: flex; width: fit-content; flex-wrap: wrap; align-items: center; gap: 0 .4em; padding: 7px 14px; margin-bottom: 22px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ph-hi) 8%, transparent); border: 1px solid var(--ph-rim);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ph-hi) 40%, transparent); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4); }
+.page-hero .h-display { font-size: clamp(40px, 3.6vw + 1rem, 76px); line-height: 1; margin-bottom: 18px; }
+.page-hero .lead { margin: 0; }
+
+/* Phones: tighter top and bottom, smaller title, eyebrow hidden (the breadcrumb already says where you are),
+   droplet tucked into the top-right corner beside the breadcrumb chip. */
+@media (max-width: 860px) {
+  .page-hero { padding: calc(var(--nav-h) + 22px) 0 34px; min-height: 0; display: block; }
+  .page-hero .eyebrow { display: none; }
+  .page-hero .crumbs { font-size: 11px; padding: 6px 12px; margin-bottom: 14px; max-width: calc(100% - 96px); }
+  .page-hero .h-display { font-size: clamp(32px, 7.4vw + .2rem, 44px); line-height: 1.04; letter-spacing: -.035em; margin-bottom: 12px; }
+  .page-hero .lead { font-size: 17px; line-height: 1.5; }
+  .ph-anchor { right: 8px; top: calc(var(--nav-h) - 4px); bottom: auto; width: 96px; height: 100px; }
+  .page-hero + .section { padding-top: 40px; }
+}
+@media (max-width: 860px) {
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-hero > .wrap { padding-inline: calc(var(--gutter) + 10px); } }
+  :root[data-theme="dark"] .page-hero > .wrap, :root .page-hero > .wrap { padding-inline: calc(var(--gutter) + 10px); }
+}
+
+/* ---------- Order page ("Relief, delivered."): show the whole box and canister, never crop them ---------- */
+.order-visual img { width: auto; height: auto; max-width: 84%; max-height: 86%; object-fit: contain; }
+@media (max-width: 960px) { .order-visual { aspect-ratio: 4 / 3; } }

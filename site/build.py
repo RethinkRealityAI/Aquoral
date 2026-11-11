@@ -83,6 +83,12 @@ def layout(meta, body, base):
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
                   '<canvas id="stage" aria-hidden="true"></canvas><svg id="leaders" aria-hidden="true"></svg>') if stage else ''
     stage_js = f'<script type="module" src="{base}assets/js/stage.js"></script>' if stage else ''
+    # Inner-page hero: liquid-glass panel with a real-time 3D droplet (assets/js/drop.js, css/page-hero.css)
+    page_hero = 'class="page-hero' in body
+    if page_hero:
+        body = re.sub(r'(<section class="page-hero"[^>]*>)', r'\1<div class="ph-fx" aria-hidden="true"><canvas></canvas></div><div class="ph-anchor" aria-hidden="true"></div>', body, count=1)
+    hero_css = f'<link rel="stylesheet" href="{base}assets/css/page-hero.css">' if page_hero else ''
+    hero_js = f'<script type="module" src="{base}assets/js/drop.js"></script>' if page_hero else ''
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -97,6 +103,7 @@ def layout(meta, body, base):
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
+{hero_css}
 {models}
 </head>
 <body class="{"has-stage" if stage else ""} {meta.get("bodyClass", "")}">
@@ -138,6 +145,7 @@ def layout(meta, body, base):
 </footer>
 <script src="{base}assets/js/site.js" defer></script>
 {stage_js}
+{hero_js}
 </body>
 </html>
 '''
