@@ -1,0 +1,173 @@
+<!--{"title": "Free dry mouth assessment | Aquoral Canada", "description": "Take the free one-minute dry mouth assessment. Six quick questions show how severe your dry mouth is and what can help.", "nav": "", "bodyClass": "assess-page"}-->
+<link rel="stylesheet" href="{{base}}assets/css/assessment.css">
+<section class="qa" aria-labelledby="qa-title">
+  <div class="qa-bg" aria-hidden="true"><span class="qa-blob b1"></span><span class="qa-blob b2"></span><span class="qa-blob b3"></span></div>
+  <div class="wrap qa-wrap">
+    <p class="crumbs"><a href="{{base}}index.html">Home</a> / Dry mouth assessment</p>
+
+    <form class="qa-card" id="qa-form" novalidate autocomplete="on">
+      <!-- Progress (hidden on the intro and results screens) -->
+      <div class="qa-top" hidden>
+        <button type="button" class="qa-back" data-back aria-label="Previous question"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+        <div class="qa-progress" role="progressbar" aria-label="Assessment progress" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i></i></div>
+        <span class="qa-count" aria-live="polite"></span>
+      </div>
+
+      <!-- 0. Intro -->
+      <section class="qa-step qa-intro is-current" data-step="intro" aria-labelledby="qa-title">
+        <div class="qa-intro-art" aria-hidden="true">
+          <svg viewBox="0 0 120 150" class="qa-drop"><defs><linearGradient id="qa-dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="var(--sky-300)"/><stop offset="1" stop-color="var(--tide-600)"/></linearGradient></defs><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" fill="url(#qa-dg)"/><ellipse cx="42" cy="88" rx="9" ry="16" fill="#fff" opacity=".55" transform="rotate(20 42 88)"/></svg>
+        </div>
+        <p class="eyebrow">Free assessment</p>
+        <h1 class="qa-h1" id="qa-title" tabindex="-1">How dry is your mouth, really?</h1>
+        <p class="qa-lead">Answer six quick questions to see how severe your dry mouth is and what can help. It takes about a minute.</p>
+        <ul class="qa-perks">
+          <li>{{icon:clock}}<span>About 1 minute</span></li>
+          <li>{{icon:activity}}<span>Instant result</span></li>
+          <li>{{icon:sparkles}}<span>$10 off your first order</span></li>
+        </ul>
+        <button type="button" class="btn btn-primary qa-cta" data-next>Start the assessment {{icon:arrow-right}}</button>
+        <p class="qa-fine">For information only, not a diagnosis. Your answers stay private.</p>
+      </section>
+
+      <!-- 1. Cause (the US dropdown, rebuilt as tap cards; the list view is kept as an option) -->
+      <section class="qa-step" data-step="cause" aria-labelledby="qa-cause-h">
+        <p class="qa-kicker">About you</p>
+        <h2 class="qa-h2" id="qa-cause-h" tabindex="-1">What’s behind your dry mouth?</h2>
+        <p class="qa-sub">Pick the one that fits best. It helps us point you to the right advice.</p>
+        <fieldset class="qa-tiles" data-view="cards">
+          <legend class="sr-only">The cause of my dry mouth</legend>
+          <label class="qa-tile"><input type="radio" name="cause" value="Sjogren's or other immune condition" data-link="conditions/sjogrens.html" data-topic="Sjögren’s and immune conditions"><span class="qa-tile-ic">{{icon:shield}}</span><span class="qa-tile-t">Sjögren’s or another immune condition</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="Cancer treatment" data-link="conditions/cancer.html" data-topic="dry mouth during cancer treatment"><span class="qa-tile-ic">{{icon:ribbon}}</span><span class="qa-tile-t">Cancer treatment</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="CPAP or sleep appliance" data-link="conditions/cpap.html" data-topic="CPAP and sleep appliances"><span class="qa-tile-ic">{{icon:cpap}}</span><span class="qa-tile-t">CPAP or sleep appliance</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="Medications" data-link="medications.html" data-topic="medications that cause dry mouth"><span class="qa-tile-ic">{{icon:pill}}</span><span class="qa-tile-t">Medications</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="Cannabis" data-link="conditions/cannabis.html" data-topic="cannabis and dry mouth"><span class="qa-tile-ic">{{icon:leaf}}</span><span class="qa-tile-t">Cannabis</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="Other" data-link="conditions/other-causes.html" data-topic="other causes of dry mouth"><span class="qa-tile-ic">{{icon:layers}}</span><span class="qa-tile-t">Something else</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="I don't know" data-link="dry-mouth.html" data-topic="common causes of dry mouth"><span class="qa-tile-ic"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span><span class="qa-tile-t">I’m not sure</span></label>
+          <label class="qa-tile"><input type="radio" name="cause" value="Prefer not to answer"><span class="qa-tile-ic">{{icon:lock}}</span><span class="qa-tile-t">Prefer not to say</span></label>
+        </fieldset>
+        <div class="qa-listview" hidden>
+          <label class="qa-label" for="qa-cause-select">The cause of my dry mouth</label>
+          <div class="qa-select"><select id="qa-cause-select"><option value="">Choose one</option></select></div>
+        </div>
+        <div class="qa-other" hidden>
+          <label class="qa-label" for="qa-cause-other">Tell us the cause</label>
+          <input class="qa-input" id="qa-cause-other" name="cause_other" placeholder="For example, dehydration or a recent illness" autocomplete="off">
+          <p class="qa-err" id="qa-cause-other-err" hidden>Please tell us the cause, or pick another option.</p>
+        </div>
+        <p class="qa-err" id="qa-cause-err" hidden>Please choose one option to continue.</p>
+        <div class="qa-actions">
+          <button type="button" class="qa-switch" data-toggle-view aria-pressed="false">{{icon:menu}}<span>Show as a list</span></button>
+          <button type="button" class="btn btn-primary" data-next>Continue {{icon:arrow-right}}</button>
+        </div>
+      </section>
+
+      <!-- 2-7. The six US screening questions (Yes = 1 point) -->
+      <section class="qa-step" data-step="q1" data-question aria-labelledby="qa-q1"><p class="qa-kicker">{{icon:droplet}} Everyday feeling</p><h2 class="qa-h2" id="qa-q1" tabindex="-1">Do you constantly feel parched, or have a dry, cotton-like feeling in your mouth?</h2></section>
+      <section class="qa-step" data-step="q2" data-question aria-labelledby="qa-q2"><p class="qa-kicker">{{icon:moon}} Sleep</p><h2 class="qa-h2" id="qa-q2" tabindex="-1">Does your dry mouth get in the way of your sleep?</h2></section>
+      <section class="qa-step" data-step="q3" data-question aria-labelledby="qa-q3"><p class="qa-kicker">{{icon:droplets}} Thirst</p><h2 class="qa-h2" id="qa-q3" tabindex="-1">Do you go to the washroom often because you’re drinking so much water?</h2></section>
+      <section class="qa-step" data-step="q4" data-question aria-labelledby="qa-q4"><p class="qa-kicker">{{icon:utensils}} Eating</p><h2 class="qa-h2" id="qa-q4" tabindex="-1">Do you have trouble eating?</h2><p class="qa-sub">This could include chewing, swallowing or tasting your food.</p></section>
+      <section class="qa-step" data-step="q5" data-question aria-labelledby="qa-q5"><p class="qa-kicker">{{icon:speak}} Speaking</p><h2 class="qa-h2" id="qa-q5" tabindex="-1">Do you have trouble speaking, or avoid conversations because of your dry mouth?</h2></section>
+      <section class="qa-step" data-step="q6" data-question aria-labelledby="qa-q6"><p class="qa-kicker">{{icon:check-circle}} History</p><h2 class="qa-h2" id="qa-q6" tabindex="-1">Have you been diagnosed with dry mouth (xerostomia) before?</h2></section>
+
+      <!-- 8. Details -->
+      <section class="qa-step" data-step="details" aria-labelledby="qa-details-h">
+        <p class="qa-kicker">{{icon:sparkles}} Last step</p>
+        <h2 class="qa-h2" id="qa-details-h" tabindex="-1">Where should we send your results?</h2>
+        <p class="qa-sub">We’ll email your result and a <strong>$10 code</strong> for your first order.</p>
+        <div class="qa-fields">
+          <div class="qa-field"><label class="qa-label" for="qa-fn">First name</label><input class="qa-input" id="qa-fn" name="firstname" autocomplete="given-name" required><p class="qa-err" hidden>Please enter your first name.</p></div>
+          <div class="qa-field"><label class="qa-label" for="qa-ln">Last name</label><input class="qa-input" id="qa-ln" name="lastname" autocomplete="family-name" required><p class="qa-err" hidden>Please enter your last name.</p></div>
+          <div class="qa-field qa-span"><label class="qa-label" for="qa-em">Email</label><input class="qa-input" id="qa-em" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required><p class="qa-err" hidden>Please enter a valid email, like name@example.com.</p></div>
+          <div class="qa-field qa-span"><label class="qa-label" for="qa-ph">Phone number <span class="qa-opt">Optional</span></label><input class="qa-input" id="qa-ph" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(416) 555-0123"><p class="qa-err" hidden>Please check your phone number, or leave it blank.</p></div>
+        </div>
+        <p class="qa-hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <label class="qa-check"><input type="checkbox" name="marketing_opt_in" value="yes"><span class="qa-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span><span>Yes, send me Aquoral news and offers by email. You can unsubscribe at any time.</span></label>
+        <p class="qa-fine">We use your details to send your result and code. See our <a href="{{base}}privacy.html">privacy policy</a>.</p>
+        <div class="qa-actions">
+          <button type="button" class="qa-link" data-skip>Skip and just show my result</button>
+          <button type="submit" class="btn btn-primary">See my result {{icon:arrow-right}}</button>
+        </div>
+      </section>
+
+      <!-- 9. Results -->
+      <section class="qa-step qa-result" data-step="result" aria-labelledby="qa-res-h">
+        <div class="qa-res-head">
+          <div class="qa-gauge" aria-hidden="true">
+            <span class="qa-fall"></span><span class="qa-ring r1"></span><span class="qa-ring r2"></span>
+            <span class="qa-mist"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <svg viewBox="0 0 120 160" class="qa-drop3d">
+              <defs>
+                <clipPath id="qa-clip"><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z"/></clipPath>
+                <clipPath id="qa-clip-in"><path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" transform="translate(60 96) scale(.9) translate(-60 -96)"/></clipPath>
+                <radialGradient id="qa-glass" cx=".38" cy=".42" r=".75"><stop offset="0" style="stop-color:#fff;stop-opacity:.55"/><stop offset=".45" style="stop-color:var(--qa-c1);stop-opacity:.16"/><stop offset="1" style="stop-color:var(--qa-c2);stop-opacity:.42"/></radialGradient>
+                <radialGradient id="qa-fill" cx=".32" cy=".35" r=".85"><stop offset="0" style="stop-color:color-mix(in srgb, var(--qa-c1) 55%, #fff)"/><stop offset=".45" style="stop-color:var(--qa-c1)"/><stop offset="1" style="stop-color:var(--qa-c2)"/></radialGradient>
+                <radialGradient id="qa-vol" cx=".3" cy=".32" r=".8"><stop offset=".45" style="stop-color:#000;stop-opacity:0"/><stop offset="1" style="stop-color:#06102a;stop-opacity:.42"/></radialGradient>
+                <linearGradient id="qa-rimg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#fff;stop-opacity:.95"/><stop offset=".5" style="stop-color:#fff;stop-opacity:.15"/><stop offset="1" style="stop-color:var(--qa-c1);stop-opacity:.9"/></linearGradient>
+                <radialGradient id="qa-floor"><stop offset="0" style="stop-color:var(--qa-c2);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--qa-c2);stop-opacity:0"/></radialGradient>
+                <filter id="qa-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
+              </defs>
+              <ellipse class="qa-floor" cx="60" cy="150" rx="40" ry="7" fill="url(#qa-floor)"/>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" fill="url(#qa-glass)"/>
+              <g clip-path="url(#qa-clip-in)"><g class="qa-level"><path class="qa-wave w2" d="M-120 4q15-6 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/><path class="qa-wave w1" d="M-120 0q15-7 30 0t30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0 30 0V200h-300z"/></g>
+                <ellipse cx="60" cy="132" rx="26" ry="9" fill="#fff" opacity=".28" filter="url(#qa-soft)"/></g>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" fill="url(#qa-vol)"/>
+              <path d="M60 6C60 6 14 62 14 96a46 46 0 0 0 92 0C106 62 60 6 60 6z" class="qa-gauge-rim" fill="none" stroke="url(#qa-rimg)" stroke-width="1.6"/>
+              <ellipse cx="39" cy="74" rx="8" ry="17" fill="#fff" opacity=".7" transform="rotate(24 39 74)" filter="url(#qa-soft)"/>
+              <circle cx="44" cy="58" r="2.6" fill="#fff" opacity=".95"/>
+              <path d="M92 104a34 34 0 0 1-22 30" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".4" filter="url(#qa-soft)"/>
+            </svg>
+            <span class="qa-score"><b data-score>0</b><small>of 6</small></span>
+            <span class="qa-reading">Reading your answers…</span>
+          </div>
+          <div>
+            <p class="qa-kicker">Your result</p>
+            <h2 class="qa-h1" id="qa-res-h" tabindex="-1" data-level-name>Mild dry mouth</h2>
+            <p class="qa-sub" data-level-sum></p>
+          </div>
+        </div>
+        <ol class="qa-scale" aria-label="Severity scale"><li data-l="0">None</li><li data-l="1">Mild</li><li data-l="2">Moderate</li><li data-l="3">Severe</li></ol>
+
+        <div class="qa-res-grid">
+          <div class="qa-res-card is-like"><span class="qa-res-ic">{{icon:activity}}</span><h3>What it’s like</h3><p data-symptoms></p></div>
+          <div class="qa-res-card is-helps"><span class="qa-res-ic">{{icon:droplets}}</span><h3>What helps</h3><p data-relief></p></div>
+        </div>
+
+        <div class="qa-tips" data-tips hidden><h3 class="qa-h3">Based on your answers</h3><ul></ul></div>
+
+        <div class="qa-code" data-code>
+          <div><p class="qa-kicker">{{icon:sparkles}} Thank you</p><h3>$10 off your first order</h3><p>Use this code at checkout. <span class="verify">Canadian offer to be confirmed.</span></p></div>
+          <button type="button" class="qa-code-btn" data-copy="SURVEY" aria-label="Copy code SURVEY"><span>SURVEY</span><em data-copied>Copy</em></button>
+        </div>
+        <div class="qa-code qa-code-locked" data-code-locked hidden>
+          <div><h3>Want $10 off?</h3><p>Add your email and we’ll send your result with a code for your first order.</p></div>
+          <button type="button" class="btn btn-glass" data-goto="details">Get my code</button>
+        </div>
+
+        <div class="qa-actions qa-res-actions">
+          <a class="btn btn-primary" data-order-link href="{{base}}order.html?coupon=SURVEY">Order Aquoral {{icon:arrow-right}}</a>
+          <button type="button" class="btn btn-glass" data-restart>{{icon:refresh}} Retake</button>
+        </div>
+        <p class="qa-fine">This assessment is for information only and is not a diagnosis. If your symptoms are severe or getting worse, talk to your pharmacist, dentist or doctor. No prescription is needed for Aquoral in Canada.</p>
+      </section>
+    </form>
+  </div>
+</section>
+
+<!-- Netlify Forms registration: the form above is driven by JS, so this hidden copy lists every field it posts. -->
+<form name="dry-mouth-assessment" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="firstname"><input name="lastname"><input type="email" name="email"><input name="phone">
+  <input name="xerostomia_cause"><input name="xerostomia_cause_other">
+  <input name="q1_parched"><input name="q2_sleep"><input name="q3_washroom"><input name="q4_eating"><input name="q5_speaking"><input name="q6_diagnosed">
+  <input name="score"><input name="severity"><input name="marketing_opt_in"><input name="page">
+  <input type="hidden" name="subject"><input name="bot-field">
+</form>
+
+<!-- Yes / No control, cloned into every question step -->
+<template id="qa-yn">
+  <div class="qa-yn" role="radiogroup">
+    <label class="qa-pick yes"><input type="radio" value="1"><span class="qa-pick-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span><span class="qa-pick-t">Yes</span><kbd>Y</kbd></label>
+    <label class="qa-pick no"><input type="radio" value="0"><span class="qa-pick-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span><span class="qa-pick-t">No</span><kbd>N</kbd></label>
+  </div>
+</template>
+<script src="{{base}}assets/js/assessment.js" defer></script>

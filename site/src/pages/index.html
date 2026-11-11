@@ -45,7 +45,7 @@
               <div class="detail"><div><p>A slim 10 mL canister fits a pocket, purse or bedside table, so relief is there when dryness hits: at work, on the road or at 3 a.m.</p></div></div>
             </div>
           </li>
-          <li class="beat" data-beat data-anchor="cap" data-yaw="-0.2" data-explode="1">
+          <li class="beat" data-beat data-anchor="cap" data-yaw="-0.95" data-explode="1">
             <div class="callout-card">
               <span class="num">02</span>
               <div><div class="label">Fine-mist pump</div><div class="title">Two sprays, evenly spread</div></div>
@@ -53,7 +53,7 @@
               <div class="detail"><div><p>Lift the cap, aim inside the cheek and press twice. The pump delivers a fine mist that covers the mouth. Prime it with a few presses before first use.</p></div></div>
             </div>
           </li>
-          <li class="beat" data-beat data-anchor="formula" data-yaw="-0.8" data-explode="1">
+          <li class="beat" data-beat data-anchor="formula" data-yaw="-0.8" data-explode="1" data-bx="0.2">
             <div class="callout-card">
               <span class="num">03</span>
               <div><div class="label">Formula</div><div class="title">A lipid film that mimics saliva</div></div>
@@ -78,7 +78,7 @@
             </div>
           </li>
         </ol>
-        <div class="anatomy-progress" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="anatomy-progress" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span class="keep-scrolling">Keep scrolling<b></b></span></div>
         <div class="spec-strip"><span>Net <b>2 × 10 mL</b></span><span>Dose <b>2 sprays · 3–4×/day</b></span><span><b>Gluten free</b></span></div>
       </div>
     </div>
@@ -101,32 +101,56 @@
         <p>Millions of Canadians live with dry mouth (xerostomia). It is most often a side effect of medication, cancer treatment or a health condition, and it can make speaking, eating and sleeping hard.</p>
         <a class="btn btn-glass btn-sm" href="{{base}}dry-mouth.html">All causes {{icon:arrow-right}}</a>
       </div>
-      <div data-panel="meds"><div class="ic-lg">{{icon:pill}}</div><h3 class="h3">Medication</h3><p>Many medications can cause dry mouth as a side effect. Check out our list or ask your healthcare professional if your medication may be one of them.</p><a class="btn btn-glass btn-sm" href="{{base}}medications.html">Medication list {{icon:arrow-right}}</a></div>
-      <div data-panel="cpap"><div class="ic-lg">{{icon:cpap}}</div><h3 class="h3">C-PAP and sleep apnea</h3><p>Sleep apnea often leads to mouth breathing, and the constant flow of air from using a CPAP machine can dry out the oral cavity leading to oral health issues.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cpap.html">CPAP and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="sjogren"><div class="ic-lg">{{icon:eye}}</div><h3 class="h3">Sjögren’s disease</h3><p>While the effects of Sjögren’s disease can be widespread, inflammation of the salivary glands is common and results in dry mouth, being one of the main symptoms.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/sjogrens.html">Sjögren’s and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="cancer"><div class="ic-lg">{{icon:ribbon}}</div><h3 class="h3">Cancer treatment</h3><p>Many cancer treatments, including radiation for head and neck cancer, can directly affect the salivary glands, resulting in decreased saliva production and dry mouth.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cancer.html">Cancer and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="cannabis"><div class="ic-lg">{{icon:leaf}}</div><h3 class="h3">Medical cannabis</h3><p>Cannabis use decreases saliva production, causing dry mouth and increasing the risk of tooth decay and gum disease.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cannabis.html">Cannabis and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="diabetes"><div class="ic-lg">{{icon:activity}}</div><h3 class="h3">Diabetes</h3><p>Diabetes can cause dry mouth due to decreased salivary function caused by high blood sugar in saliva, frequent urination and dehydration, as well as from diabetic medications.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/diabetes.html">Diabetes and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="neuro"><div class="ic-lg">{{icon:sparkles}}</div><h3 class="h3">Neurological diseases</h3><p>Alzheimer’s, Parkinson’s disease, ALS and others can cause dry mouth due to changes in salivary production. Dry mouth is also a side effect of many of the medications used to treat these diseases.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/neurological-diseases.html">Neurological diseases {{icon:arrow-right}}</a></div>
-      <div data-panel="dysphagia"><div class="ic-lg">{{icon:utensils}}</div><h3 class="h3">Dysphagia</h3><p>Dry mouth can make difficulty swallowing worse. Food cannot move through the mouth and esophagus easily without enough saliva. Medications can increase the incidence of dry mouth.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/dysphagia.html">Dysphagia and dry mouth {{icon:arrow-right}}</a></div>
-      <div data-panel="other"><div class="ic-lg">{{icon:layers}}</div><h3 class="h3">Other causes</h3><p>Many medical conditions including HIV/AIDS, mast cell activation syndrome and many rare diseases often cause dry mouth. Stroke patients, nursing home residents and others in chronic caregiver settings are also at risk.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/other-causes.html">Other causes {{icon:arrow-right}}</a></div>
+      <div data-panel="meds"><div class="ic-lg">{{cause:medications}}</div><h3 class="h3">Medication</h3><p>Many medications can cause dry mouth as a side effect. Check out our list or ask your healthcare professional if your medication may be one of them.</p><a class="btn btn-glass btn-sm" href="{{base}}medications.html">Medication list {{icon:arrow-right}}</a></div>
+      <div data-panel="cpap"><div class="ic-lg">{{cause:cpap}}</div><h3 class="h3">C-PAP and sleep apnea</h3><p>Sleep apnea often leads to mouth breathing, and the constant flow of air from using a CPAP machine can dry out the oral cavity leading to oral health issues.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cpap.html">CPAP and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="sjogren"><div class="ic-lg">{{cause:sjogren}}</div><h3 class="h3">Sjögren’s disease</h3><p>While the effects of Sjögren’s disease can be widespread, inflammation of the salivary glands is common and results in dry mouth, being one of the main symptoms.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/sjogrens.html">Sjögren’s and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="cancer"><div class="ic-lg">{{cause:cancer}}</div><h3 class="h3">Cancer treatment</h3><p>Many cancer treatments, including radiation for head and neck cancer, can directly affect the salivary glands, resulting in decreased saliva production and dry mouth.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cancer.html">Cancer and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="cannabis"><div class="ic-lg">{{cause:cannabis}}</div><h3 class="h3">Medical cannabis</h3><p>Cannabis use decreases saliva production, causing dry mouth and increasing the risk of tooth decay and gum disease.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/cannabis.html">Cannabis and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="diabetes"><div class="ic-lg">{{cause:diabetes}}</div><h3 class="h3">Diabetes</h3><p>Diabetes can cause dry mouth due to decreased salivary function caused by high blood sugar in saliva, frequent urination and dehydration, as well as from diabetic medications.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/diabetes.html">Diabetes and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="neuro"><div class="ic-lg">{{cause:neuro}}</div><h3 class="h3">Neurological diseases</h3><p>Alzheimer’s, Parkinson’s disease, ALS and others can cause dry mouth due to changes in salivary production. Dry mouth is also a side effect of many of the medications used to treat these diseases.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/neurological-diseases.html">Neurological diseases {{icon:arrow-right}}</a></div>
+      <div data-panel="dysphagia"><div class="ic-lg">{{cause:dysphagia}}</div><h3 class="h3">Dysphagia</h3><p>Dry mouth can make difficulty swallowing worse. Food cannot move through the mouth and esophagus easily without enough saliva. Medications can increase the incidence of dry mouth.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/dysphagia.html">Dysphagia and dry mouth {{icon:arrow-right}}</a></div>
+      <div data-panel="other"><div class="ic-lg">{{cause:other}}</div><h3 class="h3">Other causes</h3><p>Many medical conditions including HIV/AIDS, mast cell activation syndrome and many rare diseases often cause dry mouth. Stroke patients, nursing home residents and others in chronic caregiver settings are also at risk.</p><a class="btn btn-glass btn-sm" href="{{base}}conditions/other-causes.html">Other causes {{icon:arrow-right}}</a></div>
     </div>
   </div>
   <div id="stage-ui">
-    <button class="orbit-btn" type="button" data-orbit="meds" data-h=".3" style="--k:0" aria-expanded="false"><span class="ic">{{icon:pill}}</span><span class="label-text">Medications</span></button>
-    <button class="orbit-btn" type="button" data-orbit="cpap" data-h=".12" style="--k:1" aria-expanded="false"><span class="ic">{{icon:cpap}}</span><span class="label-text">CPAP</span></button>
-    <button class="orbit-btn" type="button" data-orbit="sjogren" data-h=".58" style="--k:2" aria-expanded="false"><span class="ic">{{icon:eye}}</span><span class="label-text">Sjögren’s</span></button>
-    <button class="orbit-btn" type="button" data-orbit="cancer" data-h=".78" style="--k:3" aria-expanded="false"><span class="ic">{{icon:ribbon}}</span><span class="label-text">Cancer treatment</span></button>
-    <button class="orbit-btn" type="button" data-orbit="cannabis" data-h=".2" style="--k:4" aria-expanded="false"><span class="ic">{{icon:leaf}}</span><span class="label-text">Cannabis</span></button>
-    <button class="orbit-btn" type="button" data-orbit="diabetes" data-h=".45" style="--k:5" aria-expanded="false"><span class="ic">{{icon:activity}}</span><span class="label-text">Diabetes</span></button>
-    <button class="orbit-btn" type="button" data-orbit="neuro" data-h=".9" style="--k:6" aria-expanded="false"><span class="ic">{{icon:sparkles}}</span><span class="label-text">Neurological</span></button>
-    <button class="orbit-btn" type="button" data-orbit="dysphagia" data-h=".66" style="--k:7" aria-expanded="false"><span class="ic">{{icon:utensils}}</span><span class="label-text">Dysphagia</span></button>
-    <button class="orbit-btn" type="button" data-orbit="other" data-h=".36" style="--k:8" aria-expanded="false"><span class="ic">{{icon:layers}}</span><span class="label-text">Other causes</span></button>
+    <button class="orbit-btn" type="button" data-orbit="meds" data-h=".3" style="--k:0" aria-expanded="false"><span class="ic">{{cause:medications}}</span><span class="label-text">Medications</span></button>
+    <button class="orbit-btn" type="button" data-orbit="cpap" data-h=".12" style="--k:1" aria-expanded="false"><span class="ic">{{cause:cpap}}</span><span class="label-text">CPAP</span></button>
+    <button class="orbit-btn" type="button" data-orbit="sjogren" data-h=".58" style="--k:2" aria-expanded="false"><span class="ic">{{cause:sjogren}}</span><span class="label-text">Sjögren’s</span></button>
+    <button class="orbit-btn" type="button" data-orbit="cancer" data-h=".78" style="--k:3" aria-expanded="false"><span class="ic">{{cause:cancer}}</span><span class="label-text">Cancer treatment</span></button>
+    <button class="orbit-btn" type="button" data-orbit="cannabis" data-h=".2" style="--k:4" aria-expanded="false"><span class="ic">{{cause:cannabis}}</span><span class="label-text">Cannabis</span></button>
+    <button class="orbit-btn" type="button" data-orbit="diabetes" data-h=".45" style="--k:5" aria-expanded="false"><span class="ic">{{cause:diabetes}}</span><span class="label-text">Diabetes</span></button>
+    <button class="orbit-btn" type="button" data-orbit="neuro" data-h=".9" style="--k:6" aria-expanded="false"><span class="ic">{{cause:neuro}}</span><span class="label-text">Neurological</span></button>
+    <button class="orbit-btn" type="button" data-orbit="dysphagia" data-h=".66" style="--k:7" aria-expanded="false"><span class="ic">{{cause:dysphagia}}</span><span class="label-text">Dysphagia</span></button>
+    <button class="orbit-btn" type="button" data-orbit="other" data-h=".36" style="--k:8" aria-expanded="false"><span class="ic">{{cause:other}}</span><span class="label-text">Other causes</span></button>
+  </div>
+</section>
+
+<!-- 3b · THE WHY: the Canadian commercial, click to play with sound and captions (Dapo 2026-11-11: sits before How it works) -->
+<section class="section section-solid film-section" id="the-why" aria-labelledby="the-why-title">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow">The why</p>
+      <h2 class="h1" id="the-why-title">Meet <em>Aquoral</em></h2>
+      <p class="lead">A one-minute look at what causes dry mouth, and how Aquoral's lipid film brings relief that lasts.</p>
+    </div>
+    <figure class="film reveal">
+      <div class="film-frame">
+        <video class="film-vid" controls playsinline preload="none" poster="{{base}}assets/video/aquoral-film.jpg" aria-label="Why Aquoral: 1 minute 10 second video with captions">
+          <source src="{{base}}assets/video/aquoral-film.mp4" type="video/mp4">
+          <track kind="captions" src="{{base}}assets/video/aquoral-film.en.vtt" srclang="en" label="English" default>
+        </video>
+        <button class="film-play" type="button" aria-label="Play the video (1:10, sound on)">
+          <span class="film-play-ring" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          <span class="film-play-label">Watch now <span class="film-dur">1:10</span></span>
+        </button>
+      </div>
+      <figcaption class="film-cap">Captions on · Sound on</figcaption>
+    </figure>
   </div>
 </section>
 
 <!-- 4 · HOW IT WORKS (light) -->
-<section class="section section-solid" id="how" aria-labelledby="how-title">
+<section class="section section-solid" id="how" data-island aria-labelledby="how-title">
   <div class="wrap">
     <div class="section-head reveal">
       <p class="eyebrow">How it works</p>
@@ -235,7 +259,7 @@
 </section>
 
 <!-- 5 · MOMENTS -->
-<section class="section section-solid section-sunken" aria-labelledby="moments-title">
+<section class="section section-solid section-sunken" data-island aria-labelledby="moments-title">
   <div class="wrap">
     <div class="section-head center reveal">
       <p class="eyebrow">Everyday relief</p>
@@ -273,7 +297,7 @@
 </section>
 
 <!-- 7 · LEARN -->
-<section class="section section-solid section-sunken" aria-labelledby="learn-title">
+<section class="section section-solid section-sunken" data-island aria-labelledby="learn-title">
   <div class="wrap">
     <div class="section-head reveal" style="display:flex;justify-content:space-between;align-items:end;gap:24px;max-width:none;flex-wrap:wrap">
       <div><p class="eyebrow">Learn</p><h2 class="h1" id="learn-title" style="margin:0">Understand your dry mouth</h2></div>

@@ -1,0 +1,12 @@
+{
+  "name": "aquoral-canada",
+  "private": true,
+  "type": "module",
+  "description": "Aquoral Canada site backend: Netlify Functions + Netlify Database. The static site itself is built by site/build.py.",
+  "dependencies": {
+    "@netlify/database": "^2.0.3"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.1.1"
+  }
+}

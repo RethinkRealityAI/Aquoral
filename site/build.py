@@ -54,15 +54,30 @@ ICONS = {
   'info': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
   'cpap': '<path d="M5 9a7 7 0 0 1 14 0v3a7 7 0 0 1-14 0Z"/><path d="M9 11h6"/><path d="M12 19v3"/><path d="M5 10H2M22 10h-3"/>',
 }
+def cause_icon(name):
+    '''Coloured cause icons shared with the commercial (assets/icons/causes/*.svg, inlined).'''
+    svg = (HERE / 'assets' / 'icons' / 'causes' / f'{name}.svg').read_text().strip()
+    return svg.replace('<svg ', '<svg class="cause-icon" aria-hidden="true" focusable="false" ', 1)
+
 def icon(name, cls='icon'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true">{ICONS[name]}</svg>'
 
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
+# Light / dark theme (2026-11-11). Default follows the device; a choice is kept in localStorage('aq-theme')
+# and applied by the inline <head> script before CSS loads, so the page never flashes the wrong theme.
+SUN = '<svg class="tt-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>'
+MOON = '<svg class="tt-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>'
+THEME_SWITCH = ('<button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Dark mode" data-theme-toggle>'
+                f'<span class="tt-track" aria-hidden="true"><span class="tt-stars"></span><span class="tt-thumb">{SUN}{MOON}</span></span></button>')
+THEME_CHOICE = ('<div class="theme-choice" role="radiogroup" aria-label="Appearance"><span class="tc-label" aria-hidden="true">Appearance</span><div class="tc-seg">'
+                + ''.join(f'<button type="button" role="radio" aria-checked="false" data-theme-set="{v}">{l}</button>' for v, l in [('system', 'Auto'), ('light', 'Light'), ('dark', 'Dark')])
+                + '<span class="tc-pill" aria-hidden="true"></span></div></div>')
+
 def layout(meta, body, base):
     nav_links = ''.join(f'<li><a href="{base}{href}"{" aria-current=\"page\"" if meta.get("nav") == key else ""}>{label}</a></li>' for key, label, href in NAV)
-    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
+    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}assessment.html">Free assessment</a></li><li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
     stage = meta.get('stage')
     models = f'<script src="{base}assets/js/models.js"></script>' if (stage and ARTIFACT) else ''
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
@@ -71,6 +86,7 @@ def layout(meta, body, base):
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
+<script>try{{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}}catch(e){{}}</script>
 <script type="importmap">{{"imports":{{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}}}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -87,19 +103,21 @@ def layout(meta, body, base):
 <script>document.documentElement.classList.replace('no-js','js')</script>
 <a class="skip-link" href="#main">Skip to content</a>
 {stage_html}
-<header class="site-header{" on-dark" if meta.get("headerDark", stage) else ""}" id="top">
+<header class="site-header" id="top">
   <div class="bar">
     <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
-      <a class="btn btn-primary btn-sm" href="{base}order.html">Order {icon("arrow-right")}</a>
+      <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
       <button class="btn btn-glass btn-sm menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">{icon("menu")}</button>
+      {THEME_SWITCH}
     </div>
   </div>
 </header>
 <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
   <button class="btn btn-glass btn-sm close menu-close" type="button" aria-label="Close menu" style="width:48px;padding:0;color:#fff">{icon("x")}</button>
   <ul>{mobile_links}</ul>
+  {THEME_CHOICE}
 </div>
 <main id="main">
 {body}
@@ -108,11 +126,11 @@ def layout(meta, body, base):
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <span class="wordmark" role="img" aria-label="Aquoral" style="height:34px;width:150px;margin-bottom:16px"></span>
-        <p style="max-width:26rem;margin:0;color:#A9B8D2;font-size:16px">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
+        <span class="wordmark footer-mark" role="img" aria-label="Aquoral"></span>
+        <p class="footer-blurb">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>
-      <div><h3>Dry mouth</h3><ul><li><a href="{base}dry-mouth.html">Causes and who it helps</a></li><li><a href="{base}medications.html">Medications</a></li><li><a href="{base}conditions/cancer.html">Cancer treatment</a></li><li><a href="{base}conditions/sjogrens.html">Sjögren’s</a></li><li><a href="{base}conditions/cpap.html">CPAP and sleep apnea</a></li><li><a href="{base}conditions/diabetes.html">Diabetes</a></li><li><a href="{base}learn.html">Articles</a></li></ul></div>
+      <div><h3>Dry mouth</h3><ul><li><a href="{base}dry-mouth.html">Causes and who it helps</a></li><li><a href="{base}medications.html">Medications</a></li><li><a href="{base}conditions/cancer.html">Cancer treatment</a></li><li><a href="{base}conditions/sjogrens.html">Sjögren’s</a></li><li><a href="{base}conditions/cpap.html">CPAP and sleep apnea</a></li><li><a href="{base}conditions/diabetes.html">Diabetes</a></li><li><a href="{base}learn.html">Articles</a></li><li><a href="{base}assessment.html">Free dry mouth assessment</a></li></ul></div>
       <div><h3>Company</h3><ul><li><a href="{base}contact.html">Contact</a></li><li><a href="{base}safety.html">Safety information</a></li><li><a href="{base}privacy.html">Privacy</a></li><li><a href="{base}terms.html">Terms</a></li></ul></div>
     </div>
     <div class="footer-base"><span>© 2026 Aquoral Canada. Aquoral is a registered trademark.</span><span>Prototype for review. Product claims pending Canadian label approval.</span></div>
@@ -126,6 +144,7 @@ def layout(meta, body, base):
 
 def render(text, base):
     text = re.sub(r'\{\{icon:([a-z-]+)(?::([a-z-]+))?\}\}', lambda m: icon(m.group(1), m.group(2) or 'icon'), text)
+    text = re.sub(r'\{\{cause:([a-z-]+)\}\}', lambda m: cause_icon(m.group(1)), text)
     return text.replace('{{base}}', base)
 
 def build():

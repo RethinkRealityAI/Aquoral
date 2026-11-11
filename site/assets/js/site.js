@@ -10,19 +10,61 @@
   $('.menu-close')?.addEventListener('click', () => setMenu(false));
   addEventListener('keydown', e => { if (e.key === 'Escape' && menu?.classList.contains('open')) setMenu(false); });
 
-  /* Header turns light/dark with the section under it */
+  /* Header glass follows the section under it. The whole site follows the theme (Dapo 2026-11-11: a true swap), except the
+     inverted panels ([data-island] and inner-page heroes), which are white in the dark theme and navy in the light theme. */
   const header = $('.site-header');
-  const darkSecs = $$('[data-stage-section], .site-footer, [data-dark]');
+  const inverted = $$('[data-island], .page-hero');
   const onScroll = () => {
     if (!header) return;
-    const y = 40; let dark = false;
-    for (const s of darkSecs) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { dark = true; break; } }
-    // In the dark colour scheme every section is dark, so the bar always uses the dark liquid glass
-    const t = document.documentElement.dataset.theme;
-    if (t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)) dark = true;
+    const y = 40, t = document.documentElement.dataset.theme;
+    const themeDark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    let inv = false;
+    for (const s of inverted) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { inv = true; break; } }
+    const dark = themeDark !== inv;
     header.classList.toggle('on-dark', dark);
+    header.classList.toggle('on-light', !dark);
   };
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* Light / dark theme. No stored choice = follow the device. The <head> script applies a stored choice before
+     first paint; this wires the header switch, the menu's Auto / Light / Dark control, and other open tabs. */
+  const root = document.documentElement, KEY = 'aq-theme', sysDark = matchMedia('(prefers-color-scheme: dark)');
+  const store = v => { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} };
+  const choice = () => root.dataset.theme || 'system';
+  const darkFor = c => c === 'dark' || (c === 'system' && sysDark.matches);
+  const syncTheme = () => {
+    const c = choice(), d = darkFor(c);
+    $$('[data-theme-toggle]').forEach(b => { b.setAttribute('aria-checked', String(d)); b.title = d ? 'Switch to light mode' : 'Switch to dark mode'; });
+    $$('[data-theme-set]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themeSet === c)));
+    $$('.tc-seg').forEach(s => s.style.setProperty('--i', ['system', 'light', 'dark'].indexOf(c)));
+    onScroll();
+    document.dispatchEvent(new CustomEvent('aq:theme'));
+  };
+  const setTheme = (v, from) => {
+    const apply = () => { if (v === 'system') delete root.dataset.theme; else root.dataset.theme = v; store(v === 'system' ? null : v); syncTheme(); };
+    if (!document.startViewTransition || darkFor(choice()) === darkFor(v)) return apply();
+    // Liquid reveal: the new theme spreads out from the control like a drop; a soft cross-fade under reduced motion
+    const quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    root.classList.add(quiet ? 'theme-fade' : 'theme-wipe');
+    const vt = document.startViewTransition(apply);
+    if (!quiet) vt.ready.then(() => {
+      const r = from && from.offsetParent ? from.getBoundingClientRect() : null;
+      const x = r ? r.left + r.width / 2 : innerWidth / 2, y = r ? r.top + r.height / 2 : 0;
+      const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+        { duration: 720, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' });
+    }).catch(() => {});
+    vt.finished.finally(() => root.classList.remove('theme-wipe', 'theme-fade'));
+  };
+  $$('[data-theme-toggle]').forEach(b => b.addEventListener('click', () => setTheme(darkFor(choice()) ? 'light' : 'dark', b)));
+  $$('[data-theme-set]').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeSet, b)));
+  $$('.tc-seg').forEach(seg => seg.addEventListener('keydown', e => {   // radio group: arrow keys move the choice
+    const opts = $$('[data-theme-set]', seg), i = opts.indexOf(document.activeElement), k = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (i < 0 || !k) return; e.preventDefault(); const n = opts[(i + k + opts.length) % opts.length]; n.focus(); n.click();
+  }));
+  sysDark.addEventListener('change', syncTheme);
+  addEventListener('storage', e => { if (e.key !== KEY) return; if (e.newValue === 'light' || e.newValue === 'dark') root.dataset.theme = e.newValue; else delete root.dataset.theme; syncTheme(); });
+  syncTheme();
 
   /* Reveal on scroll */
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
@@ -208,4 +250,16 @@
   const v = document.querySelector('.tech-vid'); if (!v) return;
   v.muted = true;
   new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
+})();
+
+/* The why (video): big play button over the poster; hands over to native controls once playing */
+(() => {
+  const v = document.querySelector('.film-vid'), b = document.querySelector('.film-play'); if (!v || !b) return;
+  const fig = v.closest('.film');
+  v.controls = false; // native controls only once playing, so they don't clutter the poster (kept in HTML as a no-JS fallback)
+  b.addEventListener('click', () => { v.muted = false; v.play().catch(() => {}); });
+  v.addEventListener('play', () => { fig.classList.add('is-playing'); v.controls = true; });
+  v.addEventListener('ended', () => { fig.classList.remove('is-playing'); v.controls = false; v.load(); });
+  // pause when scrolled well out of view so sound never plays off-screen
+  new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting && !v.paused) v.pause(); }), { threshold: 0.15 }).observe(v);
 })();
