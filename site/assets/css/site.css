@@ -560,3 +560,10 @@ html { overflow-x: clip; }
 .keep-scrolling b { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); animation: aq-nudge 1.6s var(--ease-liquid) infinite; }
 @keyframes aq-nudge { 0%, 100% { translate: 0 0 } 50% { translate: 0 4px } }
 .anatomy[data-step="4"] .keep-scrolling { opacity: 0; }
+
+/* Large screens (Dapo 2026-11-11): more air between the 3D canister and the step cards. Wider container, a capped text column
+   on the right and a generous gap, so the bottle and its animations sit well clear of the text. */
+@media (min-width: 1181px) {
+  .anatomy .wrap.anatomy-grid { max-width: min(1760px, 100%); padding-inline: clamp(32px, 4vw, 96px);
+    grid-template-columns: minmax(0, 1fr) minmax(480px, 580px); column-gap: clamp(64px, 7vw, 180px); }
+}

@@ -15,6 +15,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 const root = document.documentElement;
 const canvas = document.getElementById('stage');
@@ -245,7 +246,7 @@ async function boot() {
   const addFresnel = (mat, rim, k) => { mat.onBeforeCompile = sh => {
     sh.uniforms.uRim = { value: new THREE.Color(rim) }; sh.uniforms.uRimK = { value: k };
     sh.fragmentShader = 'uniform vec3 uRim; uniform float uRimK;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
-      `float fr = pow(1.0 - abs(dot(normalize(-vViewPosition), normal)), 2.4); outgoingLight += uRim * fr * uRimK;
+      `float fr = pow(clamp(1.0 - abs(dot(normalize(-vViewPosition), normal)), 0.0, 1.0), 2.4); outgoingLight += uRim * fr * uRimK;
        #include <opaque_fragment>`); }; };
   const water = () => new THREE.MeshPhysicalMaterial({ color: C('water'), roughness: .04, transmission: .72, thickness: .3, ior: 1.33,
     attenuationColor: C('rim'), attenuationDistance: 2, clearcoat: 1, clearcoatRoughness: .02, envMapIntensity: 1.4, iridescence: .15, iridescenceIOR: 1.3 });
@@ -337,7 +338,7 @@ async function boot() {
   const bandMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false,
     uniforms: { uC: { value: cSky4 }, uK: { value: 0 } },
     vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
-    fragmentShader: `uniform vec3 uC; uniform float uK; varying vec2 vUv; void main(){ float a = pow(vUv.y, 2.2) * .32 * uK; gl_FragColor = vec4(uC, a);
+    fragmentShader: `uniform vec3 uC; uniform float uK; varying vec2 vUv; void main(){ float a = pow(clamp(vUv.y, 0., 1.), 2.2) * .32 * uK; gl_FragColor = vec4(uC, a);
       #include <colorspace_fragment>
     }` });
   const band = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .07, 72, 1, true), bandMat); scanG.add(band);
@@ -487,11 +488,14 @@ async function boot() {
     // strike-through
     g.strokeStyle = '#D42A8E'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
     g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.center.set(.5, .5); t.rotation = -Math.PI / 2; return t; })();
-  const BR = .068, BS = isPhone ? 1.2 : 1.15;
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
+  const BR = .068, BS = isPhone ? 1.05 : 1.2;
   const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });
   const coinSide = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--sky-200', '#C9E9F9')), roughness: .22, metalness: .2, clearcoat: 1, sheen: 1, sheenColor: new THREE.Color(0xffffff), transparent: true });
-  const coin = new THREE.Mesh(new THREE.CylinderGeometry(BR, BR, .016, 72, 1), [coinSide, coinFace, coinFace]); coin.rotation.x = Math.PI / 2; badge3.add(coin);
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(BR, BR, .016, 72, 1, true), coinSide); coin.rotation.x = Math.PI / 2; badge3.add(coin);
+  // faces as circles: their UVs map the artwork upright; the back face is turned round so it also reads correctly
+  const faceGeo = new THREE.CircleGeometry(BR, 72);
+  const faceF = new THREE.Mesh(faceGeo, coinFace), faceB = new THREE.Mesh(faceGeo, coinFace); faceF.position.z = .008; faceB.position.z = -.008; faceB.rotation.y = Math.PI; badge3.add(faceF, faceB);
   const coinGlow = glowSprite(cSky, .3, .35); coinGlow.position.z = -.02; badgeG.add(coinGlow);
   const sparkles = Array.from({ length: 7 }, (_, i) => { const s = glowSprite(i % 2 ? cSky : cOrchid3, .03, .9); s.userData.a = i / 7 * Math.PI * 2; s.userData.r = BR + .03 + (i % 3) * .012; badgeG.add(s); return s; });
   const badgeMats = [coinFace, coinSide]; badgeMats.forEach(m => m.userData.o = 1);
@@ -597,8 +601,9 @@ async function boot() {
     // 05
     k = fxK[4]; badgeG.visible = k > .005;
     if (badgeG.visible) {
-      const t = fxT[4], e = ease.out(k), tw = axisOf(twinG, fxV2);
-      badgeG.position.set(tw.x + profile(.5) * twinG.scale.x + BR * BS + .035, .62 + Math.sin(t * 1.2) * .01, tw.z + .05);
+      const t = fxT[4], e = ease.out(k), leftEdge = (px2w(isPhone ? 8 : 24, 0)[0] - cur.x) / cur.s;
+      const bx = Math.max(leftEdge + BR * BS + .03, bAxis.x - profile(.5) - BR * BS - .05);
+      badgeG.position.set(bx, .62 + Math.sin(t * 1.2) * .01, bAxis.z - .12);
       badge3.rotation.y = Math.sin(t * .9) * .42 - (1 - e) * Math.PI;
       badge3.scale.setScalar(BS * (.6 + .4 * e)); coinGlow.scale.setScalar(.3 * BS);
       setK(badgeMats, k); coinGlow.material.opacity = .35 * k;
@@ -620,6 +625,11 @@ async function boot() {
   if (HIGH) {
     composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
     composer.addPass(new RenderPass(scene, camera));
+    /* Safety net: one NaN/Inf pixel (MSAA can extrapolate a varying outside its range) would otherwise be smeared by bloom into big black blocks. */
+    composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+      fragmentShader: `uniform sampler2D tDiffuse; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv);
+        if (any(isnan(c)) || any(isinf(c))) c = vec4(0.); gl_FragColor = clamp(c, 0., 64.); }` }));
     bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .1, .5, .985); composer.addPass(bloom);
     composer.addPass(new OutputPass());
   }
@@ -688,6 +698,8 @@ async function boot() {
       if (s && b) s.dyn = { yaw: parseFloat(b.dataset.yaw || 0), explode: parseFloat(b.dataset.explode || 0), box: parseFloat(b.dataset.box || 0), twin: parseFloat(b.dataset.twin || 0), bx: parseFloat(b.dataset.bx || 0) };
       /* Desktop: when the cap lifts off, pull back a little so the cap clears the menu bar (phones already leave room). */
       if (s && b && !isPhone && s.dyn.explode > 0) s.dyn.fit = Math.max(s.base.fit, 1.34);
+      /* Desktop twin shot: step back a little so the pair and the gluten-free badge clear the screen edge and the cards. */
+      if (s && b && !isPhone && s.dyn.twin > 0) s.dyn.fit = Math.max(s.base.fit, 1.62);
     }
     anatomy.style.setProperty('--progress', p.toFixed(4));
   }
@@ -965,7 +977,7 @@ async function boot() {
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   startIntro();
 
-  window.__stage = { renderer, scene, camera, fxT, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
+  window.__stage = { snap: () => { first = true; }, renderer, scene, camera, fxT, fxK, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
   if (params.has('debug')) {
     const gl = renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info'), box = document.createElement('pre');
     box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;font:12px/1.4 monospace;background:#000c;color:#fff;padding:8px;border-radius:6px;max-width:90vw;white-space:pre-wrap';
