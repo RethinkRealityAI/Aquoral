@@ -62,6 +62,15 @@ def cause_icon(name):
 def icon(name, cls='icon'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true">{ICONS[name]}</svg>'
 
+# Logo marks from the packaging (Dapo 2026-11-11): orchid dot, divider bar, cobalt eight-spoke wheel, set above the wordmark.
+BRAND_MARKS = ('<svg class="brand-marks" viewBox="0 0 36 16" aria-hidden="true" focusable="false">'
+               '<circle class="bm-dot" cx="6.5" cy="8" r="6.2"/><rect class="bm-bar" x="14.6" y="0" width="1.7" height="16" rx=".5"/>'
+               '<circle class="bm-wheel" cx="27.5" cy="8" r="7.5"/><circle cx="27.5" cy="8" r="6.3" fill="none" stroke="#fff" stroke-width=".5"/>'
+               '<path d="M27.5 1.9v12.2M21.4 8h12.2M23.19 3.69l8.62 8.62M31.81 3.69l-8.62 8.62" fill="none" stroke="#fff" stroke-width=".8" stroke-linecap="round"/></svg>')
+
+def lockup(extra=''):
+    return f'<span class="brand-lockup {extra}" role="img" aria-label="Aquoral">{BRAND_MARKS}<span class="wordmark" aria-hidden="true"></span></span>'
+
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
@@ -105,7 +114,7 @@ def layout(meta, body, base):
 {stage_html}
 <header class="site-header" id="top">
   <div class="bar">
-    <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
+    <a class="brand" href="{base}index.html" aria-label="Aquoral home">{lockup()}</a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
       <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
@@ -126,7 +135,7 @@ def layout(meta, body, base):
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <span class="wordmark footer-mark" role="img" aria-label="Aquoral"></span>
+        {lockup("footer-mark")}
         <p class="footer-blurb">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>

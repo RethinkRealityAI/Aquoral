@@ -25,7 +25,19 @@ Load order on every page:
 - Sky is light and water: `halo`, `caustic`, the swirl, and in the dark theme `accent-glow` (leader lines, hotspot drop) and the stage primary-button fill. On white pages, Sky never carries text. **The only exception** is `highlight` on the dark stage (`sky-300` on `tide-950`, 11.6:1), used for the highlighted words in a display headline. Get sign-off from the root owner before relying on it.
 - **Dark = deep-ocean stage** for 3D sections and the hero: `tide-950` ground fading to `abyss` (derived, never pure black), with a cobalt glow behind the product. Put `data-theme="dark"` on any section. Root sets `:root` dark; v2 also lets the attribute work on any element. To do that, v2 *mirrors* a handful of root's literal dark values (marked `/* mirror */`). Keep them in step if root changes.
 - v2 dark overrides root in one place: `action` is `sky-300` (luminous fill, `tide-950` label, 11.6:1). Root dark uses `tide-300`, which looked washed out on the stage.
-- Gradients appear only as stage light (`.aq-stage::before`), the product halo, and the glass sheen. Never as gradient text, buttons or bars.
+### No-gradient rule (Dapo, 2026-11-11)
+
+Every colour surface is **one solid token**. Where a gradient used to be, pick the single accent that suits that spot:
+
+- **Highlighted words** in headings: solid `orchid-600` (light) / `orchid-300` (dark) for warm, benefit-led lines; solid `tide-600` (light) / `sky-300` (dark) for factual or brand lines. One highlight colour per heading.
+- **Buttons**: solid `action` fill, with `action-hover` on hover. No sheen gradients.
+- **Stat numbers, accent bars, chips, icon tiles, play buttons**: solid Orchid or Cobalt, alternating where items repeat.
+- **Panels and footers**: a solid surface (`tide-900` navy panel, `sky-50` light panel, white island) plus the swirl motif for texture.
+- **Icon chips** (for example the hero fact pills): solid `tide-600` circle with a white icon in both themes. Never a grey or sky-tinted chip on white.
+
+The **only** exception is the hero headline's highlighted word ("Moisture that *stays.*"), which keeps its subtle gradient in both themes because the client asked for it. Do not copy that treatment anywhere else.
+
+Not counted as gradients (allowed): alpha masks that fade an image or video edge, the 3D stage's lighting backdrop and the WebGL/canvas shading inside animations, and textures such as the payment placeholder stripes.
 
 ### Contrast (measured, WCAG 2.2 AA)
 | Pair | Light | Dark |
@@ -138,6 +150,10 @@ Lucide outline, 1.75px stroke, 24px, in `brand` on a `surface-tint` tile. Every 
 | Protection | `shield-check` |
 
 Logo-derived marks (dot, bar, spoke wheel) come from the root layer.
+
+### Logo lockup (2026-11-11)
+
+Wherever the wordmark appears (site header, footer), it carries the packaging marks above it, as on the carton: **orchid dot, divider bar, cobalt spoke wheel**, left-aligned over the "a". The site build emits it as `.brand-lockup` (`BRAND_MARKS` + `lockup()` in `site/build.py`). The dot is always `orchid-500` and the wheel `tide-600` with white spokes; the bar follows the wordmark colour, and on dark grounds the wheel gets a thin white rim so it reads against navy. Mark row height is about 38% of the wordmark height. Never use the wordmark without the marks.
 
 ## Accessibility
 
