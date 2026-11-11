@@ -103,9 +103,9 @@ def layout(meta, body, base):
     <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
-      {THEME_SWITCH}
-      <a class="btn btn-primary btn-sm" href="{base}order.html">Order {icon("arrow-right")}</a>
+      <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
       <button class="btn btn-glass btn-sm menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">{icon("menu")}</button>
+      {THEME_SWITCH}
     </div>
   </div>
 </header>
