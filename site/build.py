@@ -54,6 +54,11 @@ ICONS = {
   'info': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
   'cpap': '<path d="M5 9a7 7 0 0 1 14 0v3a7 7 0 0 1-14 0Z"/><path d="M9 11h6"/><path d="M12 19v3"/><path d="M5 10H2M22 10h-3"/>',
 }
+def cause_icon(name):
+    '''Coloured cause icons shared with the commercial (assets/icons/causes/*.svg, inlined).'''
+    svg = (HERE / 'assets' / 'icons' / 'causes' / f'{name}.svg').read_text().strip()
+    return svg.replace('<svg ', '<svg class="cause-icon" aria-hidden="true" focusable="false" ', 1)
+
 def icon(name, cls='icon'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true">{ICONS[name]}</svg>'
 
@@ -139,6 +144,7 @@ def layout(meta, body, base):
 
 def render(text, base):
     text = re.sub(r'\{\{icon:([a-z-]+)(?::([a-z-]+))?\}\}', lambda m: icon(m.group(1), m.group(2) or 'icon'), text)
+    text = re.sub(r'\{\{cause:([a-z-]+)\}\}', lambda m: cause_icon(m.group(1)), text)
     return text.replace('{{base}}', base)
 
 def build():
