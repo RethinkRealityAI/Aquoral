@@ -44,6 +44,7 @@ body.has-stage { background: var(--stage-top); }
 .stage-poster .loader { position: absolute; left: 68%; top: 52%; width: 22px; height: 30px; translate: -50% -50%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background: radial-gradient(circle at 35% 35%, #fff, var(--stage-rim) 60%); box-shadow: 0 0 30px var(--stage-rim); animation: aq-drop-pulse 1.4s var(--ease-wave) infinite; transition: opacity 400ms; }
 .stage-ready .stage-poster .loader { opacity: 0; }
+.stage-poster .loader { display: none; }   /* Dapo 2026-11-11: no placeholder drop before the intro */
 @keyframes aq-drop-pulse { 0%,100% { transform: scale(.85); opacity: .6 } 50% { transform: scale(1); opacity: 1 } }
 .stage-failed .stage-poster { background: url(../img/pack.png) 72% 55% / auto 62% no-repeat, linear-gradient(180deg, var(--stage-top), var(--stage-bot)); }
 .stage-failed .stage-poster .loader { display: none; }
@@ -475,3 +476,79 @@ html { overflow-x: clip; }
   .beat.is-active .callout-card { animation: aq-beat-in 450ms var(--ease-liquid); }
 }
 @keyframes aq-beat-in { from { opacity: 0; transform: translateY(10px) } }
+
+/* ================= Desktop polish round (Dapo 2026-11-11) ================= */
+
+/* Primary CTAs in the Aquoral orchid (pink highlight from the packaging). White on orchid-500 = 4.6:1, orchid-600 = 6.9:1. */
+:root { --action: var(--orchid-600); --action-hover: var(--orchid-700); --on-action: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --action: var(--orchid-500); --action-hover: var(--orchid-600); --on-action: #fff; } }
+:root[data-theme="dark"] { --action: var(--orchid-500); --action-hover: var(--orchid-600); --on-action: #fff; }
+[data-stage-section], .tech-section, .site-header.on-dark { --action: var(--orchid-500); --action-hover: var(--orchid-600); --on-action: #fff; }
+.btn-primary { background: linear-gradient(180deg, color-mix(in srgb, var(--action) 88%, #fff), var(--action)); }
+.btn-primary:hover { background: var(--action-hover); color: var(--on-action); }
+
+/* Menu bar: real liquid glass over dark backgrounds (dark scheme, stage and dark sections) */
+.site-header.on-dark .bar { --glass-tint: rgba(14,30,66,.34); color: #EEF5FC;
+  background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.03) 55%, rgba(255,255,255,.06)), var(--glass-tint);
+  -webkit-backdrop-filter: blur(26px) saturate(190%) brightness(1.08); backdrop-filter: blur(26px) saturate(190%) brightness(1.08);
+  border-color: rgba(255,255,255,.14); border-top-color: rgba(255,255,255,.38);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.06), 0 18px 44px -20px rgba(0,0,0,.65); }
+
+/* Benefit cards and performance stats: orchid + sky accents instead of one blue */
+.moments .moment:nth-child(even) .ic { background: var(--accent-soft); color: var(--accent); }
+.moments .moment { position: relative; overflow: hidden; }
+.moments.stats .moment::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--orchid-500), var(--sky-400)); }
+.moments.stats .moment:nth-child(even)::before { background: linear-gradient(90deg, var(--sky-400), var(--orchid-500)); }
+.stat-num { background: linear-gradient(110deg, var(--orchid-600), var(--orchid-500) 40%, var(--tide-600)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat-num { background-image: linear-gradient(110deg, var(--orchid-300), #F7C9E0 45%, var(--sky-300)); } }
+:root[data-theme="dark"] .stat-num { background-image: linear-gradient(110deg, var(--orchid-300), #F7C9E0 45%, var(--sky-300)); }
+.moments.stats .moment:nth-child(even) .stat-num { background-image: linear-gradient(110deg, var(--tide-600), var(--orchid-500)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .moments.stats .moment:nth-child(even) .stat-num { background-image: linear-gradient(110deg, var(--sky-300), var(--orchid-300)); } }
+
+/* Exclusive technology: deep stage background, two columns, OGT molecule film in a liquid-glass orb */
+.tech-section { position: relative; z-index: 1; overflow: hidden; color: #EEF5FC; padding-block: clamp(88px, 12vh, 150px); color-scheme: dark;
+  --ink: #EEF5FC; --ink-muted: #B9C8E2; --brand: var(--sky-300); --accent: var(--orchid-300); --line: rgba(255,255,255,.14);
+  --glass-tint: rgba(11,24,51,.55); --glass-edge: rgba(255,255,255,.26); --glass-line: rgba(255,255,255,.12); --glass-sheen: rgba(255,255,255,.16);
+  background: radial-gradient(60% 70% at 78% 45%, rgba(212,42,142,.22), transparent 70%), radial-gradient(55% 60% at 12% 85%, rgba(111,194,236,.18), transparent 70%), linear-gradient(160deg, #0B1833 0%, #10285A 55%, #0B1833 100%); }
+.tech-bg { position: absolute; inset: -10%; background: url(../img/swirl-dark.svg) center / 1400px auto repeat; opacity: .22; mix-blend-mode: screen; pointer-events: none;
+  -webkit-mask-image: radial-gradient(70% 70% at 60% 50%, #000, transparent); mask-image: radial-gradient(70% 70% at 60% 50%, #000, transparent); animation: tech-drift 40s linear infinite; }
+@keyframes tech-drift { to { transform: translate3d(-120px, 60px, 0) rotate(2deg); } }
+.tech-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(32px, 5vw, 80px); align-items: center; position: relative; }
+.tech-section .h1 em { background: linear-gradient(100deg, #F7C9E0, var(--orchid-300) 50%, var(--sky-300)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tech-section .lead { font-size: 18px; max-width: 40rem; margin-bottom: 24px; }
+.tech-facts { display: grid; gap: 12px; margin-bottom: 28px; }
+.tech-fact { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: start; padding: 18px 20px; border-radius: 20px; background: var(--glass-tint); border: 1px solid var(--glass-line); border-top-color: var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%); box-shadow: inset 0 1px 0 var(--glass-sheen); }
+.tech-fact .k { display: grid; place-items: center; height: 36px; border-radius: 999px; font: 600 13px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(120deg, var(--orchid-500), var(--orchid-600)); box-shadow: 0 8px 20px -8px rgba(212,42,142,.7); }
+.tech-fact:nth-child(2) .k { background: linear-gradient(120deg, var(--sky-400), #3A8FC8); box-shadow: 0 8px 20px -8px rgba(111,194,236,.7); }
+.tech-fact p { margin: 0; color: var(--ink-muted); font-size: 16px; line-height: 1.6; }
+.tech-cta { margin: 0; }
+.tech-media { position: relative; width: min(100%, 560px); justify-self: center; aspect-ratio: 1; animation: tech-float 9s ease-in-out infinite; }
+@keyframes tech-float { 0%, 100% { translate: 0 0 } 50% { translate: 0 -12px } }
+.tech-media::before { content: ""; position: absolute; inset: 6%; border-radius: 50%; background: radial-gradient(circle, rgba(212,42,142,.35), rgba(111,194,236,.18) 55%, transparent 72%); filter: blur(30px); }
+.tech-orb { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, rgba(0,0,0,.6) 62%, transparent 71%); mask-image: radial-gradient(circle at 50% 50%, #000 52%, rgba(0,0,0,.6) 62%, transparent 71%); }
+.tech-vid { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.08) contrast(1.04); }
+.tech-media::after { content: ""; position: absolute; inset: 14.5%; border-radius: 50%; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), inset 0 18px 40px -20px rgba(255,255,255,.55), inset 0 -24px 50px -30px rgba(111,194,236,.6); }
+.tech-tag { position: absolute; z-index: 2; padding: 9px 14px; border-radius: 999px; font: 500 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #fff; white-space: nowrap;
+  background: rgba(11,24,51,.55); border: 1px solid rgba(255,255,255,.18); border-top-color: rgba(255,255,255,.36); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.tech-tag::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--orchid-300); box-shadow: 0 0 10px var(--orchid-300); }
+.tech-tag.t1 { top: 14%; left: 0; } .tech-tag.t2 { bottom: 16%; right: 0; } .tech-tag.t2::before { background: var(--sky-300); box-shadow: 0 0 10px var(--sky-300); }
+@media (max-width: 900px) {
+  .tech-grid { grid-template-columns: 1fr; }
+  .tech-media { width: min(88%, 420px); order: -1; margin-bottom: 8px; }
+  .tech-fact { grid-template-columns: 1fr; gap: 10px; } .tech-fact .k { justify-self: start; padding: 0 14px; }
+}
+
+/* Bigger 3D product on laptop/desktop: taller slots (stage.js also lowers the fit on wide screens) */
+@media (min-width: 1081px) {
+  .explore .stage-slot { height: 72vh; }
+  .anatomy .stage-slot { max-height: 88vh; }
+  .anatomy-grid { padding-top: calc(var(--nav-h) + 20px); padding-bottom: 24px; }
+}
+
+/* Dark colour scheme: glass surfaces (glass buttons, cards) are dark tinted, never light grey */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass-tint: rgba(18,38,80,.55); --glass-line: rgba(255,255,255,.12); --glass-edge: rgba(255,255,255,.28); --glass-sheen: rgba(255,255,255,.14); } }
+:root[data-theme="dark"] { --glass-tint: rgba(18,38,80,.55); --glass-line: rgba(255,255,255,.12); --glass-edge: rgba(255,255,255,.28); --glass-sheen: rgba(255,255,255,.14); }
