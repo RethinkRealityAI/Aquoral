@@ -767,3 +767,10 @@ html { overflow-x: clip; }
 .film.is-playing .film-play { opacity: 0; visibility: hidden; }
 .film-cap { margin-top: 14px; text-align: center; font: 500 12px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted, inherit); opacity: .75; }
 @media (prefers-reduced-motion: reduce) { .film-play, .film-play-ring { transition: none; } }
+
+/* Large screens (Dapo 2026-11-11): more air between the 3D canister and the step cards. Wider container, a capped text column
+   on the right and a generous gap, so the bottle and its animations sit well clear of the text. */
+@media (min-width: 1181px) {
+  .anatomy .wrap.anatomy-grid { max-width: min(1760px, 100%); padding-inline: clamp(32px, 4vw, 96px);
+    grid-template-columns: minmax(0, 1fr) minmax(480px, 580px); column-gap: clamp(64px, 7vw, 180px); }
+}
