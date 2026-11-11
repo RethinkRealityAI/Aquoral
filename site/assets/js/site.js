@@ -251,3 +251,15 @@
   v.muted = true;
   new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
 })();
+
+/* The film: big play button over the poster; hands over to native controls once playing */
+(() => {
+  const v = document.querySelector('.film-vid'), b = document.querySelector('.film-play'); if (!v || !b) return;
+  const fig = v.closest('.film');
+  v.controls = false; // native controls only once playing, so they don't clutter the poster (kept in HTML as a no-JS fallback)
+  b.addEventListener('click', () => { v.muted = false; v.play().catch(() => {}); });
+  v.addEventListener('play', () => { fig.classList.add('is-playing'); v.controls = true; });
+  v.addEventListener('ended', () => { fig.classList.remove('is-playing'); v.controls = false; v.load(); });
+  // pause when scrolled well out of view so sound never plays off-screen
+  new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting && !v.paused) v.pause(); }), { threshold: 0.15 }).observe(v);
+})();
