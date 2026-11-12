@@ -24,3 +24,11 @@
   .cs-title { font-size: clamp(40px, 11.5vw, 60px); }
   .cs .stage-slot { min-height: 58svh; margin: 8px 0 0; }
 }
+
+/* Light stage: white liquid-glass pills with navy text (the shared hotspot pill is tuned for the dark stage) */
+.stage-light .cs-facts .fact-pill { background: color-mix(in srgb, #fff 74%, transparent); border-color: rgba(37,76,158,.16); border-top-color: #fff; box-shadow: 0 14px 34px -18px rgba(18,38,80,.45), inset 0 1px 0 #fff; }
+.stage-light .cs-facts .fact-pill b { color: var(--tide-900); }
+.stage-light .cs-facts .fact-pill div > span { color: #4A5A7A; }
+.stage-light .cs-facts .fact-pill .ic { background: var(--sky-100); color: var(--tide-600); }
+.coming-soon.stage-light .hot-lines path { stroke: var(--tide-600); opacity: .55; }
+.coming-soon.stage-light .hot-lines circle.ring { stroke: var(--tide-600); }
