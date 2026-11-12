@@ -36,3 +36,12 @@ Netlify builds from `netlify.toml`: command `python3 site/build.py`, publish dir
 ## Not in this repo
 
 Large working media is kept in the project files rather than git: the commercial (masters, raw clips, audio, keyframes), raw Meshy GLBs and renders, How-it-works raw generations and keyframes, and design-system screenshots.
+
+## Coming Soon gate (pre-launch)
+
+While the client keeps the site hidden, `netlify/edge-functions/gate.ts` serves the Coming Soon page
+(`site/src/coming-soon.html`, hero scene only) at every URL, with noindex and no-store headers.
+
+- Unlock the full site in a browser: open any URL with `?access=<key>` (key = Netlify env var `SITE_ACCESS_KEY`).
+  A 180-day cookie keeps it unlocked at the same URLs. Lock again with `?access=lock`.
+- Launch: set Netlify env var `SITE_GATE=off` and trigger a deploy (or delete the edge function), then purge the Cloudflare cache.
