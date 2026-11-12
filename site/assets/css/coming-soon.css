@@ -1,0 +1,22 @@
+/* Coming Soon gate page: the approved hero scene only, with the wordmark and "Coming soon to Canada" in brand orchid.
+   Loaded after site.css. Layout mirrors the homepage hero: copy left / product right on desktop,
+   copy on top / big bottle below on phones. */
+.cs { min-height: 100svh; }
+.cs-hero { position: relative; z-index: 1; min-height: 100svh; display: grid; }
+.cs-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: 24px; min-height: 100svh; padding-block: 40px; }
+.cs-copy { max-width: 36rem; }
+.cs-mark { width: clamp(180px, 17vw, 260px); height: clamp(44px, 4.2vw, 64px); margin-bottom: clamp(28px, 4vh, 48px); color: #fff; }
+.cs-title { margin: 0; font: 750 clamp(48px, 5.6vw + .5rem, 112px)/.95 var(--font-display); letter-spacing: -.045em; text-wrap: balance; color: var(--orchid-500); }
+.cs-title span { display: block; }
+.cs .stage-slot { align-self: stretch; min-height: 520px; margin-block: 4vh; }
+
+/* Light stage (stage.js adds .stage-light when the light theme is active): cobalt wordmark on the pale water */
+.stage-light .cs-mark { color: var(--tide-600); }
+
+@media (max-width: 860px) {
+  .cs-grid { grid-template-columns: 1fr; grid-template-rows: auto minmax(58svh, 1fr); align-items: start; gap: 0; padding-block: max(28px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-bottom)); }
+  .cs-copy { text-align: center; margin-inline: auto; }
+  .cs-mark { width: 132px; height: 32px; margin: 0 auto 22px; -webkit-mask-position: center; mask-position: center; }
+  .cs-title { font-size: clamp(40px, 11.5vw, 60px); }
+  .cs .stage-slot { min-height: 58svh; margin: 8px 0 0; }
+}
