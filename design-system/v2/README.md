@@ -155,6 +155,8 @@ Logo-derived marks (dot, bar, spoke wheel) come from the root layer.
 
 Wherever the wordmark appears (site header, footer), it carries the packaging marks above it, as on the carton: **orchid dot, divider bar, cobalt spoke wheel**, left-aligned over the "a". The site build emits it as `.brand-lockup` (`BRAND_MARKS` + `lockup()` in `site/build.py`). The dot is always `orchid-500` and the wheel `tide-600` with white spokes; the bar follows the wordmark colour, and on dark grounds the wheel gets a thin white rim so it reads against navy. Mark row height is about 38% of the wordmark height. Never use the wordmark without the marks.
 
+**Favicon (2026-11-12):** the cobalt spoke wheel alone (`site/assets/img/favicon.svg`, 16/32 px PNG, `favicon.ico`, 180 px apple-touch icon, 192/512 px manifest icons). The SVG adds a white rim under `prefers-color-scheme: dark` so it holds on dark browser tabs. Keep the set in `assets/img/` (the Coming Soon gate serves that folder publicly).
+
 ## Accessibility
 
 - Target WCAG 2.2 AA. Touch targets are at least 48px and buttons are 52px tall. Focus is a 3px `focus` ring, and inputs also get a 4px glow.

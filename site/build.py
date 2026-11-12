@@ -70,6 +70,14 @@ BRAND_MARKS = ('<svg class="brand-marks" viewBox="0 0 36 16" aria-hidden="true" 
 def lockup(extra=''):
     return f'<span class="brand-lockup {extra}" role="img" aria-label="Aquoral">{BRAND_MARKS}<span class="wordmark" aria-hidden="true"></span></span>'
 
+# Favicon set (Dapo 2026-11-12): the cobalt spoke wheel from the logo lockup. Lives in assets/img so the Coming Soon
+# gate's public-asset rule (/assets/img/*) serves it to locked visitors too. favicon.svg adds a white rim on dark tabs.
+FAVICON_LINKS = ('<link rel="icon" href="{b}assets/img/favicon.svg" type="image/svg+xml">'
+                 '<link rel="icon" href="{b}assets/img/favicon-32.png" sizes="32x32" type="image/png">'
+                 '<link rel="icon" href="{b}assets/img/favicon-16.png" sizes="16x16" type="image/png">'
+                 '<link rel="apple-touch-icon" href="{b}assets/img/apple-touch-icon.png">'
+                 '<link rel="manifest" href="{b}assets/img/site.webmanifest">')
+
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
@@ -102,6 +110,7 @@ def layout(meta, body, base):
 <meta name="description" content="{meta.get("description", "")}">
 <meta name="aq-base" content="{base}">
 <meta name="theme-color" content="#0B1833">
+{FAVICON_LINKS.format(b=base)}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
@@ -160,6 +169,7 @@ def build():
     (DIST / 'assets').mkdir(parents=True)
     for sub in ['css', 'js', 'img', 'video']:
         shutil.copytree(HERE / 'assets' / sub, DIST / 'assets' / sub)
+    shutil.copy(HERE / 'assets' / 'img' / 'favicon.ico', DIST / 'favicon.ico')   # for clients that only ask for /favicon.ico
     # design-system tokens: root (colour + motifs, source of truth) then v2 (type, glass, components)
     # design-system: root tokens are the colour + type source of truth; site.css adds the site layer
     (DIST / 'assets' / 'css' / 'tokens.css').write_text((DS / 'aquoral-tokens.css').read_text())
