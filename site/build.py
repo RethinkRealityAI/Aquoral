@@ -190,6 +190,7 @@ def coming_soon(h):
     raw = (SRC / 'coming-soon.html').read_text()
     m = re.match(r'\s*<!--(\{.*?\})-->\s*', raw, re.S); meta = json.loads(m.group(1))
     body = re.sub(r'<!--.*?-->\s*', '', raw[m.end():], flags=re.S)
+    body = render(body, '/')
     v = f'?v={h}'
     page = f'''<!doctype html>
 <html lang="en-CA" class="no-js">

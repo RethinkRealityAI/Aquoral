@@ -4,9 +4,12 @@
 .cs { min-height: 100svh; }
 .cs-hero { position: relative; z-index: 1; min-height: 100svh; display: grid; }
 .cs-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: 24px; min-height: 100svh; padding-block: 40px; }
-.cs-copy { max-width: 36rem; }
+.cs-copy { max-width: 36rem; align-self: start; padding-top: clamp(24px, 9vh, 110px); }
+/* Fact pills float beside the bottle (stage.js positions them and fades them in one by one after the intro) */
+.cs-facts { position: absolute; left: 0; top: 0; }
+.stage-failed .cs-facts { position: static; display: flex; flex-wrap: wrap; gap: 10px; grid-column: 1; }
 .cs-mark { width: clamp(180px, 17vw, 260px); height: clamp(44px, 4.2vw, 64px); margin-bottom: clamp(28px, 4vh, 48px); color: #fff; }
-.cs-title { margin: 0; font: 750 clamp(48px, 5.6vw + .5rem, 112px)/.95 var(--font-display); letter-spacing: -.045em; text-wrap: balance; color: var(--orchid-500); }
+.cs-title { margin: 0; font: 750 clamp(48px, 4.6vw + .5rem, 96px)/.95 var(--font-display); letter-spacing: -.045em; text-wrap: balance; color: var(--orchid-500); }
 .cs-title span { display: block; }
 .cs .stage-slot { align-self: stretch; min-height: 520px; margin-block: 4vh; }
 
@@ -15,7 +18,8 @@
 
 @media (max-width: 860px) {
   .cs-grid { grid-template-columns: 1fr; grid-template-rows: auto minmax(58svh, 1fr); align-items: start; gap: 0; padding-block: max(28px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-bottom)); }
-  .cs-copy { text-align: center; margin-inline: auto; }
+  .cs-copy { text-align: center; margin-inline: auto; padding-top: 0; }
+  .cs-facts .fact-pill:not([data-phone]) { display: none; }
   .cs-mark { width: 132px; height: 32px; margin: 0 auto 22px; -webkit-mask-position: center; mask-position: center; }
   .cs-title { font-size: clamp(40px, 11.5vw, 60px); }
   .cs .stage-slot { min-height: 58svh; margin: 8px 0 0; }

@@ -796,7 +796,7 @@ async function boot() {
     if (t >= t4 && !root.classList.contains('intro-revealed')) { root.classList.add('intro-revealed'); }
   }
   function introFinish() {
-    introDone = true; playing = false;
+    introDone = true; playing = false; introAt = performance.now() / 1000;
     ghost.visible = droplet.visible = meniscus.visible = false; ripples.forEach(r => r.visible = false); crown.forEach(m => m.visible = false);
     product.visible = true; solidPlane.constant = 1e4; underSolid.constant = 1e4; bottleG.scale.setScalar(1); setBoxFade(1); boxG.position.y = 0;
     contact.material.opacity = 1; floorMat.uniforms.uCausticK.value = 1; motesMat.uniforms.uK.value = 1;
@@ -806,7 +806,7 @@ async function boot() {
 
   /* Frame */
   const hv = new THREE.Vector3(), tmp = new THREE.Vector3(), ndc = new THREE.Vector3();
-  let lastS = 0, elapsed = 0, errors = 0, onScreen = true, last = performance.now();
+  let lastS = 0, elapsed = 0, errors = 0, onScreen = true, last = performance.now(), introAt = 0;
   const stageSections = [...document.querySelectorAll('[data-stage-section]')];
   const io = new IntersectionObserver(es => { for (const e of es) e.target.__vis = e.isIntersecting; onScreen = stageSections.some(s => s.__vis); }, { rootMargin: '10% 0px' });
   stageSections.forEach(s => io.observe(s));
@@ -880,7 +880,8 @@ async function boot() {
 
   /* Hero facts as floating hotspot labels beside the bottle (anchored to the bottle axis so they don't swing with the spin) */
   const hotPills = [...document.querySelectorAll('.hero-facts .fact-pill')];
-  const hotH = [.86, .58, .3], hotSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  /* data-h (bottle heights; data-hp on phones) and data-reach (px) per pill override the defaults; .hero-facts[data-stagger] reveals them one by one after the intro */
+  const hotH = hotPills.map((p, i) => +(isPhone && p.dataset.hp) || +p.dataset.h || [.86, .58, .3][i] || .5), hotSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   if (hotPills.length) {
     hotSvg.setAttribute('class', 'hot-lines'); hotSvg.setAttribute('aria-hidden', 'true');
     hotSvg.innerHTML = hotPills.map(() => '<g><path/><circle r="4.5"/><circle class="ring" r="10"/></g>').join('');
@@ -893,19 +894,22 @@ async function boot() {
     hotSvg.style.opacity = k.toFixed(3); hotSvg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
     bottleG.getWorldScale(ws);
     const gs = hotSvg.children;
+    const stagger = hotPills[0].parentElement.hasAttribute('data-stagger');
     hotPills.forEach((pill, i) => {
-      pill.style.opacity = k.toFixed(3); pill.style.pointerEvents = k > .5 ? 'auto' : 'none';
-      if (k < .01) return;
+      const ki = stagger ? k * ease.out(clamp((performance.now() / 1000 - introAt - .5 - i * .35) / .8, 0, 1)) : k, g = gs[i];
+      pill.style.opacity = ki.toFixed(3); pill.style.pointerEvents = ki > .5 ? 'auto' : 'none';
+      g.style.opacity = ki.toFixed(3);
+      if (ki < .01 || !pill.offsetWidth) { g.style.display = 'none'; return; }
       tmp.set(0, hotH[i], 0); bottleG.localToWorld(tmp);
       tmp2.copy(tmp); tmp2.x -= .13 * ws.x;                      // bottle's left silhouette edge
       const [ax, ay] = project(tmp2), [cx] = project(tmp);
       const bob = reduceMotion ? 0 : Math.sin(time * 1.1 + i * 2.1) * 5;
       const w = pill.offsetWidth, h = pill.offsetHeight;
-      const reach = isPhone ? 14 : 46 + (i % 2) * 34;
+      const reach = pill.dataset.reach ? +pill.dataset.reach * (isPhone ? .3 : 1) : isPhone ? 14 : 46 + (i % 2) * 34;
       const px = Math.max(8, ax - reach - w), py = ay - h / 2 + bob;
       pill.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
       const ex = px + w, ey = ay + bob;
-      const g = gs[i]; g.querySelector('path').setAttribute('d', `M${ex},${ey} L${ax},${ay}`);
+      g.querySelector('path').setAttribute('d', `M${ex},${ey} L${ax},${ay}`);
       for (const c of g.querySelectorAll('circle')) { c.setAttribute('cx', ax); c.setAttribute('cy', ay); }
       g.style.display = ax - ex > 6 ? '' : 'none';
     });
