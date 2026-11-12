@@ -20,7 +20,7 @@ Aquoral Canada is calm, clinical and quietly premium. It keeps the packaging's o
 - Status colours (`success`, `warning`, `danger`) always come with a word or an icon, never colour alone.
 - `sky-*` and the `swirl-*` tokens are decorative only: the swirl, liquid and 3D highlights. Never set text in Sky.
 - The primitive scales (`tide-*`, `sky-*`, `orchid-*`, `pearl-*`) are for illustration, 3D lighting and charts. Build UI from the semantic tokens so the dark theme works for free.
-- Keep the old pack's loudness out: no pure electric blue, no full-strength magenta beside full-strength blue, no gradients except the hero stage (`tide-950` fading to `tide-900`), and never more than one Orchid element competing for attention in a view.
+- Keep the old pack's loudness out: no pure electric blue, no full-strength magenta beside full-strength blue, no gradients except the hero stage lighting and the hero's highlighted word "stays" (see the no-gradient rule in `v2/README.md`), and never more than one Orchid element competing for attention in a view.
 
 ## Typography
 
