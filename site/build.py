@@ -181,7 +181,7 @@ def build():
     # design-system: root tokens are the colour + type source of truth; site.css adds the site layer
     # The design-system file pulls fonts from Google with @import (a render-blocking chain of three requests);
     # the site self-hosts the same fonts in assets/css/fonts.css instead.
-    tokens = (DS / 'aquoral-tokens.css').read_text() if ARTIFACT else re.sub(r"@import url\('https://fonts\.googleapis\.com[^;]*;\n?", '', (DS / 'aquoral-tokens.css').read_text())
+    tokens = (DS / 'aquoral-tokens.css').read_text() if ARTIFACT else re.sub(r"@import url\('https://fonts\.googleapis\.com[^']*'\);\n?", '', (DS / 'aquoral-tokens.css').read_text())
     (DIST / 'assets' / 'css' / 'tokens.css').write_text(tokens)
     bundle_stage()
     if ARTIFACT:
