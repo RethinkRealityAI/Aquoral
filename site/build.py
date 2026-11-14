@@ -9,12 +9,19 @@ Placeholders: {{icon:name}} inline Lucide-style icons, {{base}} relative root ("
   python3 build.py --artifact -> dist/ plus assets/js/models.js with the GLBs inlined as base64
                                  (artifact hosting does not serve .glb)
 """
-import base64, hashlib, json, pathlib, re, shutil, sys
+import base64, hashlib, json, pathlib, re, shutil, subprocess, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 SRC, DIST = HERE / 'src', HERE / 'dist'
 DS = HERE.parent / 'design-system'
 ARTIFACT = '--artifact' in sys.argv
+# Performance (2026-11-14): stage.js and three.js are bundled into one minified, tree-shaken file with esbuild when it is
+# installed (Netlify runs `npm install` from package.json before this script). Without it the page falls back to the
+# unbundled stage.js + three.js from the CDN import map, which works the same, just with a slower request chain.
+ESBUILD = HERE.parent / 'node_modules' / '.bin' / 'esbuild'
+BUNDLED = False
+# Fonts the first screen needs, preloaded so headings do not wait for the CSS to discover them
+FONT_PRELOAD = ['sora-normal-latin.woff2', 'atkinson-hyperlegible-next-normal-latin.woff2']
 
 ICONS = {
   'droplet': '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
@@ -82,7 +89,13 @@ def layout(meta, body, base):
     models = f'<script src="{base}assets/js/models.js"></script>' if (stage and ARTIFACT) else ''
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
                   '<canvas id="stage" aria-hidden="true"></canvas><svg id="leaders" aria-hidden="true"></svg>') if stage else ''
-    stage_js = f'<script type="module" src="{base}assets/js/stage.js"></script>' if stage else ''
+    stage_file = 'stage.bundle.js' if BUNDLED else 'stage.js'
+    stage_js = f'<script type="module" src="{base}assets/js/{stage_file}"></script>' if stage else ''
+    # Start the 3D downloads with the HTML instead of after the script chain has run (models used to start ~2.5 s late)
+    stage_preload = (f'<link rel="modulepreload" href="{base}assets/js/{stage_file}">'
+                     + ('' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin>' for n in ['bottle', 'box']))
+                     ) if stage else ''
+    font_preload = '' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in FONT_PRELOAD)
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -94,7 +107,9 @@ def layout(meta, body, base):
 <meta name="description" content="{meta.get("description", "")}">
 <meta name="aq-base" content="{base}">
 <meta name="theme-color" content="#0B1833">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{font_preload}
+{stage_preload}
+{'' if ARTIFACT else f'<link rel="stylesheet" href="{base}assets/css/fonts.css">'}
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
 {models}
@@ -147,14 +162,28 @@ def render(text, base):
     text = re.sub(r'\{\{cause:([a-z-]+)\}\}', lambda m: cause_icon(m.group(1)), text)
     return text.replace('{{base}}', base)
 
+def bundle_stage():
+    global BUNDLED
+    if not ESBUILD.exists():
+        print('WARNING: esbuild not installed (run npm install); using unbundled stage.js + CDN three.js')
+        return
+    out = DIST / 'assets' / 'js' / 'stage.bundle.js'
+    subprocess.run([str(ESBUILD), str(HERE / 'assets' / 'js' / 'stage.js'), '--bundle', '--format=esm', '--minify',
+                    '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
+    BUNDLED = True
+
 def build():
     if DIST.exists(): shutil.rmtree(DIST)
     (DIST / 'assets').mkdir(parents=True)
-    for sub in ['css', 'js', 'img', 'video']:
+    for sub in ['css', 'js', 'img', 'video', 'fonts']:
         shutil.copytree(HERE / 'assets' / sub, DIST / 'assets' / sub)
     # design-system tokens: root (colour + motifs, source of truth) then v2 (type, glass, components)
     # design-system: root tokens are the colour + type source of truth; site.css adds the site layer
-    (DIST / 'assets' / 'css' / 'tokens.css').write_text((DS / 'aquoral-tokens.css').read_text())
+    # The design-system file pulls fonts from Google with @import (a render-blocking chain of three requests);
+    # the site self-hosts the same fonts in assets/css/fonts.css instead.
+    tokens = (DS / 'aquoral-tokens.css').read_text() if ARTIFACT else re.sub(r"@import url\('https://fonts\.googleapis\.com[^']*'\);\n?", '', (DS / 'aquoral-tokens.css').read_text())
+    (DIST / 'assets' / 'css' / 'tokens.css').write_text(tokens)
+    bundle_stage()
     if ARTIFACT:
         data = {n: base64.b64encode((HERE / 'assets' / 'models' / f'{n}.glb').read_bytes()).decode() for n in ['bottle', 'box']}
         (DIST / 'assets' / 'js' / 'models.js').write_text('window.AQ_GLB=' + json.dumps(data) + ';')

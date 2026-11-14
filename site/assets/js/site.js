@@ -249,7 +249,12 @@
 (() => {
   const v = document.querySelector('.tech-vid'); if (!v) return;
   v.muted = true;
-  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
+  /* 1.2 MB clip far below the fold: fetch it about a screen before it scrolls in, not with the first page load */
+  const load = () => { if (v.dataset.src && !v.getAttribute('src')) { v.src = v.dataset.src; v.load(); } };
+  if (!('IntersectionObserver' in window)) { load(); v.play().catch(() => {}); return; }
+  const near = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { load(); near.disconnect(); } }, { rootMargin: '120% 0px' });
+  near.observe(v);
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(); v.play().catch(() => {}); } else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
 })();
 
 /* The why (video): big play button over the poster; hands over to native controls once playing */
