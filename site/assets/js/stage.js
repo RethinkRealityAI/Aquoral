@@ -972,13 +972,31 @@ async function boot() {
     }
   }
 
+  /* Adaptive resolution (2026-11-14): if a device genuinely struggles (sustained < ~25 fps while the stage is drawing),
+     render fewer pixels in small steps instead of stuttering; step back up once it has headroom again. The threshold
+     sits below 30 fps on purpose, so phones capped at 30 fps (iOS Low Power Mode) keep full sharpness. Any ?q= flag pins it. */
+  const DPR_MAX = renderer.getPixelRatio(), DPR_MIN = Math.min(DPR_MAX, 1);
+  let frameMs = 16.7, slowFor = 0, fastFor = 0;
+  function govern(rawMs) {
+    if (params.has('q') || rawMs > 250) return;          // ?q= pins quality; a tab switch / hitch is not a trend
+    frameMs += (rawMs - frameMs) * .08;
+    slowFor = frameMs > 40 ? slowFor + rawMs : 0;
+    fastFor = frameMs < 20 ? fastFor + rawMs : 0;
+    const p = renderer.getPixelRatio();
+    let next = p;
+    if (slowFor > 1500 && p > DPR_MIN) next = Math.max(DPR_MIN, p - .25);
+    else if (fastFor > 5000 && p < DPR_MAX) next = Math.min(DPR_MAX, p + .15);
+    if (next !== p) { renderer.setPixelRatio(next); composer?.setPixelRatio(next); vw = 0; resize(); slowFor = fastFor = 0; }
+  }
+
   function frame(now) {
     requestAnimationFrame(frame);
-    const dt = Math.min(.034, (now - last) / 1000); last = now;   // a slow frame slows the intro instead of skipping it
+    const rawMs = now - last;
+    const dt = Math.min(.034, rawMs / 1000); last = now;   // a slow frame slows the intro instead of skipping it
     if (document.hidden) return;
     try {
       step(dt);
-      if (onScreen || playing) draw();
+      if (onScreen || playing) { draw(); govern(rawMs); }
     } catch (e) { console.error(e); if (++errors > 5) fail(); }
   }
 
@@ -1005,7 +1023,7 @@ async function boot() {
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   startIntro();
 
-  window.__stage = { snap: () => { first = true; }, renderer, scene, camera, fxT, fxK, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
+  window.__stage = { get dpr() { return renderer.getPixelRatio(); }, get frameMs() { return frameMs; }, snap: () => { first = true; }, renderer, scene, camera, fxT, fxK, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
   if (params.has('debug')) {
     const gl = renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info'), box = document.createElement('pre');
     box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;font:12px/1.4 monospace;background:#000c;color:#fff;padding:8px;border-radius:6px;max-width:90vw;white-space:pre-wrap';
