@@ -978,7 +978,8 @@ async function boot() {
   const DPR_MAX = renderer.getPixelRatio(), DPR_MIN = Math.min(DPR_MAX, 1);
   let frameMs = 16.7, slowFor = 0, fastFor = 0;
   function govern(rawMs) {
-    if (params.has('q') || rawMs > 250) return;          // ?q= pins quality; a tab switch / hitch is not a trend
+    if (params.has('q') || rawMs > 1000) return;         // ?q= pins quality; a tab switch is not a trend
+    rawMs = Math.min(rawMs, 250);                        // one long hitch must not dominate the average
     frameMs += (rawMs - frameMs) * .08;
     slowFor = frameMs > 40 ? slowFor + rawMs : 0;
     fastFor = frameMs < 20 ? fastFor + rawMs : 0;
@@ -1023,7 +1024,7 @@ async function boot() {
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   startIntro();
 
-  window.__stage = { get dpr() { return renderer.getPixelRatio(); }, get frameMs() { return frameMs; }, snap: () => { first = true; }, renderer, scene, camera, fxT, fxK, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
+  window.__stage = { get dpr() { return renderer.getPixelRatio(); }, get frameMs() { return frameMs; }, get slowFor() { return slowFor; }, snap: () => { first = true; }, renderer, scene, camera, fxT, fxK, seek: x => { playing = false; intro = x; introUpdate(x); draw(); }, finish: introFinish, get t() { return intro; }, get spin() { return spin; }, get dragging() { return !!dragging?.on; } };
   if (params.has('debug')) {
     const gl = renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info'), box = document.createElement('pre');
     box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;font:12px/1.4 monospace;background:#000c;color:#fff;padding:8px;border-radius:6px;max-width:90vw;white-space:pre-wrap';
