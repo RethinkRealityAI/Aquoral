@@ -21,3 +21,9 @@
   for = "/assets/models/*.glb"
   [headers.values]
     Content-Type = "model/gltf-binary"
+
+# Self-hosted fonts never change in place (a new font gets a new file name), so let browsers keep them.
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
