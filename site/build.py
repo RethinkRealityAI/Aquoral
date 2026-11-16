@@ -92,8 +92,8 @@ def layout(meta, body, base):
     stage_file = 'stage.bundle.js' if BUNDLED else 'stage.js'
     stage_js = f'<script type="module" src="{base}assets/js/{stage_file}"></script>' if stage else ''
     # Start the 3D downloads with the HTML instead of after the script chain has run (models used to start ~2.5 s late)
-    stage_preload = (f'<link rel="modulepreload" href="{base}assets/js/{stage_file}">'
-                     + ('' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin>' for n in ['bottle', 'box']))
+    stage_preload = (f'<link rel="modulepreload" href="{base}assets/js/{stage_file}" fetchpriority="high">'
+                     + ('' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">' for n in ['bottle', 'box']))
                      ) if stage else ''
     font_preload = '' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in FONT_PRELOAD)
     return f'''<!doctype html>

@@ -50,6 +50,7 @@ if (!isPhone && innerWidth > 1080) { POSES.explore.fit = .96; POSES.anatomy.fit 
 const KEYS = ['x', 'y', 's', 'box', 'floor', 'grid', 'explode', 'orbit', 'bx', 'bz', 'xx', 'xz', 'xyaw', 'spin', 'twin'];
 
 async function boot() {
+  performance.mark('aq:boot');   // boot timeline marks: aq:boot → aq:models → aq:built → aq:compiled → aq:intro
   const css = (n, fb) => (getComputedStyle(root).getPropertyValue(n).trim() || fb);
   const readCol = () => ({
     top: css('--stage-top', '#04131D'), bot: css('--stage-bot', '#0A2A3D'), halo: css('--stage-halo', '#15608A'),
@@ -269,6 +270,7 @@ async function boot() {
     return loader.loadAsync(`${base}assets/models/${name}.glb`);
   }
   const [bG, xG] = await Promise.all([loadGLB('bottle'), loadGLB('box')]);
+  performance.mark('aq:models');
   const UNIT = 1 / .087;  // metres → bottle heights (bottle is 87 mm tall)
   const prep = (m, kind) => {
     m.traverse(o => {
@@ -757,7 +759,9 @@ async function boot() {
   }
 
   /* Intro timeline (~2.5 s) */
-  const T = { delay: .1, fall: .5, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
+  /* delay: the canvas fades in over 350 ms (site.css), so the drop appears once the stage is fully visible instead of
+     falling through the fade (Dapo 2026-11-16: drop should start sooner and run smoother). It forms at the top first. */
+  const T = { delay: .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
   const t0 = T.delay, t1 = t0 + T.fall, t2 = t1 + T.splash * .4, t3 = t2 + T.build, t4 = t3 + T.solidify, t5 = t4 + T.pop, t6 = t4 + T.box;
   let intro = 0, playing = false, introDone = false;
   const boxIntro = { k: 1 };
@@ -768,8 +772,11 @@ async function boot() {
   function introUpdate(t) {
     const f = seg(t, t0, t1);
     droplet.visible = t >= t0 && t < t2 + .05;
-    droplet.position.set(0, lerp(1.45, .06, ease.in(f)), 0);
-    const st = 1 + ease.in(f) * .22; droplet.scale.set(1 / Math.sqrt(st), st, 1 / Math.sqrt(st));
+    /* forms (swells in with a soft wobble) during the first part, then falls under gravity */
+    const fm = seg(t, t0, t0 + T.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + T.form * .6, t1));
+    droplet.position.set(0, lerp(1.45, .06, fall), 0);
+    const st = 1 + fall * .22, wob = 1 + Math.sin(fm * Math.PI * 2) * .06 * (1 - fm);
+    droplet.scale.set(grow / Math.sqrt(st) * wob, grow * st / wob, grow / Math.sqrt(st) * wob);
     dropMat.color.copy(DROP_A).lerp(DROP_B, seg(t, t1 - .05, t1 + .2));
     if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + T.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
     ripples.forEach(r => { const rp = seg(t, t1 + r.userData.delay, t1 + r.userData.delay + 1.2); r.visible = rp > 0 && rp < 1; r.scale.setScalar(.06 + ease.out(rp) * .8); r.material.opacity = .55 * (1 - rp); });
@@ -978,7 +985,7 @@ async function boot() {
   const DPR_MAX = renderer.getPixelRatio(), DPR_MIN = Math.min(DPR_MAX, 1);
   let frameMs = 16.7, slowFor = 0, fastFor = 0;
   function govern(rawMs) {
-    if (params.has('q') || rawMs > 1000) return;         // ?q= pins quality; a tab switch is not a trend
+    if (params.has('q') || playing || rawMs > 1000) return;   // never resize mid-intro (a resize is a visible hitch)         // ?q= pins quality; a tab switch is not a trend
     rawMs = Math.min(rawMs, 250);                        // one long hitch must not dominate the average
     frameMs += (rawMs - frameMs) * .08;
     slowFor = frameMs > 40 ? slowFor + rawMs : 0;
@@ -1003,11 +1010,13 @@ async function boot() {
 
   /* Warm-up: compile every material that will ever show, render twice, then reveal. This is what
      makes the first seconds smooth: no shader compile hitches in the middle of the intro. */
+  performance.mark('aq:built');
   const all = [product, ghost, droplet, meniscus, boxG, ...crown, ...ripples];
   all.forEach(o => o.visible = true);
   setBoxFade(.5);
   step(0); first = true;
   try { await renderer.compileAsync(scene, camera); } catch { renderer.compile(scene, camera); }
+  performance.mark('aq:compiled');
   draw(); setBoxFade(1); draw();
   all.forEach(o => o.visible = false); product.visible = true;
 
@@ -1015,7 +1024,7 @@ async function boot() {
   const startIntro = () => {
     if (!atTop) { introFinish(); }   // the droplet intro is short (~2.5 s) and plays once, so it runs under reduced motion too (no splash crown)
     else { product.visible = false; setBoxFade(0); intro = 0; playing = true; introUpdate(0); }
-    root.classList.add('stage-ready');
+    root.classList.add('stage-ready'); performance.mark('aq:intro');
     last = performance.now(); requestAnimationFrame(frame);
   };
   // Start only when the page is actually visible to the visitor (background tabs / preloading iframes would otherwise "finish" the intro unseen)
