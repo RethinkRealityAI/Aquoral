@@ -69,6 +69,22 @@ def cause_icon(name):
 def icon(name, cls='icon'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true">{ICONS[name]}</svg>'
 
+# Logo marks from the packaging (Dapo 2026-11-11): orchid dot, divider bar, cobalt eight-spoke wheel, set above the wordmark.
+BRAND_MARKS = ('<svg class="brand-marks" viewBox="0 0 36 16" aria-hidden="true" focusable="false">'
+               '<circle class="bm-dot" cx="6.5" cy="8" r="6.2"/><rect class="bm-bar" x="14.6" y="0" width="1.7" height="16" rx=".5"/>'
+               '<circle class="bm-wheel" cx="27.5" cy="8" r="7.5"/><path d="M27.5 2.4v11.2M21.9 8h11.2M23.54 4.04l7.92 7.92M31.46 4.04l-7.92 7.92" class="bm-spokes" fill="none" stroke-width="1.05" stroke-linecap="round"/></svg>')
+
+def lockup(extra=''):
+    return f'<span class="brand-lockup {extra}" role="img" aria-label="Aquoral">{BRAND_MARKS}<span class="wordmark" aria-hidden="true"></span></span>'
+
+# Favicon set (Dapo 2026-11-12): the cobalt spoke wheel from the logo lockup. Lives in assets/img so the Coming Soon
+# gate's public-asset rule (/assets/img/*) serves it to locked visitors too. favicon.svg adds a white rim on dark tabs.
+FAVICON_LINKS = ('<link rel="icon" href="{b}assets/img/favicon.svg" type="image/svg+xml">'
+                 '<link rel="icon" href="{b}assets/img/favicon-32.png" sizes="32x32" type="image/png">'
+                 '<link rel="icon" href="{b}assets/img/favicon-16.png" sizes="16x16" type="image/png">'
+                 '<link rel="apple-touch-icon" href="{b}assets/img/apple-touch-icon.png">'
+                 '<link rel="manifest" href="{b}assets/img/site.webmanifest">')
+
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
@@ -96,6 +112,13 @@ def layout(meta, body, base):
                      + ('' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">' for n in ['bottle', 'box']))
                      ) if stage else ''
     font_preload = '' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in FONT_PRELOAD)
+    # Inner-page hero: liquid-glass panel with a real-time 3D droplet (assets/js/drop.js, css/page-hero.css)
+    page_hero = 'class="page-hero' in body
+    if page_hero:
+        body = re.sub(r'(<section class="page-hero"[^>]*>)', r'\1<div class="ph-fx" aria-hidden="true"><canvas></canvas></div><div class="ph-anchor" aria-hidden="true"></div>', body, count=1)
+    hero_css = f'<link rel="stylesheet" href="{base}assets/css/page-hero.css">' if page_hero else ''
+    drop_file = 'drop.bundle.js' if BUNDLED else 'drop.js'
+    hero_js = f'<script type="module" src="{base}assets/js/{drop_file}"></script>' if page_hero else ''
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -107,11 +130,13 @@ def layout(meta, body, base):
 <meta name="description" content="{meta.get("description", "")}">
 <meta name="aq-base" content="{base}">
 <meta name="theme-color" content="#0B1833">
+{FAVICON_LINKS.format(b=base)}
 {font_preload}
 {stage_preload}
 {'' if ARTIFACT else f'<link rel="stylesheet" href="{base}assets/css/fonts.css">'}
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
+{hero_css}
 {models}
 </head>
 <body class="{"has-stage" if stage else ""} {meta.get("bodyClass", "")}">
@@ -120,7 +145,7 @@ def layout(meta, body, base):
 {stage_html}
 <header class="site-header" id="top">
   <div class="bar">
-    <a class="brand" href="{base}index.html" aria-label="Aquoral home"><span class="wordmark" role="img" aria-label="Aquoral"></span></a>
+    <a class="brand" href="{base}index.html" aria-label="Aquoral home">{lockup()}</a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
       <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
@@ -141,7 +166,7 @@ def layout(meta, body, base):
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <span class="wordmark footer-mark" role="img" aria-label="Aquoral"></span>
+        {lockup("footer-mark")}
         <p class="footer-blurb">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>
@@ -153,6 +178,7 @@ def layout(meta, body, base):
 </footer>
 <script src="{base}assets/js/site.js" defer></script>
 {stage_js}
+{hero_js}
 </body>
 </html>
 '''
@@ -167,9 +193,10 @@ def bundle_stage():
     if not ESBUILD.exists():
         print('WARNING: esbuild not installed (run npm install); using unbundled stage.js + CDN three.js')
         return
-    out = DIST / 'assets' / 'js' / 'stage.bundle.js'
-    subprocess.run([str(ESBUILD), str(HERE / 'assets' / 'js' / 'stage.js'), '--bundle', '--format=esm', '--minify',
-                    '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
+    for name in ['stage', 'drop']:   # homepage stage and the inner-page hero droplet
+        out = DIST / 'assets' / 'js' / f'{name}.bundle.js'
+        subprocess.run([str(ESBUILD), str(HERE / 'assets' / 'js' / f'{name}.js'), '--bundle', '--format=esm', '--minify',
+                        '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
     BUNDLED = True
 
 def build():
@@ -177,6 +204,7 @@ def build():
     (DIST / 'assets').mkdir(parents=True)
     for sub in ['css', 'js', 'img', 'video', 'fonts']:
         shutil.copytree(HERE / 'assets' / sub, DIST / 'assets' / sub)
+    shutil.copy(HERE / 'assets' / 'img' / 'favicon.ico', DIST / 'favicon.ico')   # for clients that only ask for /favicon.ico
     # design-system tokens: root (colour + motifs, source of truth) then v2 (type, glass, components)
     # design-system: root tokens are the colour + type source of truth; site.css adds the site layer
     # The design-system file pulls fonts from Google with @import (a render-blocking chain of three requests);
