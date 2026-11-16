@@ -10,7 +10,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // ---------- brand colours sampled from the current US pack ----------
-const NAVY = '#284D97', PINK = '#E0218A', INK = '#1B2129', GREY = '#3a4048';
+const NAVY = '#044F7C', PINK = '#E0218A', INK = '#1B2129', GREY = '#3a4048';
 const FONT = '"Liberation Sans", Arial, Helvetica, sans-serif';
 
 const wordmarkImg = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/wordmark.png'; });
@@ -20,6 +20,8 @@ function tinted(img, color) {
   x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c;
 }
 const WM = tinted(wordmarkImg, NAVY);
+// Official primary logo (Brand Guidelines 2025), vector traced from the client's artwork (2026-11-16)
+const LOGO = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/aquoral-logo-primary.svg'; });
 function wordmark(ctx, x, y, w) { ctx.drawImage(WM, x, y, w, w * WM.height / WM.width); }
 function spokeWheel(ctx, cx, cy, R) { // matches commercial/edit/aquoral-spoke-wheel.svg (viewBox 48, r22)
   const k = R / 22; ctx.save();
@@ -48,22 +50,16 @@ const R = 11, BODY_H = 48, CAP_Y0 = 48.6, CAP_H = 38.4; // bottle 22 x 87 mm
 const BOX = { w: 52, h: 92, d: 26 };
 
 // ---------- bottle label (wraps the body; u=0.5 faces +Z) ----------
-const LAB_Y0 = 2, LAB_Y1 = 46.5, LAB_H = LAB_Y1 - LAB_Y0;
+// Real Canadian label (Aquoral_Label_High_Resolution_4x.png, 3600 x 2100, 2026-11-16) wraps the full circumference,
+// so its height follows from the 22 mm body: 69.1 mm / (3600 / 2100) = 40.3 mm, centred on the 48 mm body.
+const LABEL_ART = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = 'assets/label-ca.png'; });
+const LAB_H = 2 * Math.PI * 11 * LABEL_ART.height / LABEL_ART.width, LAB_Y0 = (48 - LAB_H) / 2, LAB_Y1 = LAB_Y0 + LAB_H;
 const PXMM = 32, LW = 2048, LH = Math.round(LAB_H * PXMM);
 function bottleLabel() {
-  const [c, x] = canvas(LW, LH, '#f6f8fa');
-  const L = 1024 - 285, Rr = 1024 + 285;
-  const y = mm => (mm - (48 - LAB_Y1)) * PXMM; // mm measured down from body top
-  text(x, 'GTIN 196852643219', L + 10, y(3.6), 48, { color: GREY });
-  icon(x, L + 40, y(5.6), 70);
-  wordmark(x, L - 8, y(9.0), 585);
-  text(x, 'artificial saliva', Rr, y(20.4), 73, { color: NAVY, align: 'right' });
-  text(x, 'PROTECTIVE ORAL SPRAY', Rr, y(23.0), 64, { color: NAVY, align: 'right' });
-  x.fillStyle = NAVY; x.fillRect(Rr + 18, y(24.2), 5, y(43.2) - y(24.2));
-  text(x, 'Relieves symptoms', Rr - 10, y(25.9), 53, { align: 'right' });
-  text(x, 'of dry mouth', Rr - 10, y(27.7), 53, { align: 'right' });
-  text(x, 'GLUTEN FREE', Rr - 10, y(32.4), 59, { weight: '700', align: 'right' });
-  text(x, '10ml (0.338 fl oz)', Rr - 10, y(42.4), 59, { weight: '700', align: 'right' });
+  // Client artwork, shifted so the logo column (centre at u = 0.335 of the sheet) faces the front (u = 0.5 faces +Z)
+  const W = 2048, H = Math.round(W * LABEL_ART.height / LABEL_ART.width), shift = Math.round((0.5 - 0.335) * W);
+  const [c, x] = canvas(W, H);
+  x.drawImage(LABEL_ART, shift, 0, W, H); x.drawImage(LABEL_ART, shift - W, 0, W, H);
   return c;
 }
 

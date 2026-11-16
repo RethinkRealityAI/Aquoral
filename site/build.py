@@ -21,7 +21,7 @@ ARTIFACT = '--artifact' in sys.argv
 ESBUILD = HERE.parent / 'node_modules' / '.bin' / 'esbuild'
 BUNDLED = False
 # Fonts the first screen needs, preloaded so headings do not wait for the CSS to discover them
-FONT_PRELOAD = ['sora-normal-latin.woff2', 'atkinson-hyperlegible-next-normal-latin.woff2']
+FONT_PRELOAD = ['poppins-400-latin.woff2', 'poppins-600-latin.woff2']
 
 ICONS = {
   'droplet': '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
@@ -69,15 +69,18 @@ def cause_icon(name):
 def icon(name, cls='icon'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true">{ICONS[name]}</svg>'
 
-# Logo marks from the packaging (Dapo 2026-11-11): orchid dot, divider bar, cobalt eight-spoke wheel, set above the wordmark.
-BRAND_MARKS = ('<svg class="brand-marks" viewBox="0 0 36 16" aria-hidden="true" focusable="false">'
-               '<circle class="bm-dot" cx="6.5" cy="8" r="6.2"/><rect class="bm-bar" x="14.6" y="0" width="1.7" height="16" rx=".5"/>'
-               '<circle class="bm-wheel" cx="27.5" cy="8" r="7.5"/><path d="M27.5 2.4v11.2M21.9 8h11.2M23.54 4.04l7.92 7.92M31.46 4.04l-7.92 7.92" class="bm-spokes" fill="none" stroke-width="1.05" stroke-linecap="round"/></svg>')
+# Official Aquoral logo (Brand Guidelines 2025, traced to vector from the client's artwork; assets/img/logo/).
+# Header = secondary logo (mark above the wordmark), footer = primary logo (adds "artificial saliva / PROTECTIVE ORAL SPRAY").
+# Approved variants only: full colour on light grounds, the all-white reversal on dark grounds. Never recolour or redraw.
+LOGOS = {'secondary': (775.5, 387.0), 'primary': (414.7, 251.0)}
+def lockup(extra='', kind='secondary', base=''):
+    w, h = LOGOS[kind]
+    src = f'{base}assets/img/logo/aquoral-logo-{kind}'
+    return (f'<span class="brand-logo brand-logo-{kind} {extra}" role="img" aria-label="Aquoral">'
+            f'<img class="logo-c" src="{src}.svg" width="{w:.0f}" height="{h:.0f}" alt="" decoding="async">'
+            f'<img class="logo-w" src="{src}-white.svg" width="{w:.0f}" height="{h:.0f}" alt="" decoding="async"></span>')
 
-def lockup(extra=''):
-    return f'<span class="brand-lockup {extra}" role="img" aria-label="Aquoral">{BRAND_MARKS}<span class="wordmark" aria-hidden="true"></span></span>'
-
-# Favicon set (Dapo 2026-11-12): the cobalt spoke wheel from the logo lockup. Lives in assets/img so the Coming Soon
+# Favicon set: the official tgo circle from the logo (was the stand-in spoke wheel until 2026-11-16). Lives in assets/img so the Coming Soon
 # gate's public-asset rule (/assets/img/*) serves it to locked visitors too. favicon.svg adds a white rim on dark tabs.
 FAVICON_LINKS = ('<link rel="icon" href="{b}assets/img/favicon.svg" type="image/svg+xml">'
                  '<link rel="icon" href="{b}assets/img/favicon-32.png" sizes="32x32" type="image/png">'
@@ -129,7 +132,7 @@ def layout(meta, body, base):
 <title>{meta["title"]}</title>
 <meta name="description" content="{meta.get("description", "")}">
 <meta name="aq-base" content="{base}">
-<meta name="theme-color" content="#0B1833">
+<meta name="theme-color" content="#041A2A">
 {FAVICON_LINKS.format(b=base)}
 {font_preload}
 {stage_preload}
@@ -145,7 +148,7 @@ def layout(meta, body, base):
 {stage_html}
 <header class="site-header" id="top">
   <div class="bar">
-    <a class="brand" href="{base}index.html" aria-label="Aquoral home">{lockup()}</a>
+    <a class="brand" href="{base}index.html" aria-label="Aquoral home">{lockup(base=base)}</a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
       <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
@@ -166,7 +169,7 @@ def layout(meta, body, base):
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        {lockup("footer-mark")}
+        {lockup("footer-mark", "primary", base)}
         <p class="footer-blurb">Aquoral protective oral spray for lasting relief from the symptoms of dry mouth. Now available in Canada.</p>
       </div>
       <div><h3>Product</h3><ul><li><a href="{base}how-it-works.html">How it works</a></li><li><a href="{base}how-to-use.html">How to use</a></li><li><a href="{base}evidence.html">Evidence</a></li><li><a href="{base}order.html">Order</a></li><li><a href="{base}faq.html">FAQ</a></li></ul></div>

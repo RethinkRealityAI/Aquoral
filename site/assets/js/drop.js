@@ -37,7 +37,7 @@ function init() {
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   const envLight = pmrem.fromScene(new RoomEnvironment(), .04).texture;
-  const studio = new THREE.Scene(); studio.background = new THREE.Color('#1b2a4a');
+  const studio = new THREE.Scene(); studio.background = new THREE.Color('#19394c');
   for (const [x, y, z, w, h] of [[0, 6, 0, 10, 4], [-7, 1, 2, 2, 6], [7, 2, -1, 2, 5], [0, -6, 0, 12, 3]]) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(4, 4, 4), side: THREE.DoubleSide }));
     m.position.set(x, y, z); m.lookAt(0, 0, 0); studio.add(m);
@@ -110,7 +110,7 @@ function init() {
   scene.add(drop);
 
   /* The orchid brand dot from the logo, small and behind the droplet, so the droplet magnifies it. */
-  const dotMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color('#D42A8E'), roughness: .18, clearcoat: 1, clearcoatRoughness: .1 });
+  const dotMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color('#E2188F'), roughness: .18, clearcoat: 1, clearcoatRoughness: .1 });
   const dot = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), dotMat);
   scene.add(dot);
 
@@ -129,13 +129,13 @@ function init() {
     renderer.setClearColor(c);
     const lightGround = c.getHSL({}).l > .6;
     if (lightGround) {
-      bgU.uRing.value.setStyle('#254C9E', THREE.SRGBColorSpace); bgU.uRingA.value = .2;
+      bgU.uRing.value.setStyle('#044F7C', THREE.SRGBColorSpace); bgU.uRingA.value = .2;
       bgU.uGlow.value.setStyle('#A3DAF4', THREE.SRGBColorSpace); bgU.uGlowA.value = .75;
       dropMat.attenuationColor.setStyle('#d6effb', THREE.SRGBColorSpace); dropMat.attenuationDistance = 14;
       scene.environment = envDark; scene.environmentIntensity = 1.5;
     } else {
       bgU.uRing.value.setStyle('#A3DAF4', THREE.SRGBColorSpace); bgU.uRingA.value = .3;
-      bgU.uGlow.value.setStyle('#3d6fc4', THREE.SRGBColorSpace); bgU.uGlowA.value = .55;
+      bgU.uGlow.value.setStyle('#3894c9', THREE.SRGBColorSpace); bgU.uGlowA.value = .55;
       dropMat.attenuationColor.setStyle('#dff3fd', THREE.SRGBColorSpace); dropMat.attenuationDistance = 7;
       scene.environment = envLight; scene.environmentIntensity = 1.35;
     }

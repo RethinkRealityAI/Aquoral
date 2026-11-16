@@ -263,7 +263,7 @@ async function boot() {
   const shadowCatcher = new THREE.Mesh(new THREE.CircleGeometry(3, 48), shadowMat);
   shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = .002; shadowCatcher.receiveShadow = true; shadowCatcher.renderOrder = 2; floorG.add(shadowCatcher);
   const contactTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
-    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(2,10,16,.9)'); gr.addColorStop(.5, 'rgba(2,10,16,.3)'); gr.addColorStop(1, 'rgba(2,10,16,0)');
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(1,11,17,.9)'); gr.addColorStop(.5, 'rgba(1,11,17,.3)'); gr.addColorStop(1, 'rgba(1,11,17,0)');
     g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
   const contactMat = new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false, opacity: 0 });
 
@@ -293,7 +293,7 @@ async function boot() {
      Dark: deep-ocean studio. Light: an airy daylight studio with the same water floor, cobalt rims so the clear
      droplet and the white bottle still read against a pale backdrop. This part covers the water stage, which
      renders before the models arrive; applyStageTheme (further down) adds the product-side colours. */
-  const tide900 = new THREE.Color('#122650'), tide600 = new THREE.Color('#254C9E');
+  const tide900 = new THREE.Color('#06263C'), tide600 = new THREE.Color('#044F7C');
   let haloBase = .6;
   const applyEnvTheme = () => {
     COL = readCol(); const light = isLightTheme();
@@ -304,7 +304,7 @@ async function boot() {
     shadowMat.color.copy(light ? tide900 : new THREE.Color(COL.top)); shadowMat.opacity = light ? .22 : .55;
     hemi.color.set(light ? 0xffffff : 0x1b6189); hemi.groundColor.set(light ? 0xcfe3f1 : 0x081d2b); hemi.intensity = light ? .7 : .16;
     renderer.toneMappingExposure = light ? 1.02 : .86;
-    if (reflector) { const ru = reflector.material.uniforms; ru.color.value.set(light ? 0xdbe8f2 : 0x8899a0); ru.uDeep.value.set(COL.floor); ru.uLight.value = light ? 1 : 0; }
+    if (reflector) { const ru = reflector.material.uniforms; ru.color.value.set(light ? 0xdaeaf3 : 0x8899a0); ru.uDeep.value.set(COL.floor); ru.uLight.value = light ? 1 : 0; }
     document.body.classList.toggle('stage-light', light);
     return light;
   };
@@ -432,7 +432,7 @@ async function boot() {
   const fxRoot = new THREE.Group(); rig.add(fxRoot);
   const fxK = [0, 0, 0, 0, 0], fxT = [0, 0, 0, 0, 0];
   const cSky = new THREE.Color(css('--sky-300', '#A3DAF4')), cSky4 = new THREE.Color(css('--sky-400', '#6FC2EC'));
-  const cOrchid = new THREE.Color(css('--orchid-500', '#D42A8E')), cOrchid3 = new THREE.Color(css('--orchid-300', '#E59AC2'));
+  const cOrchid = new THREE.Color(css('--orchid-500', '#E2188F')), cOrchid3 = new THREE.Color(css('--orchid-300', '#E59AC2'));
   const glowMat = (color, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity, toneMapped: false, depthWrite: false, blending: THREE.AdditiveBlending });
   const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
     const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
@@ -526,7 +526,7 @@ async function boot() {
   // tissue block with a soft wavy top (lit, with a wet sheen once the film covers it)
   const TW = .31, TD = .11, TH = .075, tissueY = -PH / 2 + .022 + TH / 2;
   const wave = (x, z) => .011 * Math.sin(x * 30 + 1) + .005 * Math.sin(x * 64 + z * 42) + .004 * Math.cos(z * 57 + x * 9);
-  const tGeo = new THREE.BoxGeometry(TW, TH, TD, 72, 4, 24); { const p = tGeo.attributes.position, col = new Float32Array(p.count * 3), deep = new THREE.Color(css('--orchid-600', '#A51F72')), top = cOrchid3.clone().lerp(new THREE.Color(0xffffff), .12);
+  const tGeo = new THREE.BoxGeometry(TW, TH, TD, 72, 4, 24); { const p = tGeo.attributes.position, col = new Float32Array(p.count * 3), deep = new THREE.Color(css('--orchid-600', '#B0126F')), top = cOrchid3.clone().lerp(new THREE.Color(0xffffff), .12);
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = clamp((y + TH / 2) / TH, 0, 1); p.setY(i, y + wave(x, z) * f); const c = deep.clone().lerp(top, Math.pow(f, .7)); col.set([c.r, c.g, c.b], i * 3); }
     tGeo.setAttribute('color', new THREE.BufferAttribute(col, 3)); tGeo.computeVertexNormals(); }
   const tissueMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffd9ec), sheenRoughness: .45, clearcoat: 0, clearcoatRoughness: .2, transparent: true, envMapIntensity: .8 });
@@ -597,15 +597,15 @@ async function boot() {
   const badgeTex = (() => { const S = 512, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), m = S / 2;
     const gr = g.createRadialGradient(m * .8, m * .7, 10, m, m, m); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.7, '#EAF6FD'); gr.addColorStop(1, '#C9E9F9');
     g.fillStyle = gr; g.beginPath(); g.arc(m, m, m, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#D42A8E'; g.lineWidth = 14; g.beginPath(); g.arc(m, m, m - 26, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = '#E2188F'; g.lineWidth = 14; g.beginPath(); g.arc(m, m, m - 26, 0, Math.PI * 2); g.stroke();
     // wheat ear
-    g.save(); g.translate(m, m - 18); g.strokeStyle = '#13306B'; g.fillStyle = '#13306B'; g.lineWidth = 12; g.lineCap = 'round';
+    g.save(); g.translate(m, m - 18); g.strokeStyle = '#0F4C6F'; g.fillStyle = '#0F4C6F'; g.lineWidth = 12; g.lineCap = 'round';
     g.beginPath(); g.moveTo(0, 120); g.lineTo(0, -120); g.stroke();
     for (let k = 0; k < 4; k++) for (const sd of [-1, 1]) { g.save(); g.translate(sd * 4, -90 + k * 48); g.rotate(sd * .6); g.beginPath(); g.ellipse(sd * 26, 0, 30, 14, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
     g.beginPath(); g.ellipse(0, -128, 13, 26, 0, 0, Math.PI * 2); g.fill(); g.restore();
     // strike-through
-    g.strokeStyle = '#D42A8E'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
-    g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
+    g.strokeStyle = '#E2188F'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
+    g.fillStyle = '#0F4C6F'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
   const BR = .068, BS = isPhone ? 1.05 : 1.2;
   const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });
@@ -758,7 +758,7 @@ async function boot() {
     rimL.color.set(COL.rim); rimR.color.set(COL.rim);
     if (bloom) bloom.strength = light ? .03 : .1;
     fresnelU.forEach(f => f.u.value.copy(light ? tide600 : f.base));
-    [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#3D63B5' : COL.rim));
+    [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#1A6A99' : COL.rim));
   };
   applyStageTheme();
   document.addEventListener('aq:theme', applyStageTheme);

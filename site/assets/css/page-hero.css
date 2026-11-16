@@ -13,8 +13,8 @@
   background: var(--ph-bg, var(--tide-900)) !important; opacity: 1 !important; pointer-events: none; }
 @media not all and (prefers-color-scheme: dark) { :root:not([data-theme="dark"]) .page-hero { --ph-bg: var(--tide-900); --ph-rim: rgba(163,218,244,.22); --ph-hi: rgba(255,255,255,.28); } }
 :root[data-theme="light"] .page-hero { --ph-bg: var(--tide-900); --ph-rim: rgba(163,218,244,.22); --ph-hi: rgba(255,255,255,.28); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-hero { --ph-bg: #fff; --ph-rim: rgba(37,76,158,.14); --ph-hi: #fff; } }
-:root[data-theme="dark"] .page-hero { --ph-bg: #fff; --ph-rim: rgba(37,76,158,.14); --ph-hi: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-hero { --ph-bg: #fff; --ph-rim: rgba(4,79,124,.14); --ph-hi: #fff; } }
+:root[data-theme="dark"] .page-hero { --ph-bg: #fff; --ph-rim: rgba(4,79,124,.14); --ph-hi: #fff; }
 
 /* The 3D layer fills the panel. It fades in once the droplet's first frame is ready. */
 .ph-fx { position: absolute; inset: var(--ph-inset-y) var(--ph-inset-x); z-index: -1; border-radius: var(--ph-radius); overflow: hidden; pointer-events: none; }

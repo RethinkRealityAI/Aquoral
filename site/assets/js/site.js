@@ -224,7 +224,7 @@
         for (const [x0, x1, dir] of [[0, pl + 6, -1], [pl + mw - 6, W, 1]]) {
           const g = ctx.createLinearGradient(x0, 0, x1, 0);
           const edge = dir < 0 ? [0, 1] : [1, 0];
-          g.addColorStop(edge[0], 'rgba(163,218,244,0)'); g.addColorStop(edge[1], 'rgba(120,180,240,.85)');
+          g.addColorStop(edge[0], 'rgba(163,218,244,0)'); g.addColorStop(edge[1], 'rgba(115,197,245,.85)');
           ctx.strokeStyle = g; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath();
           for (let x = x0; x <= x1; x += 3) { const y = filmY(x, t) + Math.sin(x * .05 + t * 2) * 1.5; x === x0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); } ctx.stroke();
           ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1.4; ctx.stroke();
@@ -236,7 +236,7 @@
           const k = p.life / p.max; if (k >= 1) { P.splice(i, 1); continue; }
           const a = Math.sin(Math.PI * k) * .9;
           const g = ctx.createRadialGradient(p.x - p.r * .35, p.y - p.r * .35, 0, p.x, p.y, p.r);
-          g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(.5, `rgba(${sky},${a * .7})`); g.addColorStop(1, `rgba(37,76,158,${a * .5})`);
+          g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(.5, `rgba(${sky},${a * .7})`); g.addColorStop(1, `rgba(4,79,124,${a * .5})`);
           ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill(); }
       }
     }
