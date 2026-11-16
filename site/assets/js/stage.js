@@ -16,6 +16,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+const T = s => (window.AQ_T && window.AQ_T[s]) || s;   // French canvas labels: site/i18n.py
 
 const root = document.documentElement;
 const canvas = document.getElementById('stage');
@@ -263,7 +264,7 @@ async function boot() {
   const shadowCatcher = new THREE.Mesh(new THREE.CircleGeometry(3, 48), shadowMat);
   shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = .002; shadowCatcher.receiveShadow = true; shadowCatcher.renderOrder = 2; floorG.add(shadowCatcher);
   const contactTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
-    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(2,10,16,.9)'); gr.addColorStop(.5, 'rgba(2,10,16,.3)'); gr.addColorStop(1, 'rgba(2,10,16,0)');
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(1,11,17,.9)'); gr.addColorStop(.5, 'rgba(1,11,17,.3)'); gr.addColorStop(1, 'rgba(1,11,17,0)');
     g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
   const contactMat = new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false, opacity: 0 });
 
@@ -293,7 +294,7 @@ async function boot() {
      Dark: deep-ocean studio. Light: an airy daylight studio with the same water floor, cobalt rims so the clear
      droplet and the white bottle still read against a pale backdrop. This part covers the water stage, which
      renders before the models arrive; applyStageTheme (further down) adds the product-side colours. */
-  const tide900 = new THREE.Color('#122650'), tide600 = new THREE.Color('#254C9E');
+  const tide900 = new THREE.Color('#06263C'), tide600 = new THREE.Color('#044F7C');
   let haloBase = .6;
   const applyEnvTheme = () => {
     COL = readCol(); const light = isLightTheme();
@@ -304,7 +305,7 @@ async function boot() {
     shadowMat.color.copy(light ? tide900 : new THREE.Color(COL.top)); shadowMat.opacity = light ? .22 : .55;
     hemi.color.set(light ? 0xffffff : 0x1b6189); hemi.groundColor.set(light ? 0xcfe3f1 : 0x081d2b); hemi.intensity = light ? .7 : .16;
     renderer.toneMappingExposure = light ? 1.02 : .86;
-    if (reflector) { const ru = reflector.material.uniforms; ru.color.value.set(light ? 0xdbe8f2 : 0x8899a0); ru.uDeep.value.set(COL.floor); ru.uLight.value = light ? 1 : 0; }
+    if (reflector) { const ru = reflector.material.uniforms; ru.color.value.set(light ? 0xdaeaf3 : 0x8899a0); ru.uDeep.value.set(COL.floor); ru.uLight.value = light ? 1 : 0; }
     document.body.classList.toggle('stage-light', light);
     return light;
   };
@@ -432,7 +433,7 @@ async function boot() {
   const fxRoot = new THREE.Group(); rig.add(fxRoot);
   const fxK = [0, 0, 0, 0, 0], fxT = [0, 0, 0, 0, 0];
   const cSky = new THREE.Color(css('--sky-300', '#A3DAF4')), cSky4 = new THREE.Color(css('--sky-400', '#6FC2EC'));
-  const cOrchid = new THREE.Color(css('--orchid-500', '#D42A8E')), cOrchid3 = new THREE.Color(css('--orchid-300', '#E59AC2'));
+  const cOrchid = new THREE.Color(css('--orchid-500', '#E2188F')), cOrchid3 = new THREE.Color(css('--orchid-300', '#E59AC2'));
   const glowMat = (color, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity, toneMapped: false, depthWrite: false, blending: THREE.AdditiveBlending });
   const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
     const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
@@ -526,7 +527,7 @@ async function boot() {
   // tissue block with a soft wavy top (lit, with a wet sheen once the film covers it)
   const TW = .31, TD = .11, TH = .075, tissueY = -PH / 2 + .022 + TH / 2;
   const wave = (x, z) => .011 * Math.sin(x * 30 + 1) + .005 * Math.sin(x * 64 + z * 42) + .004 * Math.cos(z * 57 + x * 9);
-  const tGeo = new THREE.BoxGeometry(TW, TH, TD, 72, 4, 24); { const p = tGeo.attributes.position, col = new Float32Array(p.count * 3), deep = new THREE.Color(css('--orchid-600', '#A51F72')), top = cOrchid3.clone().lerp(new THREE.Color(0xffffff), .12);
+  const tGeo = new THREE.BoxGeometry(TW, TH, TD, 72, 4, 24); { const p = tGeo.attributes.position, col = new Float32Array(p.count * 3), deep = new THREE.Color(css('--orchid-600', '#B0126F')), top = cOrchid3.clone().lerp(new THREE.Color(0xffffff), .12);
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = clamp((y + TH / 2) / TH, 0, 1); p.setY(i, y + wave(x, z) * f); const c = deep.clone().lerp(top, Math.pow(f, .7)); col.set([c.r, c.g, c.b], i * 3); }
     tGeo.setAttribute('color', new THREE.BufferAttribute(col, 3)); tGeo.computeVertexNormals(); }
   const tissueMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffd9ec), sheenRoughness: .45, clearcoat: 0, clearcoatRoughness: .2, transparent: true, envMapIntensity: .8 });
@@ -561,8 +562,8 @@ async function boot() {
   const vapour = new THREE.Points(vGeo, vapMat); vapour.frustumCulled = false; vapour.renderOrder = 8.8; case3.add(vapour);
   // status chip on the case: "Moisture escaping" → "OGT film · protected"
   const chipGeo = new THREE.PlaneGeometry(.23, .23 * 96 / 720);
-  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('MOISTURE ESCAPING', { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
-  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('OGT FILM · PROTECTED', { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('MOISTURE ESCAPING'), { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('OGT FILM · PROTECTED'), { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
   [chipA, chipB].forEach(m => { m.position.set(-PW / 2 + .02 + .115, PH / 2 - .035, PD / 2 + .001); m.renderOrder = 10; case3.add(m); });
   const caseMats = [glassF, glassB, edgeMat, tissueMat, filmMat, dropletMat, chipA.material, chipB.material, filmEdge.material, filmEdgeGlow.material];
   caseMats.forEach(m => { m.userData.o = m.opacity; m.transparent = true; });
@@ -597,15 +598,15 @@ async function boot() {
   const badgeTex = (() => { const S = 512, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), m = S / 2;
     const gr = g.createRadialGradient(m * .8, m * .7, 10, m, m, m); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.7, '#EAF6FD'); gr.addColorStop(1, '#C9E9F9');
     g.fillStyle = gr; g.beginPath(); g.arc(m, m, m, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#D42A8E'; g.lineWidth = 14; g.beginPath(); g.arc(m, m, m - 26, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = '#E2188F'; g.lineWidth = 14; g.beginPath(); g.arc(m, m, m - 26, 0, Math.PI * 2); g.stroke();
     // wheat ear
-    g.save(); g.translate(m, m - 18); g.strokeStyle = '#13306B'; g.fillStyle = '#13306B'; g.lineWidth = 12; g.lineCap = 'round';
+    g.save(); g.translate(m, m - 18); g.strokeStyle = '#0F4C6F'; g.fillStyle = '#0F4C6F'; g.lineWidth = 12; g.lineCap = 'round';
     g.beginPath(); g.moveTo(0, 120); g.lineTo(0, -120); g.stroke();
     for (let k = 0; k < 4; k++) for (const sd of [-1, 1]) { g.save(); g.translate(sd * 4, -90 + k * 48); g.rotate(sd * .6); g.beginPath(); g.ellipse(sd * 26, 0, 30, 14, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
     g.beginPath(); g.ellipse(0, -128, 13, 26, 0, 0, Math.PI * 2); g.fill(); g.restore();
     // strike-through
-    g.strokeStyle = '#D42A8E'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
-    g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
+    g.strokeStyle = '#E2188F'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
+    g.fillStyle = '#0F4C6F'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(T('GLUTEN FREE'), m, m + 168);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
   const BR = .068, BS = isPhone ? 1.05 : 1.2;
   const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });
@@ -758,7 +759,7 @@ async function boot() {
     rimL.color.set(COL.rim); rimR.color.set(COL.rim);
     if (bloom) bloom.strength = light ? .03 : .1;
     fresnelU.forEach(f => f.u.value.copy(light ? tide600 : f.base));
-    [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#3D63B5' : COL.rim));
+    [meniscus.material, ...ripples.map(r => r.material)].forEach(m => m.color.set(light ? '#1A6A99' : COL.rim));
   };
   applyStageTheme();
   document.addEventListener('aq:theme', applyStageTheme);
@@ -860,8 +861,8 @@ async function boot() {
   /* Intro timeline (~2.5 s) */
   /* delay: the canvas fades in over 350 ms (site.css), so the drop appears once the stage is fully visible instead of
      falling through the fade (Dapo 2026-11-16: drop should start sooner and run smoother). It forms at the top first. */
-  const T = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
-  const t0 = T.delay, t1 = t0 + T.fall, t2 = t1 + T.splash * .4, t3 = t2 + T.build, t4 = t3 + T.solidify, t5 = t4 + T.pop, t6 = t4 + T.box;
+  const TL = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };   // intro timeline (s). Not T: that is the translation helper
+  const t0 = TL.delay, t1 = t0 + TL.fall, t2 = t1 + TL.splash * .4, t3 = t2 + TL.build, t4 = t3 + TL.solidify, t5 = t4 + TL.pop, t6 = t4 + TL.box;
   let intro = 0, playing = false, introDone = false, splashAt = -1;
   const boxIntro = { k: 1 };
   function setBoxFade(k) {
@@ -872,12 +873,12 @@ async function boot() {
     const f = seg(t, t0, t1);
     droplet.visible = t >= t0 && t < t2 + .05;
     /* forms (swells in with a soft wobble) during the first part, then falls under gravity */
-    const fm = seg(t, t0, t0 + T.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + T.form * .6, t1));
+    const fm = seg(t, t0, t0 + TL.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + TL.form * .6, t1));
     droplet.position.set(0, lerp(1.45, .06, fall), 0);
     const st = 1 + fall * .22, wob = 1 + Math.sin(fm * Math.PI * 2) * .06 * (1 - fm);
     droplet.scale.set(grow / Math.sqrt(st) * wob, grow * st / wob, grow / Math.sqrt(st) * wob);
     dropMat.color.copy(DROP_A).lerp(DROP_B, seg(t, t1 - .05, t1 + .2));
-    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + T.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
+    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + TL.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
     ripples.forEach(r => { const rp = seg(t, t1 + r.userData.delay, t1 + r.userData.delay + 1.2); r.visible = rp > 0 && rp < 1; r.scale.setScalar(.06 + ease.out(rp) * .8); r.material.opacity = .55 * (1 - rp); });
     crown.forEach(m => { const u = t - t1, d = m.userData; m.visible = !reduceMotion && u > 0 && u < .8; if (!m.visible) return;
       const rr = .1 + d.v * u * .55; m.position.set(Math.cos(d.a) * rr, Math.max(0, d.up * u - 3.4 * u * u), Math.sin(d.a) * rr); m.scale.setScalar(d.s * (1 - u * .7)); });

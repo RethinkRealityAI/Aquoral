@@ -1,0 +1,354 @@
+{
+ "038a1aeab974": {
+  "en": "<1>Home</1> / Dry mouth assessment",
+  "fr": "<1>Accueil</1> / Évaluation de la bouche sèche"
+ },
+ "0521feb44ed3": {
+  "en": "Please check your phone number, or leave it blank.",
+  "fr": "Veuillez vérifier votre numéro de téléphone ou laisser le champ vide."
+ },
+ "0e4b2056bcb8": {
+  "en": "Prefer not to say",
+  "fr": "Je préfère ne pas répondre"
+ },
+ "103755eb3b4c": {
+  "en": "<1/> Everyday feeling",
+  "fr": "<1/> Au quotidien"
+ },
+ "12fcaded6f9c": {
+  "en": "<1/> Last step",
+  "fr": "<1/> Dernière étape"
+ },
+ "17538a96b8c3": {
+  "en": "Mild",
+  "fr": "Légère"
+ },
+ "1e148cc2964d": {
+  "en": "Please enter your last name.",
+  "fr": "Veuillez entrer votre nom de famille."
+ },
+ "209d8db14d36": {
+  "en": "Your result",
+  "fr": "Votre résultat"
+ },
+ "23556a6739be": {
+  "en": "Mild dry mouth",
+  "fr": "Bouche sèche légère"
+ },
+ "241a0aa693ed": {
+  "en": "For example, dehydration or a recent illness",
+  "fr": "Par exemple, une déshydratation ou une maladie récente"
+ },
+ "25a0abe416ab": {
+  "en": "of 6",
+  "fr": "sur 6"
+ },
+ "2600e8890d19": {
+  "en": "Does your dry mouth get in the way of your sleep?",
+  "fr": "Votre bouche sèche nuit-elle à votre sommeil?"
+ },
+ "2ec595f465cb": {
+  "en": "We’ll email your result and a <1>$10 code</1> for your first order.",
+  "fr": "Nous vous enverrons par courriel votre résultat et un <1>code de 10 $</1> pour votre première commande."
+ },
+ "300bdf4d3272": {
+  "en": "CPAP or sleep appliance",
+  "fr": "PPC (CPAP) ou appareil pour le sommeil"
+ },
+ "30efaecb3ce2": {
+  "en": "This assessment is for information only and is not a diagnosis. If your symptoms are severe or getting worse, talk to your pharmacist, dentist or doctor. No prescription is needed for Aquoral in Canada.",
+  "fr": "Cette évaluation est fournie à titre informatif seulement et ne constitue pas un diagnostic. Si vos symptômes sont graves ou s’aggravent, parlez-en à votre pharmacien, à votre dentiste ou à votre médecin. Aucune ordonnance n’est requise pour Aquoral au Canada."
+ },
+ "34aeb4bc6a3c": {
+  "en": "Sjögren’s and immune conditions",
+  "fr": "le syndrome de Sjögren et les maladies immunitaires"
+ },
+ "365a529d2596": {
+  "en": "Previous question",
+  "fr": "Question précédente"
+ },
+ "385dcad62161": {
+  "en": "Get my code",
+  "fr": "Obtenir mon code"
+ },
+ "3dc6696af6ff": {
+  "en": "<1/> Thank you",
+  "fr": "<1/> Merci"
+ },
+ "404f878cae9c": {
+  "en": "CPAP and sleep appliances",
+  "fr": "la PPC (CPAP) et les appareils pour le sommeil"
+ },
+ "4136b5bba9bb": {
+  "en": "Use this code at checkout. <1>Canadian offer to be confirmed.</1>",
+  "fr": "Utilisez ce code au moment du paiement. <1>Offre canadienne à confirmer.</1>"
+ },
+ "41b891066561": {
+  "en": "Please tell us the cause, or pick another option.",
+  "fr": "Veuillez préciser la cause ou choisir une autre option."
+ },
+ "4238dc412264": {
+  "en": "Choose one",
+  "fr": "Choisissez une réponse"
+ },
+ "43ac7a5d90b5": {
+  "en": "<1/> Retake",
+  "fr": "<1/> Recommencer"
+ },
+ "44541f0cd0be": {
+  "en": "<1/> Sleep",
+  "fr": "<1/> Sommeil"
+ },
+ "47755de5d44e": {
+  "en": "Do you have trouble eating?",
+  "fr": "Avez-vous de la difficulté à manger?"
+ },
+ "48f88ac322a0": {
+  "en": "Something else",
+  "fr": "Autre chose"
+ },
+ "4b261cb77963": {
+  "en": "Leave this empty <1/>",
+  "fr": "Laissez ce champ vide <1/>"
+ },
+ "50e2b46ef877": {
+  "en": "you@example.com",
+  "fr": "vous@exemple.com"
+ },
+ "5397e0583f14": {
+  "en": "Yes",
+  "fr": "Oui"
+ },
+ "53ac8850f455": {
+  "en": "Tell us the cause",
+  "fr": "Précisez la cause"
+ },
+ "5c4698b6e0d6": {
+  "en": "About you",
+  "fr": "À propos de vous"
+ },
+ "5fafe7abbd5d": {
+  "en": "Severity scale",
+  "fr": "Échelle de gravité"
+ },
+ "610b5ea068b8": {
+  "en": "medications that cause dry mouth",
+  "fr": "les médicaments qui causent la bouche sèche"
+ },
+ "6aca64aa067f": {
+  "en": "The cause of my dry mouth",
+  "fr": "La cause de ma bouche sèche"
+ },
+ "6e020a5d1b50": {
+  "en": "<1/> Thirst",
+  "fr": "<1/> Soif"
+ },
+ "6eef6648406c": {
+  "en": "None",
+  "fr": "Aucune"
+ },
+ "7311e71059d4": {
+  "en": "Please enter your first name.",
+  "fr": "Veuillez entrer votre prénom."
+ },
+ "735796a5a0ec": {
+  "en": "Start the assessment <1/>",
+  "fr": "Commencer l’évaluation <1/>"
+ },
+ "73d84fce3446": {
+  "en": "See my result <1/>",
+  "fr": "Voir mon résultat <1/>"
+ },
+ "76a84758d452": {
+  "en": "<1/> History",
+  "fr": "<1/> Antécédents"
+ },
+ "77368211787b": {
+  "en": "How dry is your mouth, really?",
+  "fr": "À quel point votre bouche est-elle sèche, vraiment?"
+ },
+ "786f92939f57": {
+  "en": "We use your details to send your result and code. See our <1>privacy policy</1>.",
+  "fr": "Nous utilisons vos coordonnées pour vous envoyer votre résultat et votre code. Consultez notre <1>politique de confidentialité</1>."
+ },
+ "79e11a35c7f7": {
+  "en": "Based on your answers",
+  "fr": "D’après vos réponses"
+ },
+ "7e568a90221d": {
+  "en": "First name",
+  "fr": "Prénom"
+ },
+ "816c52fd2bdd": {
+  "en": "No",
+  "fr": "Non"
+ },
+ "85a7b4c8afed": {
+  "en": "Yes, send me Aquoral news and offers by email. You can unsubscribe at any time.",
+  "fr": "Oui, envoyez-moi les nouvelles et les offres d’Aquoral par courriel. Vous pouvez vous désabonner en tout temps."
+ },
+ "87d0e7943cc4": {
+  "en": "Pick the one that fits best. It helps us point you to the right advice.",
+  "fr": "Choisissez la réponse qui vous correspond le mieux. Cela nous aide à vous orienter vers les bons conseils."
+ },
+ "899eb599fdb3": {
+  "en": "Instant result",
+  "fr": "Résultat immédiat"
+ },
+ "9560a167b957": {
+  "en": "Want $10 off?",
+  "fr": "Vous voulez 10 $ de rabais?"
+ },
+ "969a6323130e": {
+  "en": "Add your email and we’ll send your result with a code for your first order.",
+  "fr": "Ajoutez votre courriel et nous vous enverrons votre résultat avec un code pour votre première commande."
+ },
+ "975ce09195a4": {
+  "en": "Copy code SURVEY",
+  "fr": "Copier le code SURVEY"
+ },
+ "99818828f217": {
+  "en": "Do you constantly feel parched, or have a dry, cotton-like feeling in your mouth?",
+  "fr": "Avez-vous constamment soif ou une sensation de bouche sèche, comme du coton dans la bouche?"
+ },
+ "9c04c9720977": {
+  "en": "Show as a list",
+  "fr": "Afficher en liste"
+ },
+ "a0bd921fb5a7": {
+  "en": "SURVEY",
+  "fr": "SURVEY"
+ },
+ "a164b0440f54": {
+  "en": "Reading your answers…",
+  "fr": "Analyse de vos réponses…"
+ },
+ "a70f57b89079": {
+  "en": "I’m not sure",
+  "fr": "Je ne suis pas sûr"
+ },
+ "adec36a821f8": {
+  "en": "Last name",
+  "fr": "Nom de famille"
+ },
+ "af74f7c5362a": {
+  "en": "Copy",
+  "fr": "Copier"
+ },
+ "afdaf46dd1d1": {
+  "en": "$10 off your first order",
+  "fr": "10 $ de rabais sur votre première commande"
+ },
+ "afddadb3940f": {
+  "en": "Assessment progress",
+  "fr": "Progression de l’évaluation"
+ },
+ "b07b1f90cd1f": {
+  "en": "Continue <1/>",
+  "fr": "Continuer <1/>"
+ },
+ "b1de9512ddb2": {
+  "en": "dry mouth during cancer treatment",
+  "fr": "la bouche sèche pendant un traitement du cancer"
+ },
+ "b36818f101ee": {
+  "en": "Do you go to the washroom often because you’re drinking so much water?",
+  "fr": "Allez-vous souvent aux toilettes parce que vous buvez beaucoup d’eau?"
+ },
+ "b3c7b60fb847": {
+  "en": "Take the free one-minute dry mouth assessment. Six quick questions show how severe your dry mouth is and what can help.",
+  "fr": "Faites l’évaluation gratuite de la bouche sèche en une minute. Six questions rapides indiquent la gravité de votre bouche sèche et ce qui peut vous aider."
+ },
+ "b7c15350a775": {
+  "en": "Severe",
+  "fr": "Sévère"
+ },
+ "bd0f9d9f2424": {
+  "en": "cannabis and dry mouth",
+  "fr": "le cannabis et la bouche sèche"
+ },
+ "be647d56c65e": {
+  "en": "Phone number <1>Optional</1>",
+  "fr": "Numéro de téléphone <1>Facultatif</1>"
+ },
+ "c4e4b888689d": {
+  "en": "Sjögren’s or another immune condition",
+  "fr": "Syndrome de Sjögren ou autre maladie immunitaire"
+ },
+ "ca76c5e215f4": {
+  "en": "common causes of dry mouth",
+  "fr": "les causes courantes de la bouche sèche"
+ },
+ "ccddecaec1ee": {
+  "en": "This could include chewing, swallowing or tasting your food.",
+  "fr": "Par exemple, pour mâcher, avaler ou goûter vos aliments."
+ },
+ "ce2123323b55": {
+  "en": "For information only, not a diagnosis. Your answers stay private.",
+  "fr": "À titre informatif seulement; ne constitue pas un diagnostic. Vos réponses restent confidentielles."
+ },
+ "d0041d706a4f": {
+  "en": "Answer six quick questions to see how severe your dry mouth is and what can help. It takes about a minute.",
+  "fr": "Répondez à six questions rapides pour connaître la gravité de votre bouche sèche et ce qui peut vous aider. Cela prend environ une minute."
+ },
+ "d11885eb6e36": {
+  "en": "other causes of dry mouth",
+  "fr": "les autres causes de la bouche sèche"
+ },
+ "d3faa186054a": {
+  "en": "Skip and just show my result",
+  "fr": "Passer et afficher seulement mon résultat"
+ },
+ "d8ff83926c16": {
+  "en": "Have you been diagnosed with dry mouth (xerostomia) before?",
+  "fr": "Avez-vous déjà reçu un diagnostic de bouche sèche (xérostomie)?"
+ },
+ "df3053ade4d2": {
+  "en": "<1/> Speaking",
+  "fr": "<1/> Parole"
+ },
+ "df4ceee57d71": {
+  "en": "What it’s like",
+  "fr": "Ce que vous vivez"
+ },
+ "e0ac42ea53c1": {
+  "en": "Where should we send your results?",
+  "fr": "Où devons-nous envoyer vos résultats?"
+ },
+ "e42cad7c85c4": {
+  "en": "Please choose one option to continue.",
+  "fr": "Veuillez choisir une option pour continuer."
+ },
+ "ea8b09c2354b": {
+  "en": "Moderate",
+  "fr": "Modérée"
+ },
+ "eaea20ad8b7d": {
+  "en": "What’s behind your dry mouth?",
+  "fr": "Qu’est-ce qui cause votre bouche sèche?"
+ },
+ "ed1e576189c7": {
+  "en": "Free dry mouth assessment | Aquoral Canada",
+  "fr": "Évaluation gratuite de la bouche sèche | Aquoral Canada"
+ },
+ "ed577018a6e0": {
+  "en": "What helps",
+  "fr": "Ce qui aide"
+ },
+ "f39795219783": {
+  "en": "About 1 minute",
+  "fr": "Environ 1 minute"
+ },
+ "f46c682d6298": {
+  "en": "<1/> Eating",
+  "fr": "<1/> Alimentation"
+ },
+ "f64ab336edb1": {
+  "en": "Do you have trouble speaking, or avoid conversations because of your dry mouth?",
+  "fr": "Avez-vous de la difficulté à parler ou évitez-vous les conversations à cause de votre bouche sèche?"
+ },
+ "fce6da6b9231": {
+  "en": "Please enter a valid email, like name@example.com.",
+  "fr": "Veuillez entrer une adresse courriel valide, par exemple nom@exemple.com."
+ }
+}

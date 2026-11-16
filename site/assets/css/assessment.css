@@ -287,8 +287,8 @@
   background: rgba(255,255,255,.82);
   border: 1px solid rgba(255,255,255,.95);
   -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%);
-  box-shadow: inset 0 1px 0 #fff, inset 0 -22px 36px -22px rgba(37,76,158,.28), inset 0 0 0 1px rgba(37,76,158,.07),
-    0 1px 2px rgba(18,38,80,.06), 0 24px 48px -24px rgba(18,38,80,.38); }
+  box-shadow: inset 0 1px 0 #fff, inset 0 -22px 36px -22px rgba(4,79,124,.28), inset 0 0 0 1px rgba(4,79,124,.07),
+    0 1px 2px rgba(6,38,60,.06), 0 24px 48px -24px rgba(6,38,60,.38); }
 .qa-pick::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1;
   background: none; opacity: .8; }
 .qa-pick > * { position: relative; z-index: 2; }
@@ -299,7 +299,7 @@
   box-shadow: inset 0 -8px 14px rgba(0,0,0,.18), inset 0 5px 10px rgba(255,255,255,.55), 0 12px 24px -10px var(--c); }
 .qa-pick-ic svg { width: 30px; height: 30px; stroke-width: 2.6; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
 .qa-pick-t { font-size: 26px; }
-.qa-pick:hover { transform: translateY(-4px); border-color: #fff; box-shadow: inset 0 1px 0 #fff, inset 0 -22px 36px -22px rgba(37,76,158,.3), inset 0 0 0 1px rgba(37,76,158,.09), 0 30px 60px -26px rgba(18,38,80,.45); }
+.qa-pick:hover { transform: translateY(-4px); border-color: #fff; box-shadow: inset 0 1px 0 #fff, inset 0 -22px 36px -22px rgba(4,79,124,.3), inset 0 0 0 1px rgba(4,79,124,.09), 0 30px 60px -26px rgba(6,38,60,.45); }
 .qa-pick:hover .qa-pick-ic { transform: scale(1.07) rotate(-4deg); }
 .qa-pick::before { background: var(--c); }
 .qa-pick:has(input:checked) { border-color: rgba(255,255,255,.6); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -20px 40px -20px rgba(0,0,0,.25), 0 26px 50px -22px var(--c); }
@@ -309,20 +309,20 @@
 .qa-pick:has(input:checked) .qa-pick-ic svg { filter: none; }
 @keyframes qa-pop { 40% { transform: scale(1.22); } }
 .qa-pick kbd { background: rgba(255,255,255,.6); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .qa-pick { background: rgba(24,50,106,.55); border-color: rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.34);
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .qa-pick { background: rgba(3,50,79,.55); border-color: rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.34);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -22px 36px -22px rgba(111,194,236,.25), 0 24px 48px -24px rgba(0,0,0,.6); }
   :root:not([data-theme="light"]) .qa-pick::after { opacity: .18; } :root:not([data-theme="light"]) .qa-pick kbd { background: transparent; } }
-:root[data-theme="dark"] .qa-pick { background: rgba(24,50,106,.55); border-color: rgba(255,255,255,.16); }
+:root[data-theme="dark"] .qa-pick { background: rgba(3,50,79,.55); border-color: rgba(255,255,255,.16); }
 
 /* Glass tiles to match */
 .qa-tile { background: rgba(255,255,255,.85);
-  border-color: rgba(255,255,255,.95); box-shadow: inset 0 1px 0 #fff, inset 0 -16px 28px -20px rgba(37,76,158,.25), inset 0 0 0 1px rgba(37,76,158,.07), 0 16px 32px -24px rgba(18,38,80,.35);
+  border-color: rgba(255,255,255,.95); box-shadow: inset 0 1px 0 #fff, inset 0 -16px 28px -20px rgba(4,79,124,.25), inset 0 0 0 1px rgba(4,79,124,.07), 0 16px 32px -24px rgba(6,38,60,.35);
   -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%); }
-.qa-tile-ic { background: color-mix(in srgb, var(--brand) 12%, #fff); box-shadow: inset 0 -3px 6px rgba(37,76,158,.12), 0 6px 12px -8px rgba(37,76,158,.5); }
+.qa-tile-ic { background: color-mix(in srgb, var(--brand) 12%, #fff); box-shadow: inset 0 -3px 6px rgba(4,79,124,.12), 0 6px 12px -8px rgba(4,79,124,.5); }
 .qa-tile:has(input:checked) .qa-tile-ic { background: var(--orchid-500); box-shadow: inset 0 -4px 8px rgba(0,0,0,.15), 0 8px 16px -8px var(--orchid-500); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .qa-tile { background: rgba(24,50,106,.5); border-color: rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 16px 32px -24px rgba(0,0,0,.6); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .qa-tile { background: rgba(3,50,79,.5); border-color: rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 16px 32px -24px rgba(0,0,0,.6); }
   :root:not([data-theme="light"]) .qa-tile-ic { background: rgba(255,255,255,.1); box-shadow: none; } }
-:root[data-theme="dark"] .qa-tile { background: rgba(24,50,106,.5); border-color: rgba(255,255,255,.14); }
+:root[data-theme="dark"] .qa-tile { background: rgba(3,50,79,.5); border-color: rgba(255,255,255,.14); }
 
 /* Hidden honeypot */
 .qa-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
@@ -364,7 +364,7 @@
 
 /* 3D droplet: glass shell, shaded liquid with a lit meniscus, specular highlights, coloured floor glow */
 .qa-gauge .qa-gauge-rim { fill: none; stroke: url(#qa-rimg); stroke-width: 1.6; }
-.qa-gauge svg { filter: drop-shadow(0 18px 22px color-mix(in srgb, var(--qa-c2) 45%, transparent)) drop-shadow(0 4px 6px rgba(6,16,42,.25)); }
+.qa-gauge svg { filter: drop-shadow(0 18px 22px color-mix(in srgb, var(--qa-c2) 45%, transparent)) drop-shadow(0 4px 6px rgba(5,29,43,.25)); }
 .qa-drop3d { animation: qa-float 6s ease-in-out infinite; transform-origin: 50% 90%; }
 @keyframes qa-float { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-5px) rotate(1.5deg); } }
 .qa-floor { animation: qa-floor 6s ease-in-out infinite; transform-origin: 60px 150px; transform-box: view-box; }
@@ -372,16 +372,16 @@
 .qa-wave.w1 { stroke: rgba(255,255,255,.75); stroke-width: 1.4; }
 .qa-wave.w2 { opacity: .5; }
 .qa-score { top: 50%; }
-.qa-score b { text-shadow: 0 2px 8px rgba(6,16,42,.45), 0 0 1px rgba(6,16,42,.4); }
+.qa-score b { text-shadow: 0 2px 8px rgba(5,29,43,.45), 0 0 1px rgba(5,29,43,.4); }
 .qa-res-head { grid-template-columns: clamp(118px, 17vw, 168px) 1fr; }
 
 /* Result surfaces lift off the card: layered glass, light edge, deep soft shadow, level-coloured glow */
 .qa-res-card, .qa-tips, .qa-code-locked { position: relative; overflow: hidden; isolation: isolate;
   background: #fff;
   border: 1px solid rgba(255,255,255,.95); border-radius: 26px;
-  box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(37,76,158,.06), 0 2px 4px rgba(18,38,80,.06), 0 28px 56px -28px rgba(18,38,80,.42);
+  box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(4,79,124,.06), 0 2px 4px rgba(6,38,60,.06), 0 28px 56px -28px rgba(6,38,60,.42);
   transition: transform 300ms var(--ease-surface), box-shadow 300ms; }
-.qa-res-card:hover, .qa-tips:hover { transform: translateY(-3px); box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(37,76,158,.08), 0 4px 8px rgba(18,38,80,.06), 0 36px 64px -28px rgba(18,38,80,.5); }
+.qa-res-card:hover, .qa-tips:hover { transform: translateY(-3px); box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(4,79,124,.08), 0 4px 8px rgba(6,38,60,.06), 0 36px 64px -28px rgba(6,38,60,.5); }
 .qa-res-card::before, .qa-tips::before { content: ""; position: absolute; z-index: -1; width: 220px; height: 220px; left: -70px; top: -110px; border-radius: 50%;
   background: color-mix(in srgb, var(--tone, var(--qa-c1)) 14%, transparent); filter: blur(30px); }
 .qa-res-card::after, .qa-tips::after { content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px; border-radius: 0 0 4px 4px; background: var(--tone, var(--qa-c1)); opacity: .9; }
@@ -397,7 +397,7 @@
 .qa-res-ic .icon { filter: drop-shadow(0 1px 1px rgba(0,0,0,.2)); }
 /* Tips: each its own inset row */
 .qa-tips ul { gap: 10px; }
-.qa-tips li { padding: 14px; border-radius: 18px; background: color-mix(in srgb, var(--sky-50) 60%, transparent); border: 1px solid rgba(37,76,158,.07); grid-template-columns: 44px 1fr; }
+.qa-tips li { padding: 14px; border-radius: 18px; background: color-mix(in srgb, var(--sky-50) 60%, transparent); border: 1px solid rgba(4,79,124,.07); grid-template-columns: 44px 1fr; }
 .qa-tips li:nth-child(2) { --tone: var(--tide-500); } .qa-tips li:nth-child(3) { --tone: var(--sky-400); } .qa-tips li:nth-child(4) { --tone: var(--tide-600); }
 /* Severity scale: thicker, glowing active segment with a marker */
 .qa-scale li::before { height: 10px; }
@@ -414,13 +414,13 @@
 
 /* Dark scheme: same depth with deep glass */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :is(.qa-res-card, .qa-tips, .qa-code-locked) {
-    background: rgba(20,40,86,.72);
+    background: rgba(17,63,89,.72);
     border-color: rgba(255,255,255,.12); border-top-color: rgba(255,255,255,.3);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 2px 4px rgba(0,0,0,.25), 0 30px 60px -24px rgba(0,0,0,.75); }
   :root:not([data-theme="light"]) .qa-tips li { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.07); }
   :root:not([data-theme="light"]) .qa-code-locked h3 { color: var(--orchid-300); }
-  :root:not([data-theme="light"]) .qa-scale li.is-on::after { box-shadow: 0 4px 10px -2px var(--qa-c2), 0 0 0 3px rgba(11,24,51,.9); } }
-:root[data-theme="dark"] :is(.qa-res-card, .qa-tips, .qa-code-locked) { background: rgba(20,40,86,.72);
+  :root:not([data-theme="light"]) .qa-scale li.is-on::after { box-shadow: 0 4px 10px -2px var(--qa-c2), 0 0 0 3px rgba(4,26,42,.9); } }
+:root[data-theme="dark"] :is(.qa-res-card, .qa-tips, .qa-code-locked) { background: rgba(17,63,89,.72);
   border-color: rgba(255,255,255,.12); border-top-color: rgba(255,255,255,.3); box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 30px 60px -24px rgba(0,0,0,.75); }
 :root[data-theme="dark"] .qa-tips li { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.07); }
 /* Dark: brighter level colours so the drop glows against navy */
@@ -428,4 +428,4 @@
   :root:not([data-theme="light"]) .qa-result[data-level="2"] { --qa-c1: var(--sky-400); --qa-c2: var(--tide-500); } }
 /* Score stays readable over glass, rising liquid and every level colour */
 .qa-result.is-intro:not(.is-filled) .qa-score, .qa-result[data-level="0"] .qa-score { color: #fff; }
-.qa-score b, .qa-score small { text-shadow: 0 0 14px rgba(6,16,42,.55), 0 2px 6px rgba(6,16,42,.45); }
+.qa-score b, .qa-score small { text-shadow: 0 0 14px rgba(5,29,43,.55), 0 2px 6px rgba(5,29,43,.45); }

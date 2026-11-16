@@ -8,23 +8,25 @@
   if (!form) return;
   const $ = (s, r = form) => r.querySelector(s), $$ = (s, r = form) => [...r.querySelectorAll(s)];
   const base = document.querySelector('meta[name="aq-base"]')?.content || '';
+  const pbase = document.querySelector('meta[name="aq-page"]')?.content ?? base;   // page links (fr/ on French pages)
+  const T = (s, ...a) => ((window.AQ_T && window.AQ_T[s]) || s).replace(/\{(\d)\}/g, (_, i) => a[i]);   // French: site/i18n.py
   const STEPS = ['intro', 'cause', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'details', 'result'];
   const QUESTIONS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'];
   const TOTAL = 8;   // cause + 6 questions + details
 
   const LEVELS = [
-    { name: 'No signs of dry mouth', sum: 'Based on your answers, you may not have dry mouth.',
-      symptoms: 'You didn’t report any of the common signs of dry mouth.',
-      relief: 'Keep sipping water through the day. If you still think something isn’t right, talk to your pharmacist or dentist.' },
-    { name: 'Mild dry mouth', sum: 'Your mouth feels dry now and then, but it isn’t running your day.',
-      symptoms: 'Occasional dryness in the mouth, usually without affecting daily activities.',
-      relief: 'Symptoms can usually be eased with water or an oral moisturizer like Aquoral when you need it.' },
-    { name: 'Moderate dry mouth', sum: 'Dryness is showing up often enough to affect how you eat, talk or sleep.',
-      symptoms: 'Frequent dryness that can be uncomfortable and may get in the way of eating or speaking. Over time this can lead to more serious dental issues.',
-      relief: 'Regular use of an oral moisturizer or frequent sips of fluid. Some changes to diet or routine may help too.' },
-    { name: 'Severe dry mouth', sum: 'Dryness is affecting your daily life. You deserve longer-lasting relief.',
-      symptoms: 'Persistent dryness that makes eating, speaking and swallowing uncomfortable. It can make dentures harder to wear and lead to frequent mouth infections.',
-      relief: 'Ongoing care, such as a long-lasting protective spray like Aquoral, frequent hydration and regular dental check-ups.' },
+    { name: T('No signs of dry mouth'), sum: T('Based on your answers, you may not have dry mouth.'),
+      symptoms: T('You didn’t report any of the common signs of dry mouth.'),
+      relief: T('Keep sipping water through the day. If you still think something isn’t right, talk to your pharmacist or dentist.') },
+    { name: T('Mild dry mouth'), sum: T('Your mouth feels dry now and then, but it isn’t running your day.'),
+      symptoms: T('Occasional dryness in the mouth, usually without affecting daily activities.'),
+      relief: T('Symptoms can usually be eased with water or an oral moisturizer like Aquoral when you need it.') },
+    { name: T('Moderate dry mouth'), sum: T('Dryness is showing up often enough to affect how you eat, talk or sleep.'),
+      symptoms: T('Frequent dryness that can be uncomfortable and may get in the way of eating or speaking. Over time this can lead to more serious dental issues.'),
+      relief: T('Regular use of an oral moisturizer or frequent sips of fluid. Some changes to diet or routine may help too.') },
+    { name: T('Severe dry mouth'), sum: T('Dryness is affecting your daily life. You deserve longer-lasting relief.'),
+      symptoms: T('Persistent dryness that makes eating, speaking and swallowing uncomfortable. It can make dentures harder to wear and lead to frequent mouth infections.'),
+      relief: T('Ongoing care, such as a long-lasting protective spray like Aquoral, frequent hydration and regular dental check-ups.') },
   ];
   const ICON = {
     moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
@@ -34,10 +36,10 @@
     book: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
   };
   const TIPS = {
-    q3: { ic: 'clock', t: 'Hours, not minutes', d: 'Water helps for a few minutes. Aquoral forms a protective film that keeps moisture in for 4 to 6 hours.', href: 'how-it-works.html', a: 'How it works' },
-    q2: { ic: 'moon', t: 'Spray before bed', d: 'One use lasts 4 to 6 hours, so a dose at bedtime can help you sleep more comfortably.', href: 'how-to-use.html', a: 'How to use Aquoral' },
-    q4: { ic: 'utensils', t: 'Spray before meals', d: 'Before meals is one of the best moments to use Aquoral, so eating feels more comfortable.', href: 'how-to-use.html', a: 'How to use Aquoral' },
-    q5: { ic: 'speak', t: 'Spray before you speak', d: 'Use Aquoral before meetings, calls or long conversations.', href: 'how-to-use.html', a: 'How to use Aquoral' },
+    q3: { ic: 'clock', t: T('Hours, not minutes'), d: T('Water helps for a few minutes. Aquoral forms a protective film that keeps moisture in for 4 to 6 hours.'), href: 'how-it-works.html', a: T('How it works') },
+    q2: { ic: 'moon', t: T('Spray before bed'), d: T('One use lasts 4 to 6 hours, so a dose at bedtime can help you sleep more comfortably.'), href: 'how-to-use.html', a: T('How to use Aquoral') },
+    q4: { ic: 'utensils', t: T('Spray before meals'), d: T('Before meals is one of the best moments to use Aquoral, so eating feels more comfortable.'), href: 'how-to-use.html', a: T('How to use Aquoral') },
+    q5: { ic: 'speak', t: T('Spray before you speak'), d: T('Use Aquoral before meetings, calls or long conversations.'), href: 'how-to-use.html', a: T('How to use Aquoral') },
   };
 
   /* Build the Yes/No control into each question step */
@@ -138,7 +140,7 @@
     const btn = e.currentTarget, list = listview.hidden;
     listview.hidden = !list; tiles.hidden = list;
     btn.setAttribute('aria-pressed', String(list));
-    $('span', btn).textContent = list ? 'Show as cards' : 'Show as a list';
+    $('span', btn).textContent = list ? T('Show as cards') : T('Show as a list');
   });
   otherIn.addEventListener('input', () => { otherIn.classList.remove('is-invalid'); $('#qa-cause-other-err').hidden = true; });
   function checkCause() {
@@ -206,7 +208,7 @@
     res.dataset.level = String(l);
     $('[data-score]', res).textContent = s;
     const fn = $('#qa-fn').value.trim();
-    $('.qa-result .qa-kicker').textContent = fn && !skipped ? `Your result, ${fn}` : 'Your result';
+    $('.qa-result .qa-kicker').textContent = fn && !skipped ? T('Your result, {0}', fn) : T('Your result');
     $('[data-level-name]', res).textContent = L.name;
     $('[data-level-sum]', res).textContent = L.sum;
     $('[data-symptoms]', res).textContent = L.symptoms;
@@ -221,16 +223,16 @@
       const li = document.createElement('li');
       li.innerHTML = `<span class="qa-res-ic"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICON[ic]}</svg></span><div><b></b><p></p></div>`;
       $('b', li).textContent = t; $('p', li).textContent = d + ' ';
-      const link = document.createElement('a'); link.href = base + href; link.textContent = a; $('p', li).append(link);
+      const link = document.createElement('a'); link.href = pbase + href; link.textContent = a; $('p', li).append(link);
       ul.append(li);
     };
     ['q3', 'q2', 'q4', 'q5'].filter(q => $(`input[name="${q}"]:checked`)?.value === '1').slice(0, 3).forEach(q => { const t = TIPS[q]; tip(t.ic, t.t, t.d, t.href, t.a + ' →'); });
     const c = $('input[name="cause"]:checked');
-    if (c?.dataset.link) tip('book', 'Learn more', `Read our guide to ${c.dataset.topic}.`, c.dataset.link, 'Read the guide →');
+    if (c?.dataset.link) tip('book', T('Learn more'), T('Read our guide to {0}.', c.dataset.topic), c.dataset.link, T('Read the guide →'));
     $('[data-tips]', res).hidden = !ul.children.length || l === 0;
     // Discount code only for people who left their email
     $('[data-code]', res).hidden = skipped; $('[data-code-locked]', res).hidden = !skipped;
-    $('[data-order-link]', res).href = base + 'order.html' + (skipped ? '' : '?coupon=SURVEY');
+    $('[data-order-link]', res).href = pbase + 'order.html' + (skipped ? '' : '?coupon=SURVEY');
   }
 
   let revealTimers = [];
