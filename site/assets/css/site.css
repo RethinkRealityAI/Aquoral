@@ -815,7 +815,7 @@ html { overflow-x: clip; }
 .orbit-panel .ic-lg .cause-icon { width: 36px; height: 36px; display: block; }
 @media (max-width: 860px) { .orbit-panel .ic-lg .cause-icon { width: 27px; height: 27px; } }
 
-/* ================= Safety information page (2026-11-16) =================
+/* ================= Safety information page (2026-11-16) ==========
    Label and carton safety copy as liquid-glass tiles. Solid token colours only (no gradients); depth comes from glass
    edges, inset light and soft shadows. Motion is limited to a gentle float on the pack and stops under reduced motion. */
 .sf-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -833,6 +833,7 @@ html { overflow-x: clip; }
 .sf-tile h3 { font: 600 19px/1.3 var(--font-display); letter-spacing: -.015em; margin: 6px 0 6px; }
 .sf-tile p { margin: 0; color: var(--ink-muted); font-size: 16px; line-height: 1.55; }
 .sf-fr { margin-top: 8px !important; font-size: 14px !important; font-style: italic; color: var(--ink-muted); opacity: .85; }
+html[lang^="fr"] .sf-fr { display: none; }   /* French pages: the heading already is the carton French, so skip the echo */
 .sf-pict { width: 76px; height: 76px; border-radius: 24px; display: grid; place-items: center; color: var(--tide-600); background: var(--sky-100);
   box-shadow: inset 0 2px 0 rgba(255,255,255,.9), inset 0 -6px 14px rgba(4,79,124,.12), 0 14px 26px -16px rgba(4,79,124,.55); transform: translateZ(30px); }
 .sf-pict svg, .sf-pict .icon { width: 44px; height: 44px; }
@@ -903,3 +904,32 @@ html { overflow-x: clip; }
 :root[data-theme="dark"] .sf-card, :root[data-theme="dark"] .sf-dose { box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 30px 60px -30px rgba(0,0,0,.7); }
 :root[data-theme="dark"] .sf-gauge-track { background: rgba(255,255,255,.1); } :root[data-theme="dark"] .sf-gauge-band, :root[data-theme="dark"] .sf-gauge-tag { background: var(--tide-300); color: var(--tide-950); }
 :root[data-theme="dark"] .sf-pack-stage::after { background: rgba(0,0,0,.6); }
+=======
+/* Language switch (2026-11-16, fr-CA site). Header: a compact pill naming the other language (FR / EN), a real link
+   to the same page in that language. Mobile menu: English | Français control styled like the Appearance switch. */
+.lang-pill { display: inline-grid; place-items: center; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 999px; color: inherit; text-decoration: none;
+  font: 600 14px/1 var(--font-mono); letter-spacing: .08em; background: color-mix(in srgb, currentColor 7%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 16%, transparent); transition: background 180ms; -webkit-tap-highlight-color: transparent; }
+.lang-pill:hover { background: color-mix(in srgb, currentColor 13%, transparent); color: inherit; }
+.lang-pill:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 1080px) { .nav-end .lang-pill { min-width: 44px; height: 44px; padding: 0 8px; font-size: 13px; } }
+@media (max-width: 359px) { .nav-end .lang-pill { display: none; } }   /* smallest phones: the menu's Language control only */
+.lang-choice { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; color: #fff; }
+.ls-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; min-width: min(100%, 264px); border-radius: 999px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.3); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+.mobile-menu .ls-opt { display: grid; place-items: center; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; color: #C9D6EC; text-decoration: none; font: 600 15px/1 var(--font-display); letter-spacing: 0; }
+.mobile-menu a.ls-opt:hover { color: #fff; }
+.mobile-menu a.ls-opt:focus-visible { outline: 3px solid var(--sky-300); outline-offset: 2px; }
+.mobile-menu .ls-opt[aria-current] { background: #fff; color: var(--tide-900); box-shadow: 0 6px 16px -6px rgba(0,0,0,.5), inset 0 1px 0 #fff; }
+/* Phones: French "Commander" is wider than "Order", so the header drops the arrow and tightens up to keep logo, EN/FR,
+   Order and menu on one row (checked at 360-430 px) */
+@media (max-width: 440px) {
+  .nav-end { gap: 8px; }
+  .nav-end .nav-order { padding: 0 14px; }
+  .nav-end .nav-order svg { display: none; }
+  .nav-end .lang-pill { min-width: 40px; height: 40px; padding: 0 6px; }
+}
+/* Longer French labels ("Évaluation gratuite") wrap inside the two hero buttons instead of pushing the page wider */
+@media (max-width: 860px) { .hero-cta .btn { min-width: 0; white-space: normal; text-align: center; line-height: 1.15; } }
+/* Phones: long button labels (French especially) wrap instead of running off the screen */
+@media (max-width: 560px) { .btn { white-space: normal; text-align: center; max-width: 100%; } }

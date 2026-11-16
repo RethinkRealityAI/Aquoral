@@ -29,6 +29,14 @@ Then open http://localhost:8000. Useful query flags on any page with the 3D stag
 
 `python3 site/build.py --artifact` is the variant used for the claude.ai artifact preview (inlines the GLBs); you do not need it for Netlify.
 
+## French (fr-CA)
+
+The build writes every page twice: English at `/` and Canadian French at `/fr/` (same file names), with
+`hreflang` alternates, an EN/FR switch in the header and mobile menu, and first-visit browser-language detection
+(`netlify/edge-functions/lang.ts`). French comes from the translation catalog in `site/i18n/fr/`. When you change
+English text, update the French in the same change: see [`site/i18n/README.md`](site/i18n/README.md)
+(`python3 site/i18n.py status` lists what is missing or stale).
+
 ## Deploy
 
 Netlify builds from `netlify.toml`: command `python3 site/build.py`, publish directory `site/dist`.

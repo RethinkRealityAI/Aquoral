@@ -10,6 +10,7 @@ Placeholders: {{icon:name}} inline Lucide-style icons, {{base}} relative root ("
                                  (artifact hosting does not serve .glb)
 """
 import base64, hashlib, json, pathlib, re, shutil, subprocess, sys
+import i18n   # Canadian French: catalog + segmenter (site/i18n.py, workflow in site/i18n/README.md)
 
 HERE = pathlib.Path(__file__).resolve().parent
 SRC, DIST = HERE / 'src', HERE / 'dist'
@@ -88,6 +89,38 @@ FAVICON_LINKS = ('<link rel="icon" href="{b}assets/img/favicon.svg" type="image/
                  '<link rel="apple-touch-icon" href="{b}assets/img/apple-touch-icon.png">'
                  '<link rel="manifest" href="{b}assets/img/site.webmanifest">')
 
+# Languages (2026-11-16): English at /, Canadian French at /fr/ (same file names). French pages are produced from the
+# English render by i18n.process() with the catalog in site/i18n/fr/. Browser language is detected at the Netlify edge
+# (netlify/edge-functions/lang.ts) with an inline fallback below; a manual choice is kept in the aq-lang cookie.
+SITE_URL = 'https://aquoralspray.ca'
+LANGS = {'en': 'en-CA', 'fr': 'fr-CA'}
+
+def page_url(rel, lang):
+    path = '' if rel == 'index.html' else rel
+    return f"{SITE_URL}/{'fr/' if lang == 'fr' else ''}{path}"
+
+def lang_detect(lang, alt_href):
+    """Inline first-visit fallback for the edge redirect: only on entry from outside the site, never for bots.
+    A saved choice (aq-lang cookie, set by the EN/FR switch) wins over the browser language."""
+    if ARTIFACT: return ''
+    return ("<script>try{var c=document.cookie.match(/(?:^|; )aq-lang=(en|fr)/),r=document.referrer,o=r&&r.indexOf(location.origin+'/')===0;"
+            "if(!o&&!/bot|crawl|spider|slurp|lighthouse|headless/i.test(navigator.userAgent)){var w=c?c[1]:null;"
+            "if(!w){var L=navigator.languages||[navigator.language||''];for(var i=0;i<L.length;i++){var k=String(L[i]).slice(0,2).toLowerCase();if(k==='en'||k==='fr'){w=k;break}}}"
+            f"if(w&&w!=='{lang}')location.replace('{alt_href}'+location.search+location.hash)}}}}catch(e){{}}</script>")
+
+def lang_switch(lang, alt_href, where):
+    """EN/FR switch: a compact pill in the header and a two-option control in the mobile menu.
+    Each option is a real link to the same page in the other language, so it works without JavaScript."""
+    other = 'fr' if lang == 'en' else 'en'
+    names = {'en': 'English', 'fr': 'Français'}
+    if where == 'header':
+        return (f'<a class="lang-pill" href="{alt_href}" hreflang="{LANGS[other]}" lang="{LANGS[other]}" data-lang-switch="{other}" '
+                f'aria-label="{names[other]}" title="{names[other]}"><span aria-hidden="true">{other.upper()}</span></a>')
+    opts = ''.join((f'<span class="ls-opt" aria-current="true" lang="{LANGS[l]}">{names[l]}</span>' if l == lang else
+                    f'<a class="ls-opt" href="{alt_href}" hreflang="{LANGS[l]}" lang="{LANGS[l]}" data-lang-switch="{l}">{names[l]}</a>')
+                   for l in ['en', 'fr'])
+    return f'<nav class="lang-choice" aria-label="Language"><span class="tc-label" aria-hidden="true">Language</span><div class="ls-seg">{opts}</div></nav>'
+
 NAV = [('how', 'How it works', 'how-it-works.html'), ('who', 'Who it helps', 'dry-mouth.html'), ('use', 'How to use', 'how-to-use.html'),
        ('learn', 'Learn', 'learn.html'), ('faq', 'FAQ', 'faq.html')]
 
@@ -101,7 +134,13 @@ THEME_CHOICE = ('<div class="theme-choice" role="radiogroup" aria-label="Appeara
                 + ''.join(f'<button type="button" role="radio" aria-checked="false" data-theme-set="{v}">{l}</button>' for v, l in [('system', 'Auto'), ('light', 'Light'), ('dark', 'Dark')])
                 + '<span class="tc-pill" aria-hidden="true"></span></div></div>')
 
-def layout(meta, body, base):
+def layout(meta, body, base, lang='en', rel='index.html'):
+    fr = lang == 'fr'
+    depth = len(pathlib.PurePosixPath(rel).parts) - 1
+    # the same page in the other language, relative to this page
+    alt_href = ('../' * (depth + 1) + rel) if fr else ('../' * depth + 'fr/' + rel)
+    alt_href = re.sub(r'(^|/)index\.html$', r'\1', alt_href) or './'
+    js_t = (f'<script>window.AQ_T={json.dumps(i18n.load_js_catalog(), ensure_ascii=False)};</script>') if fr else ''
     nav_links = ''.join(f'<li><a href="{base}{href}"{" aria-current=\"page\"" if meta.get("nav") == key else ""}>{label}</a></li>' for key, label, href in NAV)
     mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}assessment.html">Free assessment</a></li><li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
     stage = meta.get('stage')
@@ -123,8 +162,9 @@ def layout(meta, body, base):
     drop_file = 'drop.bundle.js' if BUNDLED else 'drop.js'
     hero_js = f'<script type="module" src="{base}assets/js/{drop_file}"></script>' if page_hero else ''
     return f'''<!doctype html>
-<html lang="en-CA" class="no-js">
+<html lang="{LANGS[lang]}" class="no-js">
 <head>
+{lang_detect(lang, alt_href)}
 <script>try{{var t=localStorage.getItem('aq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}}catch(e){{}}</script>
 <script type="importmap">{{"imports":{{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}}}</script>
 <meta charset="utf-8">
@@ -132,6 +172,12 @@ def layout(meta, body, base):
 <title>{meta["title"]}</title>
 <meta name="description" content="{meta.get("description", "")}">
 <meta name="aq-base" content="{base}">
+<meta name="aq-page" content="{base}{'fr/' if fr else ''}">
+<link rel="canonical" href="{page_url(rel, lang)}">
+<link rel="alternate" hreflang="en-CA" href="{page_url(rel, 'en')}">
+<link rel="alternate" hreflang="fr-CA" href="{page_url(rel, 'fr')}">
+<link rel="alternate" hreflang="x-default" href="{page_url(rel, 'en')}">
+{js_t}
 <meta name="theme-color" content="#041A2A">
 {FAVICON_LINKS.format(b=base)}
 {font_preload}
@@ -151,6 +197,7 @@ def layout(meta, body, base):
     <a class="brand" href="{base}index.html" aria-label="Aquoral home">{lockup(base=base)}</a>
     <ul class="nav-links">{nav_links}</ul>
     <div class="nav-end">
+      {lang_switch(lang, alt_href, "header")}
       <a class="btn btn-primary btn-sm nav-order" href="{base}order.html">Order {icon("arrow-right")}</a>
       <button class="btn btn-glass btn-sm menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">{icon("menu")}</button>
       {THEME_SWITCH}
@@ -161,6 +208,7 @@ def layout(meta, body, base):
   <button class="btn btn-glass btn-sm close menu-close" type="button" aria-label="Close menu" style="width:48px;padding:0;color:#fff">{icon("x")}</button>
   <ul>{mobile_links}</ul>
   {THEME_CHOICE}
+  {lang_switch(lang, alt_href, "menu")}
 </div>
 <main id="main">
 {body}
@@ -202,6 +250,28 @@ def bundle_stage():
                         '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
     BUNDLED = True
 
+def source_pages():
+    for f in sorted((SRC / 'pages').rglob('*.html')):
+        rel = f.relative_to(SRC / 'pages')
+        raw = f.read_text()
+        m = re.match(r'\s*<!--(\{.*?\})-->\s*', raw, re.S)
+        yield rel, json.loads(m.group(1)), raw[m.end():]
+
+def english_pages():
+    """English HTML of every page, for i18n.py (segment survey). Same markup as the build, without writing files."""
+    for rel, meta, body in source_pages():
+        base = '../' * (len(rel.parts) - 1)
+        yield rel.as_posix(), render(layout(meta, body, base, 'en', rel.as_posix()), base)
+
+def fr_links(html, fbase):
+    """On a French page, links that point at the site root (fbase + page.html) go to fbase + fr/page.html.
+    Links relative to the current folder already resolve inside fr/. Assets stay shared."""
+    def sub(m):
+        path = m.group(2)
+        if path.startswith(('assets/', 'fr/')) or m.group(1) != fbase: return m.group(0)
+        return f'href="{fbase}fr/{path}'
+    return re.sub(r'(?<!lang-pill" )(?<!ls-opt" )href="((?:\.\./)*)([^"#?:]*\.html|(?=[#?"]))', sub, html)
+
 def build():
     if DIST.exists(): shutil.rmtree(DIST)
     (DIST / 'assets').mkdir(parents=True)
@@ -221,14 +291,23 @@ def build():
     else:
         shutil.copytree(HERE / 'assets' / 'models', DIST / 'assets' / 'models')
     count = 0
-    for f in sorted((SRC / 'pages').rglob('*.html')):
-        rel = f.relative_to(SRC / 'pages')
+    cat = i18n.load_catalog(); missing = {}
+    def tr(key):
+        e = cat.get(i18n.key_hash(key))
+        if e: return e['fr']
+        if key in ('EN', 'English'): return None   # the switch back to English is meant to stay English
+        missing[key] = missing.get(key, 0) + 1
+    for rel, meta, body in source_pages():
         base = '../' * (len(rel.parts) - 1)
-        raw = f.read_text()
-        m = re.match(r'\s*<!--(\{.*?\})-->\s*', raw, re.S)
-        meta = json.loads(m.group(1)); body = raw[m.end():]
         out = DIST / rel; out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(render(layout(meta, body, base), base)); count += 1
+        out.write_text(render(layout(meta, body, base, 'en', rel.as_posix()), base)); count += 1
+        # French: same page one folder deeper, translated segment by segment, page links moved into fr/
+        fbase = base + '../'
+        html = i18n.process(render(layout(meta, body, fbase, 'fr', rel.as_posix()), fbase), tr)
+        out = DIST / 'fr' / rel; out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(fr_links(html, fbase)); count += 1
+    if missing:
+        print(f'French: {len(missing)} strings have no translation yet (English shown). Run: python3 site/i18n.py status')
     # Cache-bust: tag every local CSS/JS reference with a hash of the built assets, so browsers never pair a new
     # page with a stale cached stylesheet or script (2026-11-11: that rendered new markup unstyled on phones).
     h = hashlib.sha1(b''.join(f.read_bytes() for f in sorted((DIST / 'assets').rglob('*')) if f.suffix in ('.css', '.js'))).hexdigest()[:10]

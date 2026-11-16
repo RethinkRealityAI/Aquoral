@@ -16,6 +16,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+const T = s => (window.AQ_T && window.AQ_T[s]) || s;   // French canvas labels: site/i18n.py
 
 const root = document.documentElement;
 const canvas = document.getElementById('stage');
@@ -561,8 +562,8 @@ async function boot() {
   const vapour = new THREE.Points(vGeo, vapMat); vapour.frustumCulled = false; vapour.renderOrder = 8.8; case3.add(vapour);
   // status chip on the case: "Moisture escaping" → "OGT film · protected"
   const chipGeo = new THREE.PlaneGeometry(.23, .23 * 96 / 720);
-  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('MOISTURE ESCAPING', { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
-  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('OGT FILM · PROTECTED', { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('MOISTURE ESCAPING'), { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('OGT FILM · PROTECTED'), { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
   [chipA, chipB].forEach(m => { m.position.set(-PW / 2 + .02 + .115, PH / 2 - .035, PD / 2 + .001); m.renderOrder = 10; case3.add(m); });
   const caseMats = [glassF, glassB, edgeMat, tissueMat, filmMat, dropletMat, chipA.material, chipB.material, filmEdge.material, filmEdgeGlow.material];
   caseMats.forEach(m => { m.userData.o = m.opacity; m.transparent = true; });
@@ -605,7 +606,7 @@ async function boot() {
     g.beginPath(); g.ellipse(0, -128, 13, 26, 0, 0, Math.PI * 2); g.fill(); g.restore();
     // strike-through
     g.strokeStyle = '#E2188F'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
-    g.fillStyle = '#0F4C6F'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
+    g.fillStyle = '#0F4C6F'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(T('GLUTEN FREE'), m, m + 168);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
   const BR = .068, BS = isPhone ? 1.05 : 1.2;
   const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });
@@ -860,8 +861,8 @@ async function boot() {
   /* Intro timeline (~2.5 s) */
   /* delay: the canvas fades in over 350 ms (site.css), so the drop appears once the stage is fully visible instead of
      falling through the fade (Dapo 2026-11-16: drop should start sooner and run smoother). It forms at the top first. */
-  const T = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
-  const t0 = T.delay, t1 = t0 + T.fall, t2 = t1 + T.splash * .4, t3 = t2 + T.build, t4 = t3 + T.solidify, t5 = t4 + T.pop, t6 = t4 + T.box;
+  const TL = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };   // intro timeline (s). Not T: that is the translation helper
+  const t0 = TL.delay, t1 = t0 + TL.fall, t2 = t1 + TL.splash * .4, t3 = t2 + TL.build, t4 = t3 + TL.solidify, t5 = t4 + TL.pop, t6 = t4 + TL.box;
   let intro = 0, playing = false, introDone = false, splashAt = -1;
   const boxIntro = { k: 1 };
   function setBoxFade(k) {
@@ -872,12 +873,12 @@ async function boot() {
     const f = seg(t, t0, t1);
     droplet.visible = t >= t0 && t < t2 + .05;
     /* forms (swells in with a soft wobble) during the first part, then falls under gravity */
-    const fm = seg(t, t0, t0 + T.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + T.form * .6, t1));
+    const fm = seg(t, t0, t0 + TL.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + TL.form * .6, t1));
     droplet.position.set(0, lerp(1.45, .06, fall), 0);
     const st = 1 + fall * .22, wob = 1 + Math.sin(fm * Math.PI * 2) * .06 * (1 - fm);
     droplet.scale.set(grow / Math.sqrt(st) * wob, grow * st / wob, grow / Math.sqrt(st) * wob);
     dropMat.color.copy(DROP_A).lerp(DROP_B, seg(t, t1 - .05, t1 + .2));
-    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + T.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
+    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + TL.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
     ripples.forEach(r => { const rp = seg(t, t1 + r.userData.delay, t1 + r.userData.delay + 1.2); r.visible = rp > 0 && rp < 1; r.scale.setScalar(.06 + ease.out(rp) * .8); r.material.opacity = .55 * (1 - rp); });
     crown.forEach(m => { const u = t - t1, d = m.userData; m.visible = !reduceMotion && u > 0 && u < .8; if (!m.visible) return;
       const rr = .1 + d.v * u * .55; m.position.set(Math.cos(d.a) * rr, Math.max(0, d.up * u - 3.4 * u * u), Math.sin(d.a) * rr); m.scale.setScalar(d.s * (1 - u * .7)); });
