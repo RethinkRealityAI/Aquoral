@@ -822,3 +822,20 @@ html { overflow-x: clip; }
 .orbit-panel .ic-lg:has(.cause-icon) { background: var(--sky-200); border-radius: 50%; }
 .orbit-panel .ic-lg .cause-icon { width: 36px; height: 36px; display: block; }
 @media (max-width: 860px) { .orbit-panel .ic-lg .cause-icon { width: 27px; height: 27px; } }
+
+/* Language switch (2026-11-16, fr-CA site). Header: a compact pill naming the other language (FR / EN), a real link
+   to the same page in that language. Mobile menu: English | Français control styled like the Appearance switch. */
+.lang-pill { display: inline-grid; place-items: center; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 999px; color: inherit; text-decoration: none;
+  font: 600 14px/1 var(--font-mono); letter-spacing: .08em; background: color-mix(in srgb, currentColor 7%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 16%, transparent); transition: background 180ms; -webkit-tap-highlight-color: transparent; }
+.lang-pill:hover { background: color-mix(in srgb, currentColor 13%, transparent); color: inherit; }
+.lang-pill:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 1080px) { .nav-end .lang-pill { min-width: 44px; height: 44px; padding: 0 8px; font-size: 13px; } }
+@media (max-width: 359px) { .nav-end .lang-pill { display: none; } }   /* smallest phones: the menu's Language control only */
+.lang-choice { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; color: #fff; }
+.ls-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; min-width: min(100%, 264px); border-radius: 999px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.3); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+.ls-opt { display: grid; place-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; color: #C9D6EC; text-decoration: none; font: 600 15px/1 var(--font-display); }
+a.ls-opt:hover { color: #fff; }
+a.ls-opt:focus-visible { outline: 3px solid var(--sky-300); outline-offset: 2px; }
+.ls-opt[aria-current] { background: #fff; color: var(--tide-900); box-shadow: 0 6px 16px -6px rgba(0,0,0,.5), inset 0 1px 0 #fff; }

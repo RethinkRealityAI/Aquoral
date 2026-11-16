@@ -16,6 +16,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+const T = s => (window.AQ_T && window.AQ_T[s]) || s;   // French canvas labels: site/i18n.py
 
 const root = document.documentElement;
 const canvas = document.getElementById('stage');

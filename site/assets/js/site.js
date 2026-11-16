@@ -2,6 +2,12 @@
 (() => {
   if (new URLSearchParams(location.search).has('review')) document.documentElement.classList.add('review');
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const T = (s, ...a) => ((window.AQ_T && window.AQ_T[s]) || s).replace(/\{(\d)\}/g, (_, i) => a[i]);   // French: site/i18n.py
+
+  /* Language switch: remember the choice for a year so first visits and the edge redirect follow it (lang.ts) */
+  $$('[data-lang-switch]').forEach(a => a.addEventListener('click', () => {
+    document.cookie = 'aq-lang=' + a.dataset.langSwitch + '; path=/; max-age=31536000; samesite=lax' + (location.protocol === 'https:' ? '; secure' : '');
+  }));
 
   /* Mobile menu */
   const menu = $('#mobile-menu'), openBtn = $('.menu-btn');
@@ -34,7 +40,7 @@
   const darkFor = c => c === 'dark' || (c === 'system' && sysDark.matches);
   const syncTheme = () => {
     const c = choice(), d = darkFor(c);
-    $$('[data-theme-toggle]').forEach(b => { b.setAttribute('aria-checked', String(d)); b.title = d ? 'Switch to light mode' : 'Switch to dark mode'; });
+    $$('[data-theme-toggle]').forEach(b => { b.setAttribute('aria-checked', String(d)); b.title = d ? T('Switch to light mode') : T('Switch to dark mode'); });
     $$('[data-theme-set]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themeSet === c)));
     $$('.tc-seg').forEach(s => s.style.setProperty('--i', ['system', 'light', 'dark'].indexOf(c)));
     onScroll();
@@ -102,7 +108,7 @@
   /* Order flow (placeholder checkout) */
   const order = $('[data-order]');
   if (order) {
-    const fmt = n => n.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+    const fmt = n => n.toLocaleString(document.documentElement.lang || 'en-CA', { style: 'currency', currency: 'CAD' });
     const qtyOut = $('output[name=qty]', order);
     let qty = 1;
     const update = () => {
@@ -112,7 +118,7 @@
       qtyOut.value = qty;
       $('[data-sum=sub]', order).textContent = fmt(sub);
       $('[data-sum=disc]', order).textContent = disc ? '−' + fmt(disc) : fmt(0);
-      $('[data-sum=ship]', order).textContent = sub - disc >= 75 ? 'Free' : 'Calculated at checkout';
+      $('[data-sum=ship]', order).textContent = sub - disc >= 75 ? T('Free') : T('Calculated at checkout');
       $('[data-sum=total]', order).textContent = fmt(sub - disc);
       $('[data-sum=label]', order).textContent = `${qty} × ${opt.dataset.label}`;
     };
@@ -164,7 +170,7 @@
     const img = new Image(); img.onload = () => v.classList.add('is-ready'); img.src = v.poster || v.dataset.poster;
     v.addEventListener('playing', () => v.classList.add('is-ready'));
     v.addEventListener('error', () => { if (!reduce) animFallback(v); });
-    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'viz-play'; btn.setAttribute('aria-label', 'Play animation');
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'viz-play'; btn.setAttribute('aria-label', T('Play animation'));
     btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
     btn.addEventListener('click', e => { e.stopPropagation(); v._user = true; start(v); }); v.parentElement.append(btn);
     v.parentElement.addEventListener('click', () => { if (v.paused) { v._user = true; start(v); } else { v._user = false; v._held = true; v.pause(); v.parentElement.classList.add('needs-tap'); } });
