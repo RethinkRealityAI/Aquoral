@@ -249,6 +249,7 @@ def coming_soon(h):
     body = re.sub(r'<!--.*?-->\s*', '', raw[m.end():], flags=re.S)
     body = render(body, '/')
     v = f'?v={h}'
+    stage_file = 'stage.bundle.js' if BUNDLED else 'stage.js'
     page = f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -262,7 +263,10 @@ def coming_soon(h):
 <meta name="aq-base" content="/">
 <meta name="theme-color" content="#0B1833">
 {FAVICON_LINKS.format(b="/")}
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{''.join(f'<link rel="preload" href="/assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in FONT_PRELOAD)}
+<link rel="modulepreload" href="/assets/js/{stage_file}{v}" fetchpriority="high">
+{''.join(f'<link rel="preload" href="/assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">' for n in ['bottle', 'box'])}
+<link rel="stylesheet" href="/assets/css/fonts.css{v}">
 <link rel="stylesheet" href="/assets/css/tokens.css{v}">
 <link rel="stylesheet" href="/assets/css/site.css{v}">
 <link rel="stylesheet" href="/assets/css/coming-soon.css{v}">
@@ -271,7 +275,7 @@ def coming_soon(h):
 <script>document.documentElement.classList.replace('no-js','js');setTimeout(function(){{document.documentElement.classList.add('intro-revealed')}},4000)</script>
 <div class="stage-poster" aria-hidden="true"></div><canvas id="stage" aria-hidden="true"></canvas><svg id="leaders" aria-hidden="true"></svg>
 {body.strip()}
-<script type="module" src="/assets/js/stage.js{v}"></script>
+<script type="module" src="/assets/js/{stage_file}{v}"></script>
 </body>
 </html>
 '''
