@@ -161,7 +161,7 @@
       .catch(() => { refused.add(v); if (!reduce && !v._user) animFallback(v); else v.parentElement.classList.add('needs-tap'); });
   };
   for (const v of vids) {
-    const img = new Image(); img.onload = () => v.classList.add('is-ready'); img.src = v.poster;
+    const img = new Image(); img.onload = () => v.classList.add('is-ready'); img.src = v.poster || v.dataset.poster;
     v.addEventListener('playing', () => v.classList.add('is-ready'));
     v.addEventListener('error', () => { if (!reduce) animFallback(v); });
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'viz-play'; btn.setAttribute('aria-label', 'Play animation');
@@ -249,7 +249,12 @@
 (() => {
   const v = document.querySelector('.tech-vid'); if (!v) return;
   v.muted = true;
-  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
+  /* 1.2 MB clip far below the fold: fetch it about a screen before it scrolls in, not with the first page load */
+  const load = () => { if (v.dataset.src && !v.getAttribute('src')) { v.src = v.dataset.src; v.load(); } };
+  if (!('IntersectionObserver' in window)) { load(); v.play().catch(() => {}); return; }
+  const near = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { load(); near.disconnect(); } }, { rootMargin: '120% 0px' });
+  near.observe(v);
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(); v.play().catch(() => {}); } else v.pause(); }), { rootMargin: '10% 0px' }).observe(v);
 })();
 
 /* The why (video): big play button over the poster; hands over to native controls once playing */
@@ -262,4 +267,14 @@
   v.addEventListener('ended', () => { fig.classList.remove('is-playing'); v.controls = false; v.load(); });
   // pause when scrolled well out of view so sound never plays off-screen
   new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting && !v.paused) v.pause(); }), { threshold: 0.15 }).observe(v);
+})();
+
+/* Below-the-fold video posters (about 140 KB) load when they come within a screen and a half, so on a slow phone
+   connection they no longer compete with the 3D hero for bandwidth (2026-11-16). */
+(() => {
+  const vids = [...document.querySelectorAll('video[data-poster]')]; if (!vids.length) return;
+  const set = v => { if (!v.getAttribute('poster')) v.poster = v.dataset.poster; };
+  if (!('IntersectionObserver' in window)) return vids.forEach(set);
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { set(e.target); io.unobserve(e.target); } }), { rootMargin: '150% 0px' });
+  vids.forEach(v => io.observe(v));
 })();

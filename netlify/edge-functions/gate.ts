@@ -18,7 +18,7 @@ import COMING_SOON from "../generated/coming-soon.js";
 const COOKIE = "aq_preview";
 const MAX_AGE = 60 * 60 * 24 * 180;
 /* What the Coming Soon page itself loads (identical for everyone, so these stay cacheable). */
-const PUBLIC = [/^\/assets\/css\/(tokens|site|coming-soon)\.css$/, /^\/assets\/js\/stage\.js$/, /^\/assets\/models\/(bottle|box)\.glb$/, /^\/assets\/img\/[\w.-]+$/];
+const PUBLIC = [/^\/assets\/css\/(tokens|site|coming-soon)\.css$/, /^\/assets\/js\/stage\.js$/, /^\/assets\/models\/(bottle|box)\.glb$/, /^\/assets\/img\/[\w.-]+$/, /^\/(favicon\.ico|site\.webmanifest)$/];
 const NO_STORE = { "Cache-Control": "private, no-store, max-age=0", "CDN-Cache-Control": "no-store", "Netlify-CDN-Cache-Control": "no-store", "Vary": "Cookie" };
 const SECURITY = { "X-Robots-Tag": "noindex, nofollow", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" };
 
