@@ -292,6 +292,7 @@ def build():
     def tr(key):
         e = cat.get(i18n.key_hash(key))
         if e: return e['fr']
+        if key in ('EN', 'English'): return None   # the switch back to English is meant to stay English
         missing[key] = missing.get(key, 0) + 1
     for rel, meta, body in source_pages():
         base = '../' * (len(rel.parts) - 1)

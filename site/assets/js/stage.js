@@ -562,8 +562,8 @@ async function boot() {
   const vapour = new THREE.Points(vGeo, vapMat); vapour.frustumCulled = false; vapour.renderOrder = 8.8; case3.add(vapour);
   // status chip on the case: "Moisture escaping" → "OGT film · protected"
   const chipGeo = new THREE.PlaneGeometry(.23, .23 * 96 / 720);
-  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('MOISTURE ESCAPING', { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
-  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex('OGT FILM · PROTECTED', { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipA = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('MOISTURE ESCAPING'), { w: 720, dot: '#E59AC2' }), transparent: true, depthWrite: false, toneMapped: false }));
+  const chipB = new THREE.Mesh(chipGeo, new THREE.MeshBasicMaterial({ map: textTex(T('OGT FILM · PROTECTED'), { w: 720, dot: '#A3DAF4' }), transparent: true, depthWrite: false, toneMapped: false }));
   [chipA, chipB].forEach(m => { m.position.set(-PW / 2 + .02 + .115, PH / 2 - .035, PD / 2 + .001); m.renderOrder = 10; case3.add(m); });
   const caseMats = [glassF, glassB, edgeMat, tissueMat, filmMat, dropletMat, chipA.material, chipB.material, filmEdge.material, filmEdgeGlow.material];
   caseMats.forEach(m => { m.userData.o = m.opacity; m.transparent = true; });
@@ -606,7 +606,7 @@ async function boot() {
     g.beginPath(); g.ellipse(0, -128, 13, 26, 0, 0, Math.PI * 2); g.fill(); g.restore();
     // strike-through
     g.strokeStyle = '#D42A8E'; g.lineWidth = 18; g.lineCap = 'round'; g.beginPath(); g.moveTo(m - 120, m + 110); g.lineTo(m + 120, m - 140); g.stroke();
-    g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('GLUTEN FREE', m, m + 168);
+    g.fillStyle = '#13306B'; g.font = '600 50px "Geist Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(T('GLUTEN FREE'), m, m + 168);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
   const BR = .068, BS = isPhone ? 1.05 : 1.2;
   const coinFace = new THREE.MeshPhysicalMaterial({ map: badgeTex, roughness: .3, clearcoat: 1, clearcoatRoughness: .08, envMapIntensity: 1, transparent: true });

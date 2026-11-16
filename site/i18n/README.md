@@ -49,7 +49,23 @@ Audience: Canadian consumers (largely Quebec). Use clear, warm, plain French; ad
 This is a health product: translate faithfully, never add, strengthen or drop a claim, and keep every hedge
 (*may* → *peut*, *can help* → *peut aider*). Keep regulatory notes and disclaimers complete.
 
-**Official label wording (bilingual box, use exactly):**
+**Official label wording.** The Canadian carton (`/mnt/project-files/brand/Aquoral-Box-Canada-3.pdf`, 2026-11) wins
+over the earlier bilingual sticker wherever they differ:
+
+| English (carton) | French (carton) |
+| --- | --- |
+| Artificial saliva spray (product name) | Vaporisateur de salive artificielle |
+| Relieves symptoms of dry mouth (Xerostomia) | Soulage les symptômes de la sécheresse buccale (xérostomie) |
+| Lipid-based formula | Formule à base de lipides |
+| Gluten Free | Sans gluten |
+| Made in France | Fabriqué en France |
+| Net contents: 2 × 10 mL, 2 canisters | Contenu net : 2 × 10 mL, 2 flacons |
+| Caution – see directions for use / Flammable / Storage | Attention – Consulter le mode d’emploi / Inflammable / Conservation |
+| Directions for use: 1. Shake gently. 2. Prime pump before first use if needed. 3. Spray one dose (2 sprays) into the mouth, up to 4 times a day (as needed). 4. Spread over dry or inflamed areas with the tongue. | Mode d’emploi : 1. Agiter doucement. 2. Amorcer la pompe avant la première utilisation si nécessaire. 3. Pulvériser une dose (2 vaporisations) dans la bouche, jusqu’à 4 fois par jour (au besoin). 4. Répartir avec la langue sur les zones sèches ou enflammées de la bouche. |
+| Safety: Read the package insert before use. Do not use if allergic to any ingredient. Avoid eye contact. If contact occurs, rinse with water. Keep out of reach of children. | Précautions : Lire la notice avant utilisation. Ne pas utiliser en cas d’allergie à un ingrédient. Éviter le contact avec les yeux. En cas de contact, rincer à l’eau. Tenir hors de portée des enfants. |
+| Ingredients: Oxidized glycerol triesters, silicon dioxide, aspartame, artificial flavoring. | Ingrédients : Triesters de glycérol oxydés, dioxyde de silicium, aspartame, arôme artificiel. |
+
+Earlier bilingual sticker (use only for lines the carton does not cover):
 
 | English | French |
 | --- | --- |
@@ -75,13 +91,14 @@ This is a health product: translate faithfully, never add, strengthen or drop a 
 
 | English | French |
 | --- | --- |
-| Aquoral, Aquoral Canada, OGT, Institut Pasteur | unchanged |
-| Aquoral Protective Oral Spray / protective oral spray | vaporisateur buccal protecteur Aquoral / vaporisateur buccal protecteur |
-| dry mouth / xerostomia | bouche sèche / xérostomie |
+| Aquoral, Aquoral Canada, Institut Pasteur | unchanged |
+| OGT (oxidized glycerol triesters) | TGO (triesters de glycérol oxydés), the French acronym |
+| Aquoral Protective Oral Spray / protective oral spray / artificial saliva spray | vaporisateur de salive artificielle Aquoral / vaporisateur buccal protecteur (descriptive) |
+| dry mouth / xerostomia | bouche sèche in consumer copy; sécheresse buccale in label/claim lines (as on the carton) / xérostomie |
 | hyposalivation | hyposalivation |
 | saliva, salivary glands | salive, glandes salivaires |
 | spray (one puff) / 2 sprays / to spray | vaporisation / 2 vaporisations / vaporiser |
-| canister | cartouche |
+| canister | flacon (as on the carton: « 2 flacons ») |
 | box | boîte |
 | lipid film / protective film | film lipidique / film protecteur |
 | moisturize, moisture | hydrater, hydratation (humidité for the air/room) |

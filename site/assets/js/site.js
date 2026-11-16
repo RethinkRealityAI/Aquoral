@@ -1,8 +1,8 @@
 /* Aquoral Canada: shared page behaviour (menu, reveals, orbit panel, order flow). No dependencies. */
+const T = (s, ...a) => ((window.AQ_T && window.AQ_T[s]) || s).replace(/\{(\d)\}/g, (_, i) => a[i]);   // French: site/i18n.py
 (() => {
   if (new URLSearchParams(location.search).has('review')) document.documentElement.classList.add('review');
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const T = (s, ...a) => ((window.AQ_T && window.AQ_T[s]) || s).replace(/\{(\d)\}/g, (_, i) => a[i]);   // French: site/i18n.py
 
   /* Language switch: remember the choice for a year so first visits and the edge redirect follow it (lang.ts) */
   $$('[data-lang-switch]').forEach(a => a.addEventListener('click', () => {

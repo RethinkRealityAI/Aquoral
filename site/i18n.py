@@ -16,7 +16,7 @@ Commands (run from the repo root or site/)
   python3 site/i18n.py todo              Write site/i18n/todo/*.json: every missing segment with "fr": "" to fill in,
                                          and the closest old (now unused) translation as a hint when English was edited.
   python3 site/i18n.py check FILE...    Validate filled-in todo files without merging them.
-  python3 site/i18n.py merge             Validate filled-in todo files (placeholders, non-empty) and merge into the catalog.
+  python3 site/i18n.py merge [FILE...]            Validate filled-in todo files (placeholders, non-empty) and merge into the catalog.
   python3 site/i18n.py prune             Remove unused catalog entries (after merge, once the hints are no longer needed).
 
 Placeholders in a segment: <1>...</1> wraps an inline element (link, bold, span), <2/> stands for a void element
@@ -259,10 +259,10 @@ def todo():
         (TODO / name).write_text(json.dumps(entries, ensure_ascii=False, indent=1))
     print(f'wrote {sum(len(g) for g in groups.values())} strings in {len(groups)} files to {TODO}')
 
-def merge():
+def merge(files=None):
     CAT.mkdir(parents=True, exist_ok=True)
     bad = 0; merged = 0
-    for f in sorted(TODO.glob('*.json')):
+    for f in ([TODO / pathlib.Path(x).name for x in files] if files else sorted(TODO.glob('*.json'))):
         entries = json.loads(f.read_text())
         dest = CAT / f.name
         cat = json.loads(dest.read_text()) if dest.exists() else {}
@@ -309,5 +309,5 @@ def prune():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'status'
-    {'status': lambda: status('--strict' in sys.argv), 'todo': todo, 'merge': merge, 'prune': prune,
+    {'status': lambda: status('--strict' in sys.argv), 'todo': todo, 'merge': lambda: merge(sys.argv[2:]), 'prune': prune,
      'check': lambda: check(sys.argv[2:])}[cmd]()

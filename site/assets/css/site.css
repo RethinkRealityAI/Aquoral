@@ -835,7 +835,19 @@ html { overflow-x: clip; }
 .lang-choice { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; color: #fff; }
 .ls-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; min-width: min(100%, 264px); border-radius: 999px;
   background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.3); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
-.ls-opt { display: grid; place-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; color: #C9D6EC; text-decoration: none; font: 600 15px/1 var(--font-display); }
-a.ls-opt:hover { color: #fff; }
-a.ls-opt:focus-visible { outline: 3px solid var(--sky-300); outline-offset: 2px; }
-.ls-opt[aria-current] { background: #fff; color: var(--tide-900); box-shadow: 0 6px 16px -6px rgba(0,0,0,.5), inset 0 1px 0 #fff; }
+.mobile-menu .ls-opt { display: grid; place-items: center; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; color: #C9D6EC; text-decoration: none; font: 600 15px/1 var(--font-display); letter-spacing: 0; }
+.mobile-menu a.ls-opt:hover { color: #fff; }
+.mobile-menu a.ls-opt:focus-visible { outline: 3px solid var(--sky-300); outline-offset: 2px; }
+.mobile-menu .ls-opt[aria-current] { background: #fff; color: var(--tide-900); box-shadow: 0 6px 16px -6px rgba(0,0,0,.5), inset 0 1px 0 #fff; }
+/* Phones: French "Commander" is wider than "Order", so the header drops the arrow and tightens up to keep logo, EN/FR,
+   Order and menu on one row (checked at 360-430 px) */
+@media (max-width: 440px) {
+  .nav-end { gap: 8px; }
+  .nav-end .nav-order { padding: 0 14px; }
+  .nav-end .nav-order svg { display: none; }
+  .nav-end .lang-pill { min-width: 40px; height: 40px; padding: 0 6px; }
+}
+/* Longer French labels ("Évaluation gratuite") wrap inside the two hero buttons instead of pushing the page wider */
+@media (max-width: 860px) { .hero-cta .btn { min-width: 0; white-space: normal; text-align: center; line-height: 1.15; } }
+/* Phones: long button labels (French especially) wrap instead of running off the screen */
+@media (max-width: 560px) { .btn { white-space: normal; text-align: center; max-width: 100%; } }
