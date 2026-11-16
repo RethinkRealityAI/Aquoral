@@ -112,6 +112,13 @@ def layout(meta, body, base):
                      + ('' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/models/{n}.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">' for n in ['bottle', 'box']))
                      ) if stage else ''
     font_preload = '' if ARTIFACT else ''.join(f'<link rel="preload" href="{base}assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in FONT_PRELOAD)
+    # Inner-page hero: liquid-glass panel with a real-time 3D droplet (assets/js/drop.js, css/page-hero.css)
+    page_hero = 'class="page-hero' in body
+    if page_hero:
+        body = re.sub(r'(<section class="page-hero"[^>]*>)', r'\1<div class="ph-fx" aria-hidden="true"><canvas></canvas></div><div class="ph-anchor" aria-hidden="true"></div>', body, count=1)
+    hero_css = f'<link rel="stylesheet" href="{base}assets/css/page-hero.css">' if page_hero else ''
+    drop_file = 'drop.bundle.js' if BUNDLED else 'drop.js'
+    hero_js = f'<script type="module" src="{base}assets/js/{drop_file}"></script>' if page_hero else ''
     return f'''<!doctype html>
 <html lang="en-CA" class="no-js">
 <head>
@@ -129,6 +136,7 @@ def layout(meta, body, base):
 {'' if ARTIFACT else f'<link rel="stylesheet" href="{base}assets/css/fonts.css">'}
 <link rel="stylesheet" href="{base}assets/css/tokens.css">
 <link rel="stylesheet" href="{base}assets/css/site.css">
+{hero_css}
 {models}
 </head>
 <body class="{"has-stage" if stage else ""} {meta.get("bodyClass", "")}">
@@ -170,6 +178,7 @@ def layout(meta, body, base):
 </footer>
 <script src="{base}assets/js/site.js" defer></script>
 {stage_js}
+{hero_js}
 </body>
 </html>
 '''
@@ -184,9 +193,10 @@ def bundle_stage():
     if not ESBUILD.exists():
         print('WARNING: esbuild not installed (run npm install); using unbundled stage.js + CDN three.js')
         return
-    out = DIST / 'assets' / 'js' / 'stage.bundle.js'
-    subprocess.run([str(ESBUILD), str(HERE / 'assets' / 'js' / 'stage.js'), '--bundle', '--format=esm', '--minify',
-                    '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
+    for name in ['stage', 'drop']:   # homepage stage and the inner-page hero droplet
+        out = DIST / 'assets' / 'js' / f'{name}.bundle.js'
+        subprocess.run([str(ESBUILD), str(HERE / 'assets' / 'js' / f'{name}.js'), '--bundle', '--format=esm', '--minify',
+                        '--target=es2020', '--legal-comments=none', f'--outfile={out}', '--log-level=warning'], check=True)
     BUNDLED = True
 
 def build():
