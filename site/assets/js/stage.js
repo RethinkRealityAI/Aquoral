@@ -861,8 +861,8 @@ async function boot() {
   /* Intro timeline (~2.5 s) */
   /* delay: the canvas fades in over 350 ms (site.css), so the drop appears once the stage is fully visible instead of
      falling through the fade (Dapo 2026-11-16: drop should start sooner and run smoother). It forms at the top first. */
-  const T = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };
-  const t0 = T.delay, t1 = t0 + T.fall, t2 = t1 + T.splash * .4, t3 = t2 + T.build, t4 = t3 + T.solidify, t5 = t4 + T.pop, t6 = t4 + T.box;
+  const TL = { delay: root.classList.contains('stage-live') ? .1 : .3, form: .22, fall: .62, splash: .2, build: .85, solidify: .45, pop: .4, box: .7 };   // intro timeline (s). Not T: that is the translation helper
+  const t0 = TL.delay, t1 = t0 + TL.fall, t2 = t1 + TL.splash * .4, t3 = t2 + TL.build, t4 = t3 + TL.solidify, t5 = t4 + TL.pop, t6 = t4 + TL.box;
   let intro = 0, playing = false, introDone = false, splashAt = -1;
   const boxIntro = { k: 1 };
   function setBoxFade(k) {
@@ -873,12 +873,12 @@ async function boot() {
     const f = seg(t, t0, t1);
     droplet.visible = t >= t0 && t < t2 + .05;
     /* forms (swells in with a soft wobble) during the first part, then falls under gravity */
-    const fm = seg(t, t0, t0 + T.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + T.form * .6, t1));
+    const fm = seg(t, t0, t0 + TL.form), grow = ease.back(fm), fall = ease.in(seg(t, t0 + TL.form * .6, t1));
     droplet.position.set(0, lerp(1.45, .06, fall), 0);
     const st = 1 + fall * .22, wob = 1 + Math.sin(fm * Math.PI * 2) * .06 * (1 - fm);
     droplet.scale.set(grow / Math.sqrt(st) * wob, grow * st / wob, grow / Math.sqrt(st) * wob);
     dropMat.color.copy(DROP_A).lerp(DROP_B, seg(t, t1 - .05, t1 + .2));
-    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + T.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
+    if (t >= t1) { const sq = ease.out(seg(t, t1, t1 + TL.splash)); droplet.scale.set(1 + sq * 2.2, Math.max(.05, 1 - sq * .95), 1 + sq * 2.2); droplet.position.y = .06 * (1 - sq) + .006; }
     ripples.forEach(r => { const rp = seg(t, t1 + r.userData.delay, t1 + r.userData.delay + 1.2); r.visible = rp > 0 && rp < 1; r.scale.setScalar(.06 + ease.out(rp) * .8); r.material.opacity = .55 * (1 - rp); });
     crown.forEach(m => { const u = t - t1, d = m.userData; m.visible = !reduceMotion && u > 0 && u < .8; if (!m.visible) return;
       const rr = .1 + d.v * u * .55; m.position.set(Math.cos(d.a) * rr, Math.max(0, d.up * u - 3.4 * u * u), Math.sin(d.a) * rr); m.scale.setScalar(d.s * (1 - u * .7)); });
