@@ -142,7 +142,7 @@ def layout(meta, body, base, lang='en', rel='index.html'):
     alt_href = re.sub(r'(^|/)index\.html$', r'\1', alt_href) or './'
     js_t = (f'<script>window.AQ_T={json.dumps(i18n.load_js_catalog(), ensure_ascii=False)};</script>') if fr else ''
     nav_links = ''.join(f'<li><a href="{base}{href}"{" aria-current=\"page\"" if meta.get("nav") == key else ""}>{label}</a></li>' for key, label, href in NAV)
-    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}assessment.html">Free assessment</a></li><li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
+    mobile_links = ''.join(f'<li><a href="{base}{href}">{label}</a></li>' for key, label, href in NAV) + f'<li><a href="{base}assessment.html">Check my dry mouth</a></li><li><a href="{base}order.html">Order Aquoral</a></li><li><a href="{base}contact.html">Contact</a></li>'
     stage = meta.get('stage')
     models = f'<script src="{base}assets/js/models.js"></script>' if (stage and ARTIFACT) else ''
     stage_html = ('<div class="stage-poster" aria-hidden="true"><span class="loader"></span></div>'
